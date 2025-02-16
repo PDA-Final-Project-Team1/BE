@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
+#          filters:
+#            - RewritePath=/api/user(?<remaining>/?.*), $<remaining>
+#               ㄴ 만약 /api/user/list 요청이 /list 로 라우팅되도록 설정하는 값
+
+#          - id: test-service
+#            uri: lb://TEST-SERVICE
+#            predicates:
+#              - Path=/api/test/**
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka

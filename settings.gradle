@@ -1,6 +1,7 @@
 rootProject.name = 'BE'
 
-//include '하위모듈1'
-//include '하위모듈2'
+include 'api-gateway'
+include 'eureka'
+include 'common'
 //include '하위모듈3'
 //include '하위모듈4'
