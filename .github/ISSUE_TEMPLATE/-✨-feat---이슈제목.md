@@ -1,7 +1,7 @@
 ---
 name: "[✨ Feat]: 이슈제목"
 about: 'HOTSIX - Feat 이슈 생성 템플릿 '
-title: ''
+title: "[✨ Feat]: 이슈제목"
 labels: "✨ Feat"
 assignees: ''
 

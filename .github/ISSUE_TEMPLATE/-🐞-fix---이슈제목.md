@@ -1,7 +1,7 @@
 ---
 name: "[\U0001F41E Fix]: 이슈제목"
 about: 'HOTSIX - Fix 이슈 생성 템플릿 '
-title: ''
+title: "[\U0001F41E Fix]: 이슈제목"
 labels: "\U0001F41E Fix"
 assignees: ''
 

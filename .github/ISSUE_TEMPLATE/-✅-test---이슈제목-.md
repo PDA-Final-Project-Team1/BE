@@ -1,7 +1,7 @@
 ---
 name: "[✅ Test]: 이슈제목 "
 about: HOTSIX - Test 이슈 생성 템플릿
-title: ''
+title: "[✅ Test]: 이슈제목 "
 labels: "✅ Test"
 assignees: ''
 

@@ -1,7 +1,7 @@
 ---
 name: "[\U0001F9F9 Chore]: 이슈제목 "
 about: HOTSIX - Chore 이슈 생성 템플릿
-title: ''
+title: "[\U0001F9F9 Chore]: 이슈제목 "
 labels: "\U0001F9F9 Chore"
 assignees: ''
 

@@ -1,7 +1,7 @@
 ---
 name: "[\U0001F4C3 Docs]: 이슈제목 "
 about: HOTSIX - Docs 이슈 생성 템플릿
-title: ''
+title: "[\U0001F4C3 Docs]: 이슈제목 "
 labels: "\U0001F4C3 Docs"
 assignees: ''
 
