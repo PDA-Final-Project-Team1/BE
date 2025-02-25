@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ET-api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
+#          filters:
+#            - RewritePath=/api/user(?<remaining>/?.*), $<remaining>
+#               ? ?? /api/user/list ??? /list ? ?????? ???? ?
+
+#          - id: test-service
+#            uri: lb://TEST-SERVICE
+#            predicates:
+#              - Path=/api/test/**
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
