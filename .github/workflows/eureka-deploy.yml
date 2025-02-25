@@ -1,4 +1,4 @@
-name: Deploy Eureka (Manual Trigger)
+name: Deploy Eureka Trigger
 
 on:
   workflow_dispatch:

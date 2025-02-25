@@ -1,4 +1,4 @@
-name: Deploy Eureka (Manual Trigger)
+name: Deploy API-gateway Trigger
 
 on:
   workflow_dispatch:
