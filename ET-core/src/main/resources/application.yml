@@ -1,0 +1,22 @@
+spring:
+  config:
+    import: optional:file:ET-core/.env[.properties]
+  application:
+    name: ET-core
+  datasource:
+    url: jdbc:mysql://${CORE_DB_HOST}:${CORE_DB_PORT}/${CORE_DB}
+    username: ${CORE_DB_USER}
+    password: ${CORE_DB_PWD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+  port: 8082
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKA_HOST}:8761/eureka

@@ -1,0 +1,24 @@
+<configuration>
+    <property name="MODULE_NAME" value="Pipeline_Module" />
+
+    <!-- 콘솔 출력 Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 파일 출력 Appender -->
+    <appender name="MODULE_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/${MODULE_NAME}.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 루트 로거에 두 Appender 모두 추가 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="MODULE_FILE"/>
+    </root>
+</configuration>

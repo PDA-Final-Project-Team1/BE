@@ -1,0 +1,9 @@
+rootProject.name = 'BE'
+
+include 'ET-api-gateway'
+include 'ET-eureka'
+include 'ET-common'
+include 'ET-user'
+include 'ET-core'
+include 'ET-arcade'
+include 'ET-pipeline'

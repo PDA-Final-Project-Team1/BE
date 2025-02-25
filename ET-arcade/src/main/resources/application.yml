@@ -1,0 +1,22 @@
+spring:
+  config:
+    import: optional:file:ET-arcade/.env[.properties]
+  application:
+    name: ET-arcade
+  datasource:
+    url: jdbc:mysql://${ARCADE_DB_HOST}:${ARCADE_DB_PORT}/${ARCADE_DB}
+    username: ${ARCADE_DB_USER}
+    password: ${ARCADE_DB_PWD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+  port: 8083
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKA_HOST}:8761/eureka
