@@ -1,3 +1,6 @@
 spring:
   application:
     name: ET-pipeline
+
+server:
+  port: 8084
