@@ -36,7 +36,7 @@ jobs:
           context: ./ET-api-gateway
           file: ./ET-api-gateway/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ET-api-gateway:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
 
       - name: Deploy Eureka
         uses: appleboy/ssh-action@v0.1.7
@@ -51,8 +51,8 @@ jobs:
             echo "EUREKA_HOST=${{ secrets.EUREKA_HOST }}" >> .env
             
             # 도커 이미지 pull
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ET-api-gateway:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
             docker rm -f ET-api-gateway || true
-            docker run -d --name ET-api-gateway --env-file .env -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/ET-api-gateway:latest
+            docker run -d --name ET-api-gateway --env-file .env -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
 
 

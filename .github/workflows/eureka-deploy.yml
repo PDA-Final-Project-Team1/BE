@@ -36,7 +36,7 @@ jobs:
           context: ./ET-eureka
           file: ./ET-eureka/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ET-eureka:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/et-eureka:latest
 
       - name: Create .env and Deploy Eureka
         uses: appleboy/ssh-action@v0.1.7
@@ -47,8 +47,8 @@ jobs:
           script: |
             cd /home/ubuntu
             
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ET-eureka:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-eureka:latest
             docker rm -f ET-eureka || true
-            docker run -d --name ET-eureka -p 8761:8761 ${{ secrets.DOCKERHUB_USERNAME }}/ET-eureka:latest
+            docker run -d --name ET-eureka -p 8761:8761 ${{ secrets.DOCKERHUB_USERNAME }}/et-eureka:latest
 
 
