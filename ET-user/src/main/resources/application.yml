@@ -1,10 +1,12 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: ET-user
   datasource:
-    url: jdbc:mysql://localhost:3306/user
-    username: root
-    password: 1234
+    url: jdbc:mysql://${USER_DB_HOST}:${USER_DB_PORT}/${USER_DB}
+    username: ${USER_DB_USER}
+    password: ${USER_DB_PWD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -18,4 +20,4 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://${EUREKA_HOST}:8761/eureka

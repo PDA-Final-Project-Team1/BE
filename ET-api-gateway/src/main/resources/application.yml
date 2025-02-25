@@ -2,25 +2,29 @@ server:
   port: 8080
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: ET-api-gateway
   cloud:
     gateway:
       routes:
-        - id: user-service
-          uri: lb://USER-SERVICE
+        - id: USER-SERVICE
+          uri: lb://ET-user
           predicates:
-            - Path=/api/users/**
-#          filters:
-#            - RewritePath=/api/user(?<remaining>/?.*), $<remaining>
-#               ? ?? /api/user/list ??? /list ? ?????? ???? ?
+            - Path=/api/users/**, /api/friends/**
 
-#          - id: test-service
-#            uri: lb://TEST-SERVICE
-#            predicates:
-#              - Path=/api/test/**
+        - id: CORE-SERVICE
+          uri: lb://ET-core
+          predicates:
+            - Path=/api/stocks/**, /api/charts/**, /api/trades/**
+
+        - id: ARCADE-SERVICE
+          uri: lb://ET-arcade
+          predicates:
+            - Path=/api/pets/**, /api/quizs/**, /api/eggs/**
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://${EUREKA_HOST}:8761/eureka
