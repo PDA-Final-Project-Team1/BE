@@ -45,6 +45,6 @@ jobs:
             
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
             docker rm -f ET-api-gateway || true
-            docker run -d --name ET-api-gateway --env-file .env -p 8761:8761 ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
+            docker run -d --name ET-api-gateway --env-file .env -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
 
 
