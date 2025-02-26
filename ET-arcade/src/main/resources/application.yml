@@ -20,3 +20,13 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://${EUREKA_HOST}:8761/eureka
+
+#feign:
+#  client:
+#    config:
+#      default:
+#        connectTimeout: 5000
+#        readTimeout: 5000
+#        loggerLevel: full
+
+
