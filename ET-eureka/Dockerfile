@@ -1,12 +1,15 @@
-FROM openjdk:17-jdk-slim
+# 1단계: 빌드 단계
+FROM gradle:7.6-jdk17 AS builder
+WORKDIR /workspace
+COPY . ./
 
-VOLUME /tmp
+# 1) 특정 모듈(ET-eureka)만 빌드
+RUN gradle :ET-eureka:clean :ET-eureka:build --no-daemon
+
+# 2단계: 실행 단계
+FROM openjdk:17-slim
+WORKDIR /app
+COPY --from=builder /workspace/ET-eureka/build/libs/*.jar app.jar
 
 EXPOSE 8761
-
-ARG JAR_FILE=build/libs/*.jar
-
-COPY ${JAR_FILE} eureka.jar
-
-# 컨테이너 시작 시 JAR 파일을 실행
-ENTRYPOINT ["java", "-jar", "/eureka.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
