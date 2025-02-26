@@ -1,12 +1,15 @@
-FROM openjdk:17-jdk-gslim
+# 1단계: 빌드 단계
+FROM gradle:7.6-jdk17 AS builder
+WORKDIR /workspace
+COPY . ./
 
-VOLUME /tmp
+# 1) 특정 모듈(ET-eureka)만 빌드
+RUN gradle :ET-api-gatewway:clean :ET-api-gatewway:build --no-daemon
 
-EXPOSE 8080
+# 2단계: 실행 단계
+FROM openjdk:17-slim
+WORKDIR /app
+COPY --from=builder /workspace/ET-eureka/build/libs/*.jar app.jar
 
-ARG JAR_FILE=build/libs/*.jar
-
-COPY ${JAR_FILE} api-gateway.jar
-
-# 컨테이너 시작 시 JAR 파일을 실행
-ENTRYPOINT ["java", "-jar", "/api-gateway.jar"]
+EXPOSE 8761
+ENTRYPOINT ["java", "-jar", "app.jar"]

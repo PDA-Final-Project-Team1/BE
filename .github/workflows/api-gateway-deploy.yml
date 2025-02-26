@@ -17,13 +17,6 @@ jobs:
         uses: actions/checkout@v3
         # Github 소스 가져오기
 
-#      - name: Set up JDK
-#        uses: actions/setup-java@v3
-#        with:
-#          distribution: 'corretto'
-#          java-version: '17'
-
-      # 도커 로그인
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -33,7 +26,7 @@ jobs:
       - name: Build and Push Api Gateway Image
         uses: docker/build-push-action@v3
         with:
-          context: ./ET-api-gateway
+          context: .
           file: ./ET-api-gateway/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
@@ -48,7 +41,28 @@ jobs:
             cd /home/ubuntu
             
             # .env 파일 생성
+#            echo "USER_DB_HOST=${{ secrets. }}" >> .env
+#            echo "USER_DB_PORT=${{ secrets. }}" >> .env
+#            echo "USER_DB=${{ secrets. }}" >> .env
+#            echo "USER_DB_USER=${{ secrets. }}" >> .env
+#            echo "USER_DB_PWD=${{ secrets. }}" >> .env
+#
+#            echo "CORE_DB_HOST=${{ secrets. }}" >> .env
+#            echo "CORE_DB_PORT=${{ secrets. }}" >> .env
+#            echo "CORE_DB=${{ secrets. }}" >> .env
+#            echo "CORE_DB_USER=${{ secrets. }}" >> .env
+#            echo "CORE_DB_PWD=${{ secrets. }}" >> .env
+#
+#            echo "ARCADE_DB_HOST=${{ secrets. }}" >> .env
+#            echo "ARCADE_DB_PORT=${{ secrets. }}" >> .env
+#            echo "ARCADE_DB=${{ secrets. }}" >> .env
+#            echo "ARCADE_DB_USER=${{ secrets. }}" >> .env
+#            echo "ARCADE_DB_PWD=${{ secrets. }}" >> .env
+            
             echo "EUREKA_HOST=${{ secrets.EUREKA_HOST }}" >> .env
+            
+#            echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
+#            echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env
             
             # 도커 이미지 pull
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
