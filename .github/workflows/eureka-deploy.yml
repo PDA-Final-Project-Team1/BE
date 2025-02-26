@@ -33,7 +33,7 @@ jobs:
       - name: Build and Push Eureka Image
         uses: docker/build-push-action@v3
         with:
-          context: ./ET-eureka
+          context: .
           file: ./ET-eureka/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/et-eureka:latest
