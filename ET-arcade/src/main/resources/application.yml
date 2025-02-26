@@ -1,6 +1,6 @@
 spring:
   config:
-    import: optional:file:.env[.properties]
+    import: optional:file:ET-arcade/.env[.properties]
   application:
     name: ET-arcade
   datasource:

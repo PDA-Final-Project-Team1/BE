@@ -43,6 +43,9 @@ subprojects {
 }
 
 project(':ET-api-gateway') {
+    bootJar.enabled = true
+    jar.enabled = false
+
     ext {
         set('springCloudVersion', "2024.0.0")
     }
@@ -60,6 +63,9 @@ project(':ET-api-gateway') {
 }
 
 project(':ET-eureka') {
+    bootJar.enabled = true
+    jar.enabled = false
+
     ext {
         set('springCloudVersion', "2024.0.0")
     }
@@ -89,6 +95,9 @@ project(':ET-common') {
 }
 
 project(':ET-user') {
+    bootJar.enabled = true
+    jar.enabled = false
+
     ext {
         set('springCloudVersion', "2024.0.0")
     }
@@ -111,6 +120,9 @@ project(':ET-user') {
 }
 
 project(':ET-core') {
+    bootJar.enabled = true
+    jar.enabled = false
+
     ext {
         set('springCloudVersion', "2024.0.0")
     }
@@ -133,6 +145,9 @@ project(':ET-core') {
 }
 
 project(':ET-arcade') {
+    bootJar.enabled = true
+    jar.enabled = false
+
     ext {
         set('springCloudVersion', "2024.0.0")
     }

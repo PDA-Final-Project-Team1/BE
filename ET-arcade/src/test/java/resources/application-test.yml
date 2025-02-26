@@ -1,21 +1,20 @@
 spring:
   config:
-    import: optional:file:ET-user/.env[.properties]
+    import: optional:file:.env[.properties]
   application:
-    name: ET-user
+    name: ET-arcade
   datasource:
-    url: jdbc:mysql://${USER_DB_HOST}:${USER_DB_PORT}/${USER_DB}
-    username: ${USER_DB_USER}
-    password: ${USER_DB_PWD}
+    url: jdbc:mysql://${ARCADE_DB_HOST}:${ARCADE_DB_PORT}/${ARCADE_DB}
+    username: ${ARCADE_DB_USER}
+    password: ${ARCADE_DB_PWD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
 
-
 server:
-  port: 8081
+  port: 8083
 
 eureka:
   client:

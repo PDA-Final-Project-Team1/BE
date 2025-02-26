@@ -27,8 +27,4 @@ public class Friend {
     @ManyToOne
     @JoinColumn(name = "user_id2", referencedColumnName = "id")
     private User user2;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private State state;
 }
