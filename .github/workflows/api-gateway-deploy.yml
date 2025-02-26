@@ -1,4 +1,4 @@
-name: Deploy API-gateway Trigger
+name: Deploy Gateway Trigger
 
 on:
   workflow_dispatch:
@@ -22,8 +22,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+          # 도커 로그인
 
-      - name: Build and Push Api Gateway Image
+      - name: Build and Push Eureka Image
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -34,39 +35,16 @@ jobs:
       - name: Create .env and Deploy Eureka
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.API_GATEWAY_HOST }}
-          username: ${{ secrets.API_GATEWAY _USER }}
-          key: ${{ secrets.AWS_SSH_KEY }}
+          host: ${{ secrets.API_GATEWAY_HOST }}      # Eureka가 배포될 Public 서버 주소
+          username: ${{ secrets.API_GATEWAY_USER }}    # 해당 서버의 SSH 사용자명
+          key: ${{ secrets.AWS_SSH_KEY }}      # SSH 접속용 비밀키
           script: |
             cd /home/ubuntu
             
-            # .env 파일 생성
-#            echo "USER_DB_HOST=${{ secrets. }}" >> .env
-#            echo "USER_DB_PORT=${{ secrets. }}" >> .env
-#            echo "USER_DB=${{ secrets. }}" >> .env
-#            echo "USER_DB_USER=${{ secrets. }}" >> .env
-#            echo "USER_DB_PWD=${{ secrets. }}" >> .env
-#
-#            echo "CORE_DB_HOST=${{ secrets. }}" >> .env
-#            echo "CORE_DB_PORT=${{ secrets. }}" >> .env
-#            echo "CORE_DB=${{ secrets. }}" >> .env
-#            echo "CORE_DB_USER=${{ secrets. }}" >> .env
-#            echo "CORE_DB_PWD=${{ secrets. }}" >> .env
-#
-#            echo "ARCADE_DB_HOST=${{ secrets. }}" >> .env
-#            echo "ARCADE_DB_PORT=${{ secrets. }}" >> .env
-#            echo "ARCADE_DB=${{ secrets. }}" >> .env
-#            echo "ARCADE_DB_USER=${{ secrets. }}" >> .env
-#            echo "ARCADE_DB_PWD=${{ secrets. }}" >> .env
-            
             echo "EUREKA_HOST=${{ secrets.EUREKA_HOST }}" >> .env
             
-#            echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
-#            echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env
-            
-            # 도커 이미지 pull
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
             docker rm -f ET-api-gateway || true
-            docker run -d --name ET-api-gateway --env-file .env -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
+            docker run -d --name ET-api-gateway -p 8761:8761 ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
 
 
