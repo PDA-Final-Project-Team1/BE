@@ -13,9 +13,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class FriendId implements Serializable {
-    @Column(name = "subscriber_id", nullable = false) // 구독하는 사람
-    private Long subscriberId;
+    @Column(name = "user_id1", nullable = false)
+    private Long userId1;
 
-    @Column(name = "subscribed_id", nullable = false) // 구독 대상
-    private Long subscribedId;
+    @Column(name = "user_id2", nullable = false)
+    private Long userId2;
 }

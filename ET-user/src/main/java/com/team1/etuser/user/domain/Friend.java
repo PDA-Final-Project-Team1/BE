@@ -16,16 +16,15 @@ public class Friend {
     @EmbeddedId
     private FriendId friendId;
 
-    // subscriberId에 해당하는 User 엔티티 (구독하는 사람)
-    @MapsId("subscriberId")
+    // user_id1에 대응하는 User 엔티티
+    @MapsId("userId1")
     @ManyToOne
-    @JoinColumn(name = "subscriber_id", referencedColumnName = "id")
-    private User subscriber;
+    @JoinColumn(name = "user_id1", referencedColumnName = "id")
+    private User user1;
 
-    // subscribedId에 해당하는 User 엔티티 (구독 대상)
-    @MapsId("subscribedId")
+    // user_id2에 대응하는 User 엔티티
+    @MapsId("userId2")
     @ManyToOne
-    @JoinColumn(name = "subscribed_id", referencedColumnName = "id")
-    private User subscribed;
+    @JoinColumn(name = "user_id2", referencedColumnName = "id")
+    private User user2;
 }
-
