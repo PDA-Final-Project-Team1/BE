@@ -9,7 +9,7 @@ RUN gradle :ET-api-gatewway:clean :ET-api-gatewway:build --no-daemon
 # 2단계: 실행 단계
 FROM openjdk:17-slim
 WORKDIR /app
-COPY --from=builder /workspace/ET-eureka/build/libs/*.jar app.jar
+COPY --from=builder /workspace/ET-api-gateway/build/libs/*.jar app.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
