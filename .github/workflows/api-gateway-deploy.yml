@@ -10,7 +10,7 @@ on:
       - 'ET-api-gateway/**'
 
 jobs:
-  deploy-eureka:
+  deploy-api-gateway:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -31,12 +31,12 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
 
-      - name: Deploy Eureka
+      - name: Create .env and Deploy Eureka
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.API_GATEWAY_HOST }}      # Eureka가 배포될 Public 서버 주소
-          username: ${{ secrets.API_GATEWAY_USER }}    # 해당 서버의 SSH 사용자명
-          key: ${{ secrets.AWS_SSH_KEY }}      # SSH 접속용 비밀키
+          host: ${{ secrets.API_GATEWAY_HOST }}
+          username: ${{ secrets.API_GATEWAY _USER }}
+          key: ${{ secrets.AWS_SSH_KEY }}
           script: |
             cd /home/ubuntu
             
