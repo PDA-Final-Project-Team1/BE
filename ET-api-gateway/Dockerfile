@@ -4,7 +4,7 @@ WORKDIR /workspace
 COPY . ./
 
 # 1) 특정 모듈(ET-eureka)만 빌드
-RUN gradle :ET-api-gatewway:clean :ET-api-gatewway:build --no-daemon
+RUN gradle :ET-api-gateway:clean :ET-api-gateway:build --no-daemon
 
 # 2단계: 실행 단계
 FROM openjdk:17-slim
