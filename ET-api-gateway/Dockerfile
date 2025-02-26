@@ -11,5 +11,5 @@ FROM openjdk:17-slim
 WORKDIR /app
 COPY --from=builder /workspace/ET-eureka/build/libs/*.jar app.jar
 
-EXPOSE 8761
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
