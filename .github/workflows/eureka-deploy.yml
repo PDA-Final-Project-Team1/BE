@@ -36,7 +36,7 @@ jobs:
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EUREKA_HOST }}      # Eureka가 배포될 Public 서버 주소
-          username: ${{ secrets.EUREKA_USER }}    # 해당 서버의 SSH 사용자명
+          username: ${{ secrets.EC2_USERNAME }}    # 해당 서버의 SSH 사용자명
           key: ${{ secrets.AWS_SSH_KEY }}      # SSH 접속용 비밀키
           script: |
             cd /home/ubuntu

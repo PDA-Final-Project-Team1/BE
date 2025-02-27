@@ -1,5 +1,5 @@
 # 1단계: 빌드 단계
-FROM gradle:7.6-jdk17 AS builder
+FROM gradle:8.12.1-jdk17 AS builder
 WORKDIR /workspace
 COPY . ./
 

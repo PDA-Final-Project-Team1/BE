@@ -1,12 +1,9 @@
-# 1단계: 빌드 단계
-FROM gradle:7.6-jdk17 AS builder
+FROM gradle:8.12.1-jdk17 AS builder
 WORKDIR /workspace
 COPY . ./
 
-# 1) 특정 모듈(ET-eureka)만 빌드
 RUN gradle :ET-api-gateway:clean :ET-api-gateway:build --no-daemon
 
-# 2단계: 실행 단계
 FROM openjdk:17-slim
 WORKDIR /app
 COPY --from=builder /workspace/ET-api-gateway/build/libs/*.jar app.jar
