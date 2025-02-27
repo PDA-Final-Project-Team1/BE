@@ -10,6 +10,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -19,6 +21,8 @@ public class EggService {
 
     private final EggRepository eggRepository;
     private final UserFeignConnector userFeignConnector;
+    private static final Duration INCUBATION_DURATION = Duration.ofHours(24); // 부화 시간 24시간
+
 
     @Transactional
     public EggResponseDTO acquireEgg(Long userId) { //알얻기
@@ -49,10 +53,26 @@ public class EggService {
                     .map(egg -> new EggResponseDTO(
                             egg.getId(),
                             egg.getUserId(),
-                            100,
-                            egg.isHatchable() ? "부화 가능" : "부화 대기 중"
+
+                            egg.isHatchable() ? "부화 가능" : "부화 대기 중",
+                            egg.isHatched() ? "부화중" : "부화 완료",
+                            egg.getCreatedAt(),
+                            calculateTimeRemaining(savedEgg.getCreatedAt())
+
                     ))
                     .toList();
 
+    }
+
+    private String calculateTimeRemaining(LocalDateTime createdAt) {
+        LocalDateTime expirationTime = createdAt.plus(INCUBATION_DURATION);
+        Duration remaining = Duration.between(LocalDateTime.now(), expirationTime);
+        if (remaining.isNegative()) {
+            return "00:00:00"; // 이미 부화됨
+        }
+        return String.format("%02d:%02d:%02d",
+                remaining.toHours(),
+                remaining.toMinutesPart(),
+                remaining.toSecondsPart());
     }
 }
