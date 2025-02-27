@@ -27,6 +27,12 @@ public class FriendController {
 
     @PostMapping("/subscription")
     public void subscribe(@RequestHeader(value = "X-Id") Long id, @RequestBody SubscriptionRequestDto requestDto) {
-        friendService.subscribe(id, requestDto);
+        friendService.subscribe(id, requestDto.getSubscribedId());
+    }
+
+
+    @DeleteMapping("/subscription")
+    public void unsubscribe(@RequestHeader(value = "X-Id") Long id, @RequestBody SubscriptionRequestDto requestDto) {
+        friendService.unsubscribe(id, requestDto.getSubscribedId());
     }
 }
