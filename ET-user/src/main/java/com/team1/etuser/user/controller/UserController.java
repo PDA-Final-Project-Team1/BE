@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -23,4 +22,7 @@ public class UserController {
     public SubscriptionResponseDto getSubscriptions(@PathVariable Long userId) {
         return userService.getSubscriptions(userId);
     }
+
+
+
 }
