@@ -26,8 +26,8 @@ public class FriendService {
     }
 
     // 구독하는 사람 목록 조회
-    public SubscriptionResponseDto getSubscriptions(Long userId) {
-        List<FriendResponseDto> friends = friendRepository.findBySubscriber_Id(userId)
+    public SubscriptionResponseDto getSubscriptions(Long id) {
+        List<FriendResponseDto> friends = friendRepository.findBySubscriber_Id(id)
                 .stream()
                 .map(FriendResponseDto::new)
                 .collect(Collectors.toList());
@@ -37,23 +37,17 @@ public class FriendService {
 
     // 새로운 구독 추가
     @Transactional
-    public void subscribe(SubscriptionRequestDto requestDto) {
-        Long subscriberId = requestDto.getSubscriberId();
+    public void subscribe(Long id,SubscriptionRequestDto requestDto) {
         Long subscribedId = requestDto.getSubscribedId();
 
-        // 자기 자신을 구독하는 경우 방지
-        if (subscriberId.equals(subscribedId)) {
-            throw new RuntimeException("자기 자신을 구독할 수 없습니다.");
-        }
-
         // 이미 구독한 경우 방지
-        FriendId friendId = new FriendId(subscriberId, subscribedId);
+        FriendId friendId = new FriendId(id, subscribedId);
         if (friendRepository.existsById(friendId)) {
             throw new RuntimeException("이미 구독한 사용자입니다.");
         }
 
         // 사용자 조회 (존재하지 않으면 예외 발생)
-        User subscriber = userRepository.findById(subscriberId)
+        User subscriber = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("구독하는 사용자를 찾을 수 없습니다."));
         User subscribed = userRepository.findById(subscribedId)
                 .orElseThrow(() -> new RuntimeException("구독 대상 사용자를 찾을 수 없습니다."));
@@ -67,5 +61,4 @@ public class FriendService {
 
         friendRepository.save(friend);
     }
-
 }
