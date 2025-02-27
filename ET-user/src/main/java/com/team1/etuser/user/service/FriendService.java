@@ -37,10 +37,8 @@ public class FriendService {
 
     // 새로운 구독 추가
     @Transactional
-    public void subscribe(Long id,SubscriptionRequestDto requestDto) {
-        Long subscribedId = requestDto.getSubscribedId();
-
-        // 이미 구독한 경우 방지
+    public void subscribe(Long id, Long subscribedId) {
+        // 이미 구독한 경우 방
         FriendId friendId = new FriendId(id, subscribedId);
         if (friendRepository.existsById(friendId)) {
             throw new RuntimeException("이미 구독한 사용자입니다.");
@@ -61,4 +59,17 @@ public class FriendService {
 
         friendRepository.save(friend);
     }
+
+    // 구독 취소
+    @Transactional
+    public void unsubscribe(Long id, Long subscribedId) {
+        FriendId friendId = new FriendId(id, subscribedId);
+
+        if (!friendRepository.existsById(friendId)) {
+            throw new RuntimeException("구독 정보가 존재하지 않습니다.");
+        }
+
+        friendRepository.deleteById(friendId);
+    }
+
 }
