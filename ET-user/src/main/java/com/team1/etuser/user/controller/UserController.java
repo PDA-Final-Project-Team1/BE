@@ -18,10 +18,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/subscription/{userId}")
-    public SubscriptionResponseDto getSubscriptions(@PathVariable Long userId) {
-        return userService.getSubscriptions(userId);
-    }
+
 
 
 
