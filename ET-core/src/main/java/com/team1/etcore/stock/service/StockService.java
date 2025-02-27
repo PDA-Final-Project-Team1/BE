@@ -1,7 +1,10 @@
 package com.team1.etcore.stock.service;
 
-import org.springframework.stereotype.Service;
+import com.team1.etcore.stock.domain.Stock;
 
-@Service
-public class StockService {
+import java.util.List;
+
+public interface StockService {
+    Stock getStock(String stockCode);
+
 }

@@ -24,4 +24,7 @@ public class Stock {
     @Column(nullable = false, length = 10)
     private String market;
 
+    @Column(nullable = false)
+    private String img;
+
 }
