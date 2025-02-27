@@ -1,4 +1,4 @@
-package com.team1.etpipeline.config;
+package com.team1.etcore.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
