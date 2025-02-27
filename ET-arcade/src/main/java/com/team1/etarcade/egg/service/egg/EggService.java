@@ -4,7 +4,7 @@ package com.team1.etarcade.egg.service.egg;
 import com.team1.etarcade.egg.connector.UserFeignConnector;
 import com.team1.etarcade.egg.domain.Egg;
 import com.team1.etarcade.egg.dto.EggResponseDTO;
-import com.team1.etarcade.egg.dto.UserFeignResponseDTO;
+import com.team1.etarcade.egg.dto.UserFeignPointResponseDTO;
 import com.team1.etarcade.egg.repository.EggRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +22,13 @@ public class EggService {
     private final EggRepository eggRepository;
     private final UserFeignConnector userFeignConnector;
     private static final Duration INCUBATION_DURATION = Duration.ofMinutes(1); // 부화 시간 24시간
-
+    private final RewardStockService rewardStockService;
 
     @Transactional
+    //알 얻는 과정
     public EggResponseDTO acquireEgg(Long userId) { //알얻기
         // FeignClient를 통해 사용자 정보 조회
-        UserFeignResponseDTO userInfo = userFeignConnector.getUserInfo(userId);
+        UserFeignPointResponseDTO userInfo = userFeignConnector.getUserInfo(userId);
         //유저가 가진 포인트 조회
         if (userInfo.getPoint() < 100) {
             throw new IllegalStateException("포인트가 부족합니다.");
@@ -44,6 +45,8 @@ public class EggService {
         // 포인트 차감 (별도의 Feign API 필요할 수 있음)
         // userClient.deductPoints(userId, 100);  <- 추후 구현
 
+
+        //알DTO 반환
         return new EggResponseDTO(
                 savedEgg.getId(),
                 userId,
@@ -54,10 +57,16 @@ public class EggService {
         );
     }
 
-    public List<EggResponseDTO> getAllEggs() {
 
-            return eggRepository.findAll().stream()
+    // 유저의 모든 알 조회
+    public List<EggResponseDTO> getAllEggs(Long userId) {
+
+
+
+            return eggRepository.findByUserId(userId).stream()
                     .map(egg -> {updateEggStatus(egg);
+
+
                 return new EggResponseDTO(
 
                             egg.getId(),
@@ -72,6 +81,8 @@ public class EggService {
                     .toList();
 
     }
+
+    //알 상태 갱신 함수.
     private void updateEggStatus(Egg egg) {
         LocalDateTime expirationTime = egg.getCreatedAt().plus(INCUBATION_DURATION);
         if (LocalDateTime.now().isAfter(expirationTime) && !egg.isHatched()) {
@@ -81,6 +92,8 @@ public class EggService {
         }
     }
 
+
+        // 남은 시간 계산 함수
     private String calculateTimeRemaining(LocalDateTime createdAt) {
         LocalDateTime expirationTime = createdAt.plus(INCUBATION_DURATION);
         Duration remaining = Duration.between(LocalDateTime.now(), expirationTime);
@@ -92,5 +105,22 @@ public class EggService {
                 remaining.toHours(),
                 remaining.toMinutesPart(),
                 remaining.toSecondsPart());
+    }
+
+
+    //알 부화 및 주식 지급 로직
+    public void hatchEggAndGiveStock(Long userId, Long eggId) {
+        Egg egg = eggRepository.findById(eggId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 알을 찾을 수 없습니다."));
+
+        if (!egg.isHatchable() || egg.isHatched()) {
+            throw new IllegalStateException("부화할 수 없는 알입니다.");
+        }
+
+        // 1️⃣ 주식 지급
+        rewardStockService.giveRandomStockToUser(userId, 10000); // 10,000원어치 주식 지급
+
+        // 2️⃣ 알 삭제
+        eggRepository.delete(egg);
     }
 }

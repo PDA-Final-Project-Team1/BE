@@ -25,10 +25,14 @@ public class EggController {
         EggResponseDTO response = eggService.acquireEgg(userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-    @GetMapping
-    public ResponseEntity<List<EggResponseDTO>> getAllEggs() {
-        List<EggResponseDTO> eggs = eggService.getAllEggs();
+    @GetMapping({"/{userId}"})
+    public ResponseEntity<List<EggResponseDTO>> getAllEggs(@PathVariable Long userId) {
+        List<EggResponseDTO> eggs = eggService.getAllEggs(userId);
         return ResponseEntity.ok(eggs);
     }
+
+
+
+
 
 }
