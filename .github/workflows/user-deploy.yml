@@ -1,0 +1,52 @@
+name: Deploy User Module
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'ET-user/**'
+
+jobs:
+  deploy-user-module:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          # 도커 로그인
+
+      - name: Build and Push User Image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./ET-user/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/et-user:latest
+
+
+      - name: Create .env and Deploy User
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.BASTION_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          script: |
+            ssh -tt user-mod "cd /home/ubuntu && \
+            echo 'EUREKA_HOST=${{ secrets.EUREKA_HOST }}' >> .env && \
+            echo 'USER_DB_HOST=${{ secrets.USER_DB_HOST }}' >> .env && \
+            echo 'USER_DB_PORT=${{ secrets.USER_DB_PORT }}' >> .env && \
+            echo 'USER_DB=${{ secrets.USER_DB }}' >> .env && \
+            echo 'USER_DB_USER=${{ secrets.DB_USER }}' >> .env && \
+            echo 'USER_DB_PWD=${{ secrets.DB_PWD }}' >> .env && \
+            echo 'REDIS_HOST=${{ secrets.REDIS_HOST }}' >> .env && \
+            echo 'REDIS_PORT=${{ secrets.REDIS_PORT }}' >> .env && \
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-user:latest && \
+            docker rm -f ET-user || true && \
+            docker run -d --name ET-user --env-file .env -p 8081:8081 ${{ secrets.DOCKERHUB_USERNAME }}/et-user:latest"

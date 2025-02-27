@@ -1,4 +1,4 @@
-name: Deploy API-gateway Trigger
+name: Deploy Gateway Trigger
 
 on:
   workflow_dispatch:
@@ -10,47 +10,39 @@ on:
       - 'ET-api-gateway/**'
 
 jobs:
-  deploy-eureka:
+  deploy-api-gateway:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
         # Github 소스 가져오기
 
-#      - name: Set up JDK
-#        uses: actions/setup-java@v3
-#        with:
-#          distribution: 'corretto'
-#          java-version: '17'
-
-      # 도커 로그인
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+          # 도커 로그인
 
-      - name: Build and Push Api Gateway Image
+      - name: Build and Push Eureka Image
         uses: docker/build-push-action@v3
         with:
-          context: ./ET-api-gateway
+          context: .
           file: ./ET-api-gateway/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
 
-      - name: Deploy Eureka
+      - name: Create .env and Deploy Eureka
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.API_GATEWAY_HOST }}      # Eureka가 배포될 Public 서버 주소
-          username: ${{ secrets.API_GATEWAY_USER }}    # 해당 서버의 SSH 사용자명
+          username: ${{ secrets.EC2_USERNAME }}    # 해당 서버의 SSH 사용자명
           key: ${{ secrets.AWS_SSH_KEY }}      # SSH 접속용 비밀키
           script: |
             cd /home/ubuntu
             
-            # .env 파일 생성
             echo "EUREKA_HOST=${{ secrets.EUREKA_HOST }}" >> .env
-            
-            # 도커 이미지 pull
+                        
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
             docker rm -f ET-api-gateway || true
             docker run -d --name ET-api-gateway --env-file .env -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest

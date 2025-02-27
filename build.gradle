@@ -37,9 +37,9 @@ subprojects {
         annotationProcessor 'org.projectlombok:lombok'
     }
 
-    tasks.named('test') {
-        useJUnitPlatform()
-    }
+//    tasks.named('test') {
+//        useJUnitPlatform()
+//    }
 }
 
 project(':ET-api-gateway') {
@@ -171,7 +171,6 @@ project(':ET-arcade') {
 
 project(':ET-pipeline') {
     dependencies {
-        implementation 'org.springframework.boot:spring-boot-starter-web'
         implementation 'org.springframework.boot:spring-boot-starter-data-redis'
         implementation 'org.springframework.kafka:spring-kafka'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'

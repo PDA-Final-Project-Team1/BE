@@ -1,12 +1,12 @@
-FROM openjdk:17-jdk-gslim
+FROM gradle:8.12.1-jdk17 AS builder
+WORKDIR /workspace
+COPY . ./
 
-VOLUME /tmp
+RUN gradle :ET-api-gateway:clean :ET-api-gateway:build --no-daemon
+
+FROM openjdk:17-slim
+WORKDIR /app
+COPY --from=builder /workspace/ET-api-gateway/build/libs/*.jar app.jar
 
 EXPOSE 8080
-
-ARG JAR_FILE=build/libs/*.jar
-
-COPY ${JAR_FILE} api-gateway.jar
-
-# 컨테이너 시작 시 JAR 파일을 실행
-ENTRYPOINT ["java", "-jar", "/api-gateway.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,0 +1,54 @@
+name: Deploy Arcade Module
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'ET-arcade/**'
+
+jobs:
+  deploy-arcade-module:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          # 도커 로그인
+
+
+      - name: Build and Push Arcade Image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./ET-arcade/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/et-arcade:latest
+
+
+
+      - name: Create .env and Deploy Arcade
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.BASTION_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          script: |
+            ssh -tt arcade-mod "cd /home/ubuntu && \
+            echo 'EUREKA_HOST=${{ secrets.EUREKA_HOST }}' >> .env && \
+            echo 'ARCADE_DB_HOST=${{ secrets.ARCADE_DB_HOST }}' >> .env && \
+            echo 'ARCADE_DB_PORT=${{ secrets.ARCADE_DB_PORT }}' >> .env && \
+            echo 'ARCADE_DB=${{ secrets.ARCADE_DB }}' >> .env && \
+            echo 'ARCADE_DB_USER=${{ secrets.DB_USER }}' >> .env && \
+            echo 'ARCADE_DB_PWD=${{ secrets.DB_PWD }}' >> .env && \
+            echo 'REDIS_HOST=${{ secrets.REDIS_HOST }}' >> .env && \
+            echo 'REDIS_PORT=${{ secrets.REDIS_PORT }}' >> .env && \
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-arcade:latest && \
+            docker rm -f ET-arcade || true && \
+            docker run -d --name ET-arcade --env-file .env -p 8083:8083 ${{ secrets.DOCKERHUB_USERNAME }}/et-arcade:latest"
