@@ -1,7 +1,7 @@
 package com.team1.etarcade.egg.service.egg;
 
 
-import com.team1.etarcade.egg.Client.UserClient;
+import com.team1.etarcade.egg.connector.UserFeignConnector;
 import com.team1.etarcade.egg.domain.Egg;
 import com.team1.etarcade.egg.dto.EggResponseDTO;
 import com.team1.etarcade.egg.dto.UserFeignResponseDTO;
@@ -18,12 +18,13 @@ public class EggService {
 
 
     private final EggRepository eggRepository;
-    private final UserClient userClient;
+    private final UserFeignConnector userFeignConnector;
 
     @Transactional
-    public EggResponseDTO acquireEgg(Long userId) {
+    public EggResponseDTO acquireEgg(Long userId) { //알얻기
         // FeignClient를 통해 사용자 정보 조회
-        UserFeignResponseDTO userInfo = userClient.getUserInfo(userId);
+        UserFeignResponseDTO userInfo = userFeignConnector.getUserInfo(userId);
+        //유저가 가진 포인트 조회
         if (userInfo.getPoint() < 100) {
             throw new IllegalStateException("포인트가 부족합니다.");
         }

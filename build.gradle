@@ -130,6 +130,7 @@ project(':ET-core') {
     dependencies {
         implementation project(':ET-common')
         implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.springframework.boot:spring-boot-starter-data-redis'
         implementation 'org.springframework.boot:spring-boot-starter-web'
         implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
         runtimeOnly 'com.mysql:mysql-connector-j'
@@ -156,6 +157,7 @@ project(':ET-arcade') {
         implementation project(':ET-common')
         implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
         implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
         implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
         runtimeOnly 'com.mysql:mysql-connector-j'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
