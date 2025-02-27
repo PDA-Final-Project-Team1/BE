@@ -1,8 +1,7 @@
-package com.team1.etpipeline.redis;
+package com.team1.etcore.chart;
 
-import com.team1.etpipeline.redis.dto.StockResponseDto;
+import com.team1.etcore.chart.dto.StockResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 

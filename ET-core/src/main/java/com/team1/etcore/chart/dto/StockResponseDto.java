@@ -1,4 +1,4 @@
-package com.team1.etpipeline.redis.dto;
+package com.team1.etcore.chart.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
