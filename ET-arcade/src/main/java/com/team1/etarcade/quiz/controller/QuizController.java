@@ -1,16 +1,13 @@
 package com.team1.etarcade.quiz.controller;
 
-import com.team1.etarcade.egg.dto.EggResponseDTO;
 import com.team1.etarcade.quiz.domain.Difficulty;
 import com.team1.etarcade.quiz.dto.QuizDTO;
-import com.team1.etarcade.quiz.dto.QuizStatusResponseDto;
+import com.team1.etarcade.quiz.dto.QuizSubmitResponseDTO;
 import com.team1.etarcade.quiz.service.QuizService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import com.team1.etarcade.quiz.dto.QuizSubmitRequestDTO;
 
 @RestController
 @RequestMapping("/api/quizs")
@@ -31,6 +28,11 @@ public class QuizController {
 
         QuizDTO quiz = quizService.getQuizByDifficulty(difficulty);
         return ResponseEntity.ok(quiz);
+    }
+    @PostMapping("/submit")
+    public ResponseEntity<QuizSubmitResponseDTO> submitQuiz(@RequestBody QuizSubmitRequestDTO request) {
+        QuizSubmitResponseDTO response = quizService.submitQuiz(request);
+        return ResponseEntity.ok(response);
     }
 
 }

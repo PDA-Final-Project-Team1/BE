@@ -11,4 +11,5 @@ import java.util.List;
 @Repository
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
     List<Quiz> findByDifficulty(Difficulty difficulty);
+    Quiz findQuizById(Long id);
 }

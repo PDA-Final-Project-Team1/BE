@@ -19,5 +19,6 @@ public class QuizDTO {
 
     private Difficulty difficulty;
 
-    private int answer;
+    private boolean answer;
+
 }

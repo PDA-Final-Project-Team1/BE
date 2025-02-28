@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuizStatusResponseDto {
+public class QuizStatusResponseDTO {
     private boolean hasSubmittedToday;
     private Long lastQuizId;
     private String lastQuizTitle;
