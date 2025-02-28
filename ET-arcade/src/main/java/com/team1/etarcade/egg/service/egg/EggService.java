@@ -28,7 +28,7 @@ public class EggService {
     //알 얻는 과정
     public EggResponseDTO acquireEgg(Long userId) { //알얻기
         // FeignClient를 통해 사용자 정보 조회
-        UserFeignPointResponseDTO userInfo = userFeignConnector.getUserInfo(userId);
+        UserFeignPointResponseDTO userInfo = userFeignConnector.getUserPointInfo(userId);
         //유저가 가진 포인트 조회
         if (userInfo.getPoint() < 100) {
             throw new IllegalStateException("포인트가 부족합니다.");
