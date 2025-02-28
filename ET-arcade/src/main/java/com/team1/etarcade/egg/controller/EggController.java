@@ -1,7 +1,7 @@
 package com.team1.etarcade.egg.controller;
 
 import com.team1.etarcade.egg.dto.EggResponseDTO;
-import com.team1.etarcade.egg.service.egg.EggService;
+import com.team1.etarcade.egg.service.EggService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
