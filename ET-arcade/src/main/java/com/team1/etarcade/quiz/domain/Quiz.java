@@ -24,5 +24,7 @@ public class Quiz {
     private Difficulty difficulty;
 
     @Column(nullable = false)
-    private int answer;
+    private boolean answer;
+
+
 }

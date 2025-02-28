@@ -1,4 +1,4 @@
-package com.team1.etarcade.egg.service.egg;
+package com.team1.etarcade.egg.service;
 
 import com.team1.etarcade.egg.connector.StockFeignConnector;
 import com.team1.etarcade.egg.connector.UserFeignConnector;
