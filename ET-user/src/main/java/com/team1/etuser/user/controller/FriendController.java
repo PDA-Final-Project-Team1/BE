@@ -4,6 +4,7 @@ import com.team1.etuser.user.dto.SubscriptionRequestDto;
 import com.team1.etuser.user.dto.SubscriptionResponseDto;
 import com.team1.etuser.user.service.FriendService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -20,19 +21,22 @@ public class FriendController {
     }
 
     @GetMapping("/subscription")
-    public SubscriptionResponseDto getSubscriptions(@RequestHeader(value = "X-Id") Long id) {
-        return friendService.getSubscriptions(id);
+    public ResponseEntity<SubscriptionResponseDto> getSubscriptionsByName(@RequestHeader(value = "X-Id") Long id, @RequestParam String query) {
+        SubscriptionResponseDto subscriptionResponseDto = friendService.getSubscriptionsByName(id);
+        return ResponseEntity.ok(subscriptionResponseDto);
     }
 
 
     @PostMapping("/subscription")
-    public void subscribe(@RequestHeader(value = "X-Id") Long id, @RequestBody SubscriptionRequestDto requestDto) {
+    public ResponseEntity<Void> subscribe(@RequestHeader(value = "X-Id") Long id, @RequestBody SubscriptionRequestDto requestDto) {
         friendService.subscribe(id, requestDto.getSubscribedId());
+        return ResponseEntity.ok().build();
     }
 
-
     @DeleteMapping("/subscription")
-    public void unsubscribe(@RequestHeader(value = "X-Id") Long id, @RequestBody SubscriptionRequestDto requestDto) {
+    public ResponseEntity<Void> unsubscribe(@RequestHeader(value = "X-Id") Long id, @RequestBody SubscriptionRequestDto requestDto) {
         friendService.unsubscribe(id, requestDto.getSubscribedId());
+        return ResponseEntity.ok().build();
+
     }
 }
