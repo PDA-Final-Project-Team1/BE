@@ -24,14 +24,6 @@ public class Egg extends BaseEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    public void setHatchable(boolean hatchable) {
-        isHatchable = hatchable;
-    }
-
-    public void setHatched(boolean hatched) {
-        isHatched = hatched;
-    }
-
     @Column(name = "is_hatchable", nullable = false)
     private boolean isHatchable;
 

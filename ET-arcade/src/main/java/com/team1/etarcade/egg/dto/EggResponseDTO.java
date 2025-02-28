@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 public class EggResponseDTO {
     private Long eggId;
     private Long userId;
-    private String hatchableStatus;
-    private String hatchedStatus;
+    private boolean is_hatchable;
+    private boolean is_hatched;
     private LocalDateTime createdAt;
     private String timeRemaining;
 }
