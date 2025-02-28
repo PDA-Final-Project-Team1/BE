@@ -1,10 +1,8 @@
 package com.team1.etuser.user.controller;
 
 
-import com.team1.etuser.user.dto.UserAccountInfoRes;
-import com.team1.etuser.user.dto.UserHistoryRes;
-import com.team1.etuser.user.dto.UserInfoRes;
-import com.team1.etuser.user.dto.UserStocksRes;
+import com.team1.etuser.user.dto.*;
+import com.team1.etuser.user.service.UserFavoriteService;
 import com.team1.etuser.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +17,8 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+    private final UserFavoriteService userFavoriteService;
+
     @PostMapping("/duplicate")
     public ResponseEntity<Boolean> isDuplicateUid(@RequestBody Map<String, String> uid) {
         return ResponseEntity.ok(userService.isDuplicate(uid.get("uid")));
@@ -42,5 +42,10 @@ public class UserController {
     @GetMapping("/stocks")
     public ResponseEntity<List<UserStocksRes>> getUserStocks() {
         return ResponseEntity.ok(userService.getUserStocks());
+    }
+
+    @GetMapping("/favorite")
+    public ResponseEntity<List<UserFavoriteStocksRes>> getUserFavoriteStocks() {
+        return ResponseEntity.ok(userFavoriteService.getUserFavoriteStocks());
     }
 }
