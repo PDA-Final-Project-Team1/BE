@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserFeignResponseDTO {
-    private Long userId;
-    private int point;
+//주식과 가격을 전달하는 DTO입니다.
+public class StockPriceResponseDTO {
+
+    private String stockname;
+    private Double price;
 }
