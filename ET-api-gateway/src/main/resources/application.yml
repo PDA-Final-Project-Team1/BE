@@ -12,7 +12,7 @@ spring:
         - id: USER-SERVICE
           uri: lb://ET-user
           predicates:
-            - Path=/api/users/**, /api/friends/**
+            - Path=/api/users/**, /api/friends/**, /api/sse/**
 
         - id: CORE-SERVICE
           uri: lb://ET-core

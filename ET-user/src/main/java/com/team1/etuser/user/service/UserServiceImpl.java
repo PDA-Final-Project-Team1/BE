@@ -2,10 +2,7 @@ package com.team1.etuser.user.service;
 
 import com.team1.etuser.user.domain.User;
 import com.team1.etuser.user.domain.UserAdditionalInfo;
-import com.team1.etuser.user.dto.UserAccountInfoRes;
-import com.team1.etuser.user.dto.UserHistoryRes;
-import com.team1.etuser.user.dto.UserInfoRes;
-import com.team1.etuser.user.dto.UserStocksRes;
+import com.team1.etuser.user.dto.*;
 import com.team1.etuser.user.repository.UserAdditionalInfoRepository;
 import com.team1.etuser.user.repository.UserRepository;
 import com.team1.etuser.user.repository.UserStockRepository;
@@ -110,6 +107,5 @@ public class UserServiceImpl implements UserService{
 
         return userStocksResList;
     }
-
 
 }

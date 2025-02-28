@@ -1,9 +1,6 @@
 package com.team1.etuser.user.service;
 
-import com.team1.etuser.user.dto.UserAccountInfoRes;
-import com.team1.etuser.user.dto.UserHistoryRes;
-import com.team1.etuser.user.dto.UserInfoRes;
-import com.team1.etuser.user.dto.UserStocksRes;
+import com.team1.etuser.user.dto.*;
 
 import java.util.List;
 
