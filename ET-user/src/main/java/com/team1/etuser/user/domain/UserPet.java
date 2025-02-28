@@ -23,7 +23,4 @@ public class UserPet {
 
     @Column(name = "pet_id", nullable = false)
     private Long petId;
-
-    @Column(name = "stock_code", nullable = false, length = 6)
-    private String stockCode;
 }

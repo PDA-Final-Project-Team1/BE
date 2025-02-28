@@ -18,10 +18,10 @@ import java.math.BigDecimal;
 @Table(name = "user_trade_history")
 public class UserTradeHistory extends BaseEntity {
     @Id
-    private Long user_id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
