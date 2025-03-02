@@ -48,4 +48,14 @@ public class UserController {
     public ResponseEntity<List<UserFavoriteStocksRes>> getUserFavoriteStocks() {
         return ResponseEntity.ok(userFavoriteService.getUserFavoriteStocks());
     }
+
+    @PostMapping("/favorite")
+    public ResponseEntity<Boolean> addUserFavoriteStock(@RequestBody Map<String, String> stockCode) {
+        return ResponseEntity.ok(userFavoriteService.addUserFavoriteStock(stockCode.get("stockCode")));
+    }
+
+    @DeleteMapping("/favorite/{stockCode}")
+    public ResponseEntity<Boolean> deleteUserFavoriteStock(@PathVariable("stockCode") String stockCode) {
+        return ResponseEntity.ok(userFavoriteService.deleteUserFavoriteStock(stockCode));
+    }
 }

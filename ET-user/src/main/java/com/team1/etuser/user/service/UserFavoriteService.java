@@ -1,17 +1,20 @@
 package com.team1.etuser.user.service;
 
 import com.team1.etuser.user.domain.User;
+import com.team1.etuser.user.domain.UserFavoriteStock;
 import com.team1.etuser.user.dto.UserFavoriteStocksRes;
 import com.team1.etuser.user.repository.UserFavoriteStockRepository;
 import com.team1.etuser.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserFavoriteService {
 
     private final StockFeignService stockFeignService;
@@ -35,5 +38,42 @@ public class UserFavoriteService {
         }
 
         return lists;
+    }
+
+    /**
+     *
+     * @param stockCode 종목의 코드 ex) 005930
+     * @return 성공 시 true
+     */
+    public boolean addUserFavoriteStock(String stockCode) {
+        Long id = 1L; // JWT 토큰에서 추출한 값으로 변경
+
+        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."));
+
+        UserFavoriteStock userFavoriteStock = UserFavoriteStock.builder()
+                .user(user)
+                .stockCode(stockCode)
+                .build();
+
+        if (userFavoriteStockRepository.existsByUserAndStockCode(user, stockCode)) {
+            throw new RuntimeException("이미 즐겨찾기 되어있는 종목입니다.");
+        }
+
+        userFavoriteStockRepository.save(userFavoriteStock);
+
+        return true;
+    }
+
+    public boolean deleteUserFavoriteStock(String stockCode) {
+        Long id = 1L; // JWT 토큰에서 추출한 값으로 변경
+
+        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."));
+
+        UserFavoriteStock userFavoriteStock = userFavoriteStockRepository.findByUserAndStockCode(user, stockCode)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 Entity 입니다."));
+
+        userFavoriteStockRepository.delete(userFavoriteStock);
+
+        return true;
     }
 }

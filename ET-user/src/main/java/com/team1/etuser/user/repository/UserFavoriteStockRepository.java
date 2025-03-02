@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserFavoriteStockRepository extends JpaRepository<UserFavoriteStock, Long> {
 
@@ -15,6 +16,7 @@ public interface UserFavoriteStockRepository extends JpaRepository<UserFavoriteS
             "FROM UserFavoriteStock u WHERE u.user = :user")
     List<UserFavoriteStocksRes> findByUser(@Param("user") User user);
 
-//    @Query(value = "SELECT stock_code FROM user_favorite_stock WHERE user_id = :userId", nativeQuery = true)
-//    List<String> findByUser(@Param("userId") Long userId);
+    boolean existsByUserAndStockCode(User user, String stockCode);
+
+    Optional<UserFavoriteStock> findByUserAndStockCode(User user, String stockCode);
 }
