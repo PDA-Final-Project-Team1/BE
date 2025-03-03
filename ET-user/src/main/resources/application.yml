@@ -1,6 +1,7 @@
 spring:
   config:
-    import: optional:file:ET-user/.env[.properties]
+    import:
+      - optional:file:ET-user/.env[.properties]
   application:
     name: ET-user
   datasource:
@@ -21,3 +22,7 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://${EUREKA_HOST}:8761/eureka
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}

@@ -5,6 +5,7 @@ import com.team1.etuser.user.dto.*;
 import com.team1.etuser.user.service.UserFavoriteService;
 import com.team1.etuser.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -25,8 +27,8 @@ public class UserController {
     }
 
     @GetMapping("")
-    public ResponseEntity<UserInfoRes> getUserInfo() {
-        return ResponseEntity.ok(userService.getUserInfo());
+    public ResponseEntity<UserInfoRes> getUserInfo(@RequestHeader("X-Id") String userId) {
+        return ResponseEntity.ok(userService.getUserInfo(userId));
     }
 
     @GetMapping("/account")

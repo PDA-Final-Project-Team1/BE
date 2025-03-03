@@ -44,8 +44,9 @@ public class UserServiceImpl implements UserService{
      * @return 로그인한 User의 uid, name
      */
     @Override
-    public UserInfoRes getUserInfo() {
-        Long id = 1L; // Token에 존재하는 id로 변경 예정
+    public UserInfoRes getUserInfo(String userId) {
+//        Long id = 1L; // Token에 존재하는 id로 변경 예정
+        Long id = Long.valueOf(userId);
 
         User user = userRepository.findById(id).
                 orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
@@ -110,6 +111,4 @@ public class UserServiceImpl implements UserService{
 
         return userStocksResList;
     }
-
-
 }
