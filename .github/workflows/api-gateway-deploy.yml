@@ -65,6 +65,8 @@ jobs:
             echo 'REDIS_PORT=${{ secrets.REDIS_PORT }}' >> .env
             
             echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+            
+            echo "HOST_NAME=${{ secrets.API_GATEWAY_HOST }}" >> .env
                         
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
             docker rm -f ET-api-gateway || true

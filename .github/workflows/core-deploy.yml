@@ -47,6 +47,7 @@ jobs:
             echo 'CORE_DB_PWD=${{ secrets.DB_PWD }}' >> .env && \
             echo 'REDIS_HOST=${{ secrets.REDIS_HOST }}' >> .env && \
             echo 'REDIS_PORT=${{ secrets.REDIS_PORT }}' >> .env && \
+            echo 'HOST_NAME=${{ secrets.CORE_HOST }}' >> .env && \
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-core:latest && \
             docker rm -f ET-core || true && \
             docker run -d --name ET-core --env-file .env -p 8082:8082 ${{ secrets.DOCKERHUB_USERNAME }}/et-core:latest"
