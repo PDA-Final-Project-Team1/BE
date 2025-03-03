@@ -1,6 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.3' apply false
+//    id 'org.springframework.boot' version '3.4.3' apply false
+    id 'org.springframework.boot' version '3.3.9' apply false
     id 'io.spring.dependency-management' version '1.1.7' apply false
 }
 
@@ -47,12 +48,26 @@ project(':ET-api-gateway') {
     jar.enabled = false
 
     ext {
-        set('springCloudVersion', "2024.0.0")
+        set('springCloudVersion', "2023.0.5")
+//        set('springCloudVersion', "2024.0.0")
     }
 
     dependencies {
-        implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
+        implementation 'org.springframework.cloud:spring-cloud-starter-gateway-mvc'
+//        implementation 'org.springframework.boot:spring-boot-starter-web'
         implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+        // jjwt
+        implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+        implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+        implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+//        implementation 'io.jsonwebtoken:jjwt:0.9.1'
+        //jakarta.servlet
+        implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+
+        // Spring Security
+        implementation 'org.springframework.boot:spring-boot-starter-security'
     }
 
     dependencyManagement {
@@ -67,7 +82,8 @@ project(':ET-eureka') {
     jar.enabled = false
 
     ext {
-        set('springCloudVersion', "2024.0.0")
+//        set('springCloudVersion', "2024.0.0")
+        set('springCloudVersion', "2023.0.5")
     }
 
     dependencies {
@@ -91,6 +107,9 @@ project(':ET-common') {
         implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+        // starter-web
+        implementation 'org.springframework.boot:spring-boot-starter-web'
     }
 }
 
@@ -99,7 +118,8 @@ project(':ET-user') {
     jar.enabled = false
 
     ext {
-        set('springCloudVersion', "2024.0.0")
+//        set('springCloudVersion', "2024.0.0")
+        set('springCloudVersion', "2023.0.5")
     }
 
     dependencies {
@@ -110,6 +130,21 @@ project(':ET-user') {
         runtimeOnly 'com.mysql:mysql-connector-j'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        // open feign
+        implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+        implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+        implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+        implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+//        // jjwt
+//        implementation 'io.jsonwebtoken:jjwt:0.9.1'
+
+//        // JAXB API 의존성
+//        implementation 'javax.xml.bind:jaxb-api:2.3.1'
+//
+//        // JAXB 구현체
+//        implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.4'
     }
 
     dependencyManagement {

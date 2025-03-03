@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserFeignResponseDTO {
+public class UserFeignPointResponseDTO {
     private Long userId;
     private int point;
 }

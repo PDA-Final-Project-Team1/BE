@@ -18,21 +18,20 @@ import java.math.BigDecimal;
 @Table(name = "user_stock")
 public class UserStock extends BaseEntity {
     @Id
-    private Long user_id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(name = "stock_code", nullable = false, length = 6)
     private String stockCode;
 
-    @DecimalMin(value = "0.0")
-    @Column(nullable = false, precision = 65, scale = 6)
-    private BigDecimal amount;
+    @Column(name = "amount", nullable = false)
+    private int amount;
 
     @DecimalMin(value = "0.0")
-    @Column(name = "average price", nullable = false, precision = 65, scale = 3)
+    @Column(name = "average_price", nullable = false, precision = 65, scale = 3)
     private BigDecimal averagePrice;
 }

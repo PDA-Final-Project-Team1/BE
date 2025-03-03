@@ -31,4 +31,7 @@ public class UserAdditionalInfo extends BaseEntity {
 
     @Column(nullable = false)
     private int point;
+
+    @Column(nullable = false, length = 50)
+    private String account;
 }
