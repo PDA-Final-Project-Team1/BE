@@ -7,7 +7,6 @@ spring:
   config:
     import:
       - optional:file:ET-api-gateway/.env[.properties]
-      - "classpath:jwtTokenSetting.properties"
 
   application:
     name: ET-api-gateway
@@ -37,3 +36,6 @@ eureka:
       defaultZone: http://localhost:8761/eureka
     fetch-registry: true
     register-with-eureka: true
+
+jwt:
+  secret: ${JWT_SECRET}
