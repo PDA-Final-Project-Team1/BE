@@ -37,7 +37,7 @@ eureka:
     register-with-eureka: true
   instance:
     prefer-ip-address: true
-    hostname: ${HOST_NAME}
+    ip-address: ${HOST_NAME}
 
 jwt:
   secret: ${JWT_SECRET}

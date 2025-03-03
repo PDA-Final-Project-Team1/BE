@@ -24,7 +24,7 @@ eureka:
       defaultZone: http://${EUREKA_HOST}:8761/eureka
   instance:
     prefer-ip-address: true
-    hostname: ${HOST_NAME}
+    ip-address: ${HOST_NAME}
 
 jwt:
   secret: ${JWT_SECRET}
