@@ -12,7 +12,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/users/subscription")
 public class FriendController {
     private final FriendService friendService;
 
@@ -20,20 +20,20 @@ public class FriendController {
         this.friendService = friendService;
     }
 
-    @GetMapping("/subscription")
-    public ResponseEntity<SubscriptionResponseDto> getSubscriptionsByName(@RequestHeader(value = "X-Id") Long id, @RequestParam String query) {
-        SubscriptionResponseDto subscriptionResponseDto = friendService.getSubscriptionsByName(id);
+    @GetMapping
+    public ResponseEntity<SubscriptionResponseDto> getSubscriptions(@RequestHeader(value = "X-Id") Long id) {
+        SubscriptionResponseDto subscriptionResponseDto = friendService.getSubscriptions(id);
         return ResponseEntity.ok(subscriptionResponseDto);
     }
 
 
-    @PostMapping("/subscription")
+    @PostMapping
     public ResponseEntity<Void> subscribe(@RequestHeader(value = "X-Id") Long id, @RequestBody SubscriptionRequestDto requestDto) {
         friendService.subscribe(id, requestDto.getSubscribedId());
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/subscription")
+    @DeleteMapping
     public ResponseEntity<Void> unsubscribe(@RequestHeader(value = "X-Id") Long id, @RequestBody SubscriptionRequestDto requestDto) {
         friendService.unsubscribe(id, requestDto.getSubscribedId());
         return ResponseEntity.ok().build();
