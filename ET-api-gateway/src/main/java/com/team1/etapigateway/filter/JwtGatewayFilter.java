@@ -32,7 +32,7 @@ public class JwtGatewayFilter extends OncePerRequestFilter {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private static final List<String> EXCLUDED_PATHS = List.of("/api/auth/login", "/api/auth/signup");
+    private static final List<String> EXCLUDED_PATHS = List.of("/api/auth/login", "/api/auth/signup", "/api/users/duplicate");
 
     private Key getSigningKey() {
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);

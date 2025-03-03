@@ -25,8 +25,9 @@ public class UserFavoriteService {
      * 즐겨찾기 주식 조회
      * @return stockCode, stockName
      */
-    public List<UserFavoriteStocksRes> getUserFavoriteStocks() {
-        Long id = 1L; // JWT 토큰에서 추출한 값으로 변경
+    public List<UserFavoriteStocksRes> getUserFavoriteStocks(String userId) {
+//        Long id = 1L; // JWT 토큰에서 추출한 값으로 변경
+        Long id = Long.valueOf(userId);
 
         User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."));
         List<UserFavoriteStocksRes> lists = userFavoriteStockRepository.findByUser(user);
@@ -45,8 +46,9 @@ public class UserFavoriteService {
      * @param stockCode 종목의 코드 ex) 005930
      * @return 성공 시 true
      */
-    public boolean addUserFavoriteStock(String stockCode) {
-        Long id = 1L; // JWT 토큰에서 추출한 값으로 변경
+    public boolean addUserFavoriteStock(String stockCode, String userId) {
+//        Long id = 1L; // JWT 토큰에서 추출한 값으로 변경
+        Long id = Long.valueOf(userId);
 
         User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."));
 
@@ -64,8 +66,9 @@ public class UserFavoriteService {
         return true;
     }
 
-    public boolean deleteUserFavoriteStock(String stockCode) {
-        Long id = 1L; // JWT 토큰에서 추출한 값으로 변경
+    public boolean deleteUserFavoriteStock(String stockCode, String userId) {
+//        Long id = 1L; // JWT 토큰에서 추출한 값으로 변경
+        Long id = Long.valueOf(userId);
 
         User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."));
 
