@@ -68,4 +68,11 @@ public class UserController {
         List<UserPetResponseDto> pets = userPetService.getUserPets(userId);
         return ResponseEntity.ok(pets);
     }
+
+    @PostMapping("/pets")
+    public ResponseEntity<Void> grantPet(@RequestHeader("X-Id") Long userId,
+                                         @RequestBody PetGrantRequestDto requestDto) {
+        userPetService.grantPet(userId, requestDto);
+        return ResponseEntity.ok().build();
+    }
 }

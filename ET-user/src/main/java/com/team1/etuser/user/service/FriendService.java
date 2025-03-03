@@ -26,7 +26,7 @@ public class FriendService {
     }
 
     // 구독하는 사람 목록 조회
-    public SubscriptionResponseDto getSubscriptionsByName(Long id) {
+    public SubscriptionResponseDto getSubscriptions(Long id) {
 
         List<FriendResponseDto> friends = friendRepository.findBySubscriber_Id(id)
                 .stream()
