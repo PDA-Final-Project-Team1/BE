@@ -140,9 +140,6 @@ project(':ET-user') {
 //        // jjwt
 //        implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
-        // spring security
-        implementation 'org.springframework.boot:spring-boot-starter-security'
-
 //        // JAXB API 의존성
 //        implementation 'javax.xml.bind:jaxb-api:2.3.1'
 //

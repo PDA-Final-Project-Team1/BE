@@ -11,7 +11,7 @@ public interface UserService {
 
     boolean isDuplicate(String uid);
 
-    UserInfoRes getUserInfo();
+    UserInfoRes getUserInfo(String userId);
 
     UserAccountInfoRes getUserAccountInfo();
 

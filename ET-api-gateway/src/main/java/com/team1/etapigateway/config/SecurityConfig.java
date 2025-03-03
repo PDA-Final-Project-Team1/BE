@@ -1,6 +1,7 @@
 package com.team1.etapigateway.config;
 
 import com.team1.etapigateway.filter.JwtGatewayFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,13 +14,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtGatewayFilter jwtGatewayFilter;
 
-    public SecurityConfig(JwtGatewayFilter jwtGatewayFilter) {
-        this.jwtGatewayFilter = jwtGatewayFilter;
-    }
+//    public SecurityConfig(JwtGatewayFilter jwtGatewayFilter) {
+//        this.jwtGatewayFilter = jwtGatewayFilter;
+//    }
 
 
     @Bean
