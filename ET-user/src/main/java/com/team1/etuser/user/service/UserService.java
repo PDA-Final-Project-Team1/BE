@@ -13,9 +13,9 @@ public interface UserService {
 
     UserInfoRes getUserInfo(String userId);
 
-    UserAccountInfoRes getUserAccountInfo();
+    UserAccountInfoRes getUserAccountInfo(String userId);
 
-    List<UserHistoryRes> getUserHistory();
+    List<UserHistoryRes> getUserHistory(String userId);
 
-    List<UserStocksRes> getUserStocks();
+    List<UserStocksRes> getUserStocks(String userId);
 }

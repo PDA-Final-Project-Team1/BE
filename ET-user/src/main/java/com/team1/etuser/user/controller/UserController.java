@@ -32,32 +32,32 @@ public class UserController {
     }
 
     @GetMapping("/account")
-    public ResponseEntity<UserAccountInfoRes> getUserAccountInfo() {
-        return ResponseEntity.ok(userService.getUserAccountInfo());
+    public ResponseEntity<UserAccountInfoRes> getUserAccountInfo(@RequestHeader("X-Id") String userId) {
+        return ResponseEntity.ok(userService.getUserAccountInfo(userId));
     }
 
     @GetMapping("/history")
-    public ResponseEntity<List<UserHistoryRes>> getUserHistory() {
-        return ResponseEntity.ok(userService.getUserHistory());
+    public ResponseEntity<List<UserHistoryRes>> getUserHistory(@RequestHeader("X-Id") String userId) {
+        return ResponseEntity.ok(userService.getUserHistory(userId));
     }
 
     @GetMapping("/stocks")
-    public ResponseEntity<List<UserStocksRes>> getUserStocks() {
-        return ResponseEntity.ok(userService.getUserStocks());
+    public ResponseEntity<List<UserStocksRes>> getUserStocks(@RequestHeader("X-Id") String userId) {
+        return ResponseEntity.ok(userService.getUserStocks(userId));
     }
 
     @GetMapping("/favorite")
-    public ResponseEntity<List<UserFavoriteStocksRes>> getUserFavoriteStocks() {
-        return ResponseEntity.ok(userFavoriteService.getUserFavoriteStocks());
+    public ResponseEntity<List<UserFavoriteStocksRes>> getUserFavoriteStocks(@RequestHeader("X-Id") String userId) {
+        return ResponseEntity.ok(userFavoriteService.getUserFavoriteStocks(userId));
     }
 
     @PostMapping("/favorite")
-    public ResponseEntity<Boolean> addUserFavoriteStock(@RequestBody Map<String, String> stockCode) {
-        return ResponseEntity.ok(userFavoriteService.addUserFavoriteStock(stockCode.get("stockCode")));
+    public ResponseEntity<Boolean> addUserFavoriteStock(@RequestBody Map<String, String> stockCode, @RequestHeader("X-Id") String userId) {
+        return ResponseEntity.ok(userFavoriteService.addUserFavoriteStock(stockCode.get("stockCode"), userId));
     }
 
     @DeleteMapping("/favorite/{stockCode}")
-    public ResponseEntity<Boolean> deleteUserFavoriteStock(@PathVariable("stockCode") String stockCode) {
-        return ResponseEntity.ok(userFavoriteService.deleteUserFavoriteStock(stockCode));
+    public ResponseEntity<Boolean> deleteUserFavoriteStock(@PathVariable("stockCode") String stockCode, @RequestHeader("X-Id") String userId) {
+        return ResponseEntity.ok(userFavoriteService.deleteUserFavoriteStock(stockCode, userId));
     }
 }

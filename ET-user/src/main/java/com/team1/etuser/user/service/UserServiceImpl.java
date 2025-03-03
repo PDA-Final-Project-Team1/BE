@@ -61,8 +61,9 @@ public class UserServiceImpl implements UserService{
      * @return 로그인 User의 account, deposit
      */
     @Override
-    public UserAccountInfoRes getUserAccountInfo() {
-        Long id = 1L; // JWT토큰에서 추출한 값으로 변경 예정
+    public UserAccountInfoRes getUserAccountInfo(String userId) {
+//        Long id = 1L; // JWT토큰에서 추출한 값으로 변경 예정
+        Long id = Long.valueOf(userId);
 
         return userAdditionalInfoRepository.findByUserId(id)
                 .orElseThrow(() -> new EntityNotFoundException("추가정보가 존재하지 않습니다."));
@@ -72,8 +73,10 @@ public class UserServiceImpl implements UserService{
      * @return 로그인 User의 거래내역 조회
      */
     @Override
-    public List<UserHistoryRes> getUserHistory() {
-        Long id = 1L;
+    public List<UserHistoryRes> getUserHistory(String userId) {
+//        Long id = 1L;
+        Long id = Long.valueOf(userId);
+
         User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("사용자를 찾지 못했습니다."));
 
         List<UserHistoryRes> userHistoryResList = userTradeHistoryRepository.findUserHistory(user);
@@ -92,8 +95,10 @@ public class UserServiceImpl implements UserService{
      * @return 로그인 User의 보유 주식 조회
      */
     @Override
-    public List<UserStocksRes> getUserStocks() {
-        Long id = 1L;
+    public List<UserStocksRes> getUserStocks(String userId) {
+//        Long id = 1L;
+        Long id = Long.valueOf(userId);
+
         User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("사용자를 찾지 못했습니다."));
 
         List<UserStocksRes> userStocksResList = userStockRepository.findByUserStocks(user);
