@@ -47,6 +47,8 @@ jobs:
             echo 'USER_DB_PWD=${{ secrets.DB_PWD }}' >> .env && \
             echo 'REDIS_HOST=${{ secrets.REDIS_HOST }}' >> .env && \
             echo 'REDIS_PORT=${{ secrets.REDIS_PORT }}' >> .env && \
+            echo 'JWT_SECRET=${{ secrets.JWT_SECRET }}' >> .env && \
+            echo 'JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}' >> .env && \
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-user:latest && \
             docker rm -f ET-user || true && \
             docker run -d --name ET-user --env-file .env -p 8081:8081 ${{ secrets.DOCKERHUB_USERNAME }}/et-user:latest"
