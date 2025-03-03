@@ -2,10 +2,7 @@ package com.team1.etarcade.egg.domain;
 
 import com.team1.etcommon.domain.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -24,17 +21,11 @@ public class Egg extends BaseEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @Setter
     @Column(name = "is_hatchable", nullable = false)
     private boolean isHatchable;
 
+    @Setter
     @Column(name = "is_hatched", nullable = false)
     private boolean isHatched;
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
 }
