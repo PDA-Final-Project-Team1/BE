@@ -29,7 +29,7 @@ import java.util.*;
 @Slf4j
 public class JwtGatewayFilter extends OncePerRequestFilter {
 
-    @Value("${jwt.secret}")
+    @Value("${JWT_SECRET}")
     private String secretKey;
 
     private static final List<String> EXCLUDED_PATHS = List.of("/api/auth/login", "/api/auth/signup", "/api/users/duplicate");
