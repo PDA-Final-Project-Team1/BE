@@ -66,7 +66,6 @@ public class JwtGatewayFilter extends OncePerRequestFilter {
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(request);
         mutableRequest.putHeader("X-Id", userId);
 
-//        chain.doFilter(request, response);
         chain.doFilter(mutableRequest, response);
     }
 

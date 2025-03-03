@@ -19,11 +19,6 @@ public class SecurityConfig {
 
     private final JwtGatewayFilter jwtGatewayFilter;
 
-//    public SecurityConfig(JwtGatewayFilter jwtGatewayFilter) {
-//        this.jwtGatewayFilter = jwtGatewayFilter;
-//    }
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
@@ -35,17 +30,6 @@ public class SecurityConfig {
                                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtGatewayFilter, UsernamePasswordAuthenticationFilter.class);
-
-//        http
-//                .csrf().disable()
-//                .cors().configurationSource(corsConfigurationSource())
-//                .and()
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/api/auth/signup", "/api/auth/login").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .addFilterBefore(jwtGatewayFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 
