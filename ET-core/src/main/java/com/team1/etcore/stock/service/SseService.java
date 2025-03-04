@@ -81,4 +81,36 @@ public class SseService {
 
 
 
+    public SseEmitter getAskBidPrice(String stockCode) {//호가
+        SseEmitter emitter = new SseEmitter(200_000L); // 60초 타임아웃
+        //이부분은 for 문으로 userId 로 종목들 조회해서 맵에 넣어야될듯
+        askBidSubscribers.computeIfAbsent(stockCode, k -> new ArrayList<>()).add(emitter);
+
+        //sse emitter는 사용자
+        /**
+         * 키값 변경예정 db요청해서 값 받아서
+         */
+        emitter.onCompletion(() -> askBidSubscribers.get(stockCode).remove(emitter));
+        emitter.onTimeout(() -> askBidSubscribers.get(stockCode).remove(emitter));
+
+        return emitter;
+    }
+
+    public void sendToClientsAskBidStockPrice(String stockCode, Object data) {
+
+        List<SseEmitter> emitters = askBidSubscribers.getOrDefault(stockCode, new ArrayList<>());
+
+        for (SseEmitter emitter : emitters) {
+            try {
+                // 객체를 JSON 문자열로 변환
+                ObjectMapper objectMapper = new ObjectMapper();
+                String jsonData = objectMapper.writeValueAsString(data);
+
+                // JSON 문자열을 보내기
+                emitter.send(SseEmitter.event().data(jsonData));
+            } catch (IOException e) {
+                emitter.complete();
+            }
+        }
+    }
 }

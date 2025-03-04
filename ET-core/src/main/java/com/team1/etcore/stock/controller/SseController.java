@@ -21,14 +21,13 @@ public class SseController {
     }
     @GetMapping("/subscribe/ask-price/{userId}")//보유 종목 현재가
     public SseEmitter StockPortfolioPrice(@PathVariable String userId) {
-        System.out.println("컨트롤러 체크");
 
         return sseService.getPortfolioStockPrice(userId);
     }
-//    @GetMapping("/ask-bid/{stockCode}")
-//    public SseEmitter StockAskBid(@PathVariable String stockCode) {
-//        return sseService.getAskBidPrice(stockCode);
-//
-//    }
+    @GetMapping("/ask-bid/{stockCode}")
+    public SseEmitter StockAskBid(@PathVariable String stockCode) {
+        return sseService.getAskBidPrice(stockCode);
+
+    }
 
 }
