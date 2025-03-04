@@ -2,6 +2,7 @@ package com.team1.etuser.user.controller;
 
 
 import com.team1.etuser.user.dto.*;
+import com.team1.etuser.user.service.UserEggService;
 import com.team1.etuser.user.service.UserFavoriteService;
 import com.team1.etuser.user.service.UserPetService;
 import com.team1.etuser.user.service.UserService;
@@ -22,6 +23,7 @@ public class UserController {
     private final UserService userService;
     private final UserFavoriteService userFavoriteService;
     private final UserPetService userPetService;
+    private final UserEggService userEggService;
 
     @PostMapping("/duplicate")
     public ResponseEntity<Boolean> isDuplicateUid(@RequestBody Map<String, String> uid) {
@@ -75,4 +77,11 @@ public class UserController {
         userPetService.grantPet(userId, requestDto);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/points")
+    public ResponseEntity<UserPointRes> getUserPoints(@RequestHeader("X-Id") Long userId) {
+        userEggService.getUserPoint(userId);
+        return ResponseEntity.ok().body(new UserPointRes());
+    }
+
 }

@@ -21,7 +21,7 @@ public class EggService {
 
     private final EggRepository eggRepository;
     private final UserFeignConnector userFeignConnector;
-    private static final Duration INCUBATION_DURATION = Duration.ofMinutes(1); // 부화 시간 24시간
+    private static final Duration INCUBATION_DURATION = Duration.ofMinutes(1); // 부화 시간 24시간 현재 임시로 1분
     private final RewardStockService rewardStockService;
 
     @Transactional
@@ -63,11 +63,11 @@ public class EggService {
 
 
 
-        return eggRepository.findByUserId(userId).stream()
-                .map(egg -> {updateEggStatus(egg);
+            return eggRepository.findByUserId(userId).stream()
+                    .map(egg -> {updateEggStatus(egg);
 
 
-                    return new EggResponseDTO(
+                return new EggResponseDTO(
 
                             egg.getId(),
                             egg.getUserId(),
@@ -78,7 +78,7 @@ public class EggService {
                             calculateTimeRemaining(egg.getCreatedAt())
 
                     );})
-                .toList();
+                    .toList();
 
     }
 
@@ -93,7 +93,7 @@ public class EggService {
     }
 
 
-    // 남은 시간 계산 함수
+        // 남은 시간 계산 함수
     private String calculateTimeRemaining(LocalDateTime createdAt) {
         LocalDateTime expirationTime = createdAt.plus(INCUBATION_DURATION);
         Duration remaining = Duration.between(LocalDateTime.now(), expirationTime);
@@ -117,10 +117,10 @@ public class EggService {
             throw new IllegalStateException("부화할 수 없는 알입니다.");
         }
 
-        // 1️⃣ 주식 지급
+        // 1.주식 지급
         rewardStockService.giveRandomStockToUser(userId, 10000); // 10,000원어치 주식 지급
 
-        // 2️⃣ 알 삭제
+        // 2.알 삭제
         eggRepository.delete(egg);
     }
 }
