@@ -1,6 +1,5 @@
 package com.team1.etpipeline.kafka.koreaInvestAPI;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.etpipeline.kafka.service.KafkaProducerService;
 import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.client.WebSocketClient;
@@ -23,7 +22,7 @@ public class KoreaInvestmentWebSocketClient {
 
     private String tradeKey;
     private String askKey;
-    // 20개의 tr_key를 리스트로 저장
+    // 30개의 tr_key를 리스트로 저장
     private final List<String> trKeys = List.of(
             "005930", "000660", "373220", "207940", "005380", "005935",
             "000270", "068270", "105560", "035420", "055550", "012330",
@@ -55,13 +54,27 @@ public class KoreaInvestmentWebSocketClient {
 
                 @Override
                 public void onMessage(String message) {
-                    log.info("Received message: {}", message);
+                    //log.info("Received message: {}", message);
                     //데이터 전처리 작업
                     /**
                      * 토픽: 체결가
                      * 키: 종목번호
                      * 메세지: 데이터 전처리하고 이걸 보내줌
                      */
+                    String[] splitData = message.split("\\^");
+
+                    // 필요한 인덱스의 값 추출
+                    if(splitData.length > 4) {
+                        String stockCode = splitData[0].substring(splitData[0].length() - 6);  // 종목코드의 마지막 6자리
+                        String currentPrice = splitData[2];  // 주식 현재가
+                        String priceChange = splitData[4];  // 전일 대비 변동 금액
+                        String changeRate = splitData[5];  // 전일 대비 변동률
+
+                        String data = stockCode+"^"+currentPrice + "^" + priceChange + "^" + changeRate;
+
+                        kafkaProducerService.sendMessage("H0STCNT0", stockCode, data);
+                    }
+
                 }
 
                 @Override
@@ -86,7 +99,7 @@ public class KoreaInvestmentWebSocketClient {
 
                 @Override
                 public void onMessage(String message) {
-                    log.info("Received message: {}", message);
+                    //log.info("Received message: {}", message);
                 }
 
                 @Override
