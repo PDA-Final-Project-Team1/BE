@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @Getter
 public class FriendResponseDto {
-    private final String uId;
+    private final Long id;
     private final String name;
 
     public FriendResponseDto(Friend friend) {
-        this.uId = friend.getSubscribed().getUid(); // 구독 대상자의 uid
+        this.id = friend.getSubscribed().getId(); // 구독 대상자의 id
         this.name = friend.getSubscribed().getName(); // 구독 대상자의 이름
     }
 }
