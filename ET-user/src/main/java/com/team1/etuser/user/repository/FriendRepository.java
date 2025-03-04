@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface FriendRepository extends JpaRepository<Friend, FriendId> {
     // 구독 목록 조회
-    List<Friend> findBySubscriber_Id(Long subscriberId);
+    List<Friend> findBySubscriberId(Long subscriberId);
+    boolean existsBySubscriberId(Long subscriberId);
 }
