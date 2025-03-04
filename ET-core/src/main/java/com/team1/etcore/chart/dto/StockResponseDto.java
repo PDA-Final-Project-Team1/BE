@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class StockResponseDto {
-    private String stockId;
+    private String stockCode;
     private String infoType;
     private String periodType;
     private boolean newlyListed;

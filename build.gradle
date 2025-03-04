@@ -169,6 +169,7 @@ project(':ET-core') {
         implementation 'org.springframework.boot:spring-boot-starter-data-redis'
         implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
         implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.kafka:spring-kafka'
         implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
         runtimeOnly 'com.mysql:mysql-connector-j'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -212,6 +213,9 @@ project(':ET-arcade') {
 project(':ET-pipeline') {
     dependencies {
         implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+        implementation 'org.springframework.boot:spring-boot-starter-webflux'
+        implementation 'org.java-websocket:Java-WebSocket:1.5.4'
+        implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
         implementation 'org.springframework.kafka:spring-kafka'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
         testImplementation 'org.springframework.kafka:spring-kafka-test'
