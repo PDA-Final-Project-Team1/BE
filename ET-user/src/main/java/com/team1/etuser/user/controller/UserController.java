@@ -75,4 +75,9 @@ public class UserController {
         userPetService.grantPet(userId, requestDto);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<UserResponseDto> getUserByUid(@RequestParam("uid") String uid) {
+        return ResponseEntity.ok(userService.getUserByUid(uid));
+    }
 }
