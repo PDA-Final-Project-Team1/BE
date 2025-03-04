@@ -13,15 +13,14 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class SseController {
     private final SseService sseService;
 
-    @GetMapping("/subscribe/trade-price/{userId}")//관심종목 현재가
-    public SseEmitter StockInterestPrice(@PathVariable String userId) {
+    @GetMapping("/subscribe/trade-price")//관심종목 현재가
+    public SseEmitter StockInterestPrice(@RequestHeader("X-Id") String userId) {
         System.out.println("컨트롤러 체크");
 
         return sseService.getInterestStockPrice(userId);
     }
-    @GetMapping("/subscribe/ask-price/{userId}")//보유 종목 현재가
-    public SseEmitter StockPortfolioPrice(@PathVariable String userId) {
-
+    @GetMapping("/subscribe/ask-price")//보유 종목 현재가
+    public SseEmitter StockPortfolioPrice(@RequestHeader("X-Id") String userId) {
         return sseService.getPortfolioStockPrice(userId);
     }
     @GetMapping("/ask-bid/{stockCode}")

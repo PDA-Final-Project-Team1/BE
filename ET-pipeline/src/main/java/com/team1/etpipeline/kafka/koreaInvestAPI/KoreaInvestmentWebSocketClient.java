@@ -22,7 +22,6 @@ public class KoreaInvestmentWebSocketClient {
 
     private String tradeKey;
     private String askKey;
-    // 30개의 tr_key를 리스트로 저장
     private final List<String> trKeys = List.of(
             "005930", "000660", "373220", "207940", "005380", "005935"
 //            "000270", "068270", "105560", "035420", "055550", "012330",
@@ -59,7 +58,7 @@ public class KoreaInvestmentWebSocketClient {
                     /**
                      * 토픽: 체결가
                      * 키: 종목번호
-                     * 메세지: 데이터 전처리하고 이걸 보내줌
+                     * 메세지: 데이터
                      */
                     String[] splitData = message.split("\\^");
 

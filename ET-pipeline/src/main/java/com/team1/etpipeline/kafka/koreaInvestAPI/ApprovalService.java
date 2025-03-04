@@ -40,10 +40,7 @@ public class ApprovalService {
     private String baseUrl;
 
     private final WebClient webClient;
-    //
-//    public ApprovalService(WebClient.Builder webClientBuilder) {
-//        this.webClient = webClientBuilder.baseUrl(baseUrl).build();
-//    }
+
     public ApprovalService(WebClient.Builder webClientBuilder) {
         HttpClient httpClient = HttpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
