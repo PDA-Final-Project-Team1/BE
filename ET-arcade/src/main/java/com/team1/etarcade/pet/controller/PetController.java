@@ -5,6 +5,7 @@ import com.team1.etarcade.pet.service.PetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,4 +30,12 @@ public class PetController {
         petService.grantRandomPet(userId);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/{subscribedId}")
+    public ResponseEntity<List<Pet>> getSubscriberPets(@RequestHeader("X-Id") Long userId,
+                                                       @PathVariable("subscribedId") Long subscribedId) {
+        List<Pet> pets = petService.getSubscriberPets(userId, subscribedId);
+        return ResponseEntity.ok(pets);
+    }
+
 }
