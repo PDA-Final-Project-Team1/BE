@@ -38,4 +38,8 @@ public class UserTradeHistory extends BaseEntity {
 
     @Column(nullable = false)
     private int amount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TradeStatus tradeStatus = TradeStatus.PENDING;
 }
