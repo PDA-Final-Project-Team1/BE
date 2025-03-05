@@ -1,7 +1,6 @@
 package com.team1.etuser.user.service;
 
 import com.team1.etuser.user.domain.User;
-import com.team1.etuser.user.domain.UserAdditionalInfo;
 import com.team1.etuser.user.dto.UserAccountInfoRes;
 import com.team1.etuser.user.dto.UserHistoryRes;
 import com.team1.etuser.user.dto.UserInfoRes;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

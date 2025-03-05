@@ -101,12 +101,16 @@ public class KoreaInvestmentWebSocketClient {
                     /***
                      * 호가 데이터 전처리
                      */
+                    log.info(message);
                     if(message.charAt(21) == '^') {
                         // 1. 종목코드 분리
                         String stockCode = message.substring(15, 21);
                         // 2. 종목코드를 제외한 나머지 데이터 추출
                         String datas = message.substring(22);
                         kafkaProducerService.sendMessage("H0STASP0", stockCode, datas);
+
+                        log.info("종목코드 = " + stockCode);
+                        log.info("전처리 후 = " + datas);
                     }
                 }
 
