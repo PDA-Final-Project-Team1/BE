@@ -1,6 +1,10 @@
 spring:
   application:
     name: ET-pipeline
+  config:
+    import:
+      - optional:file:ET-pipeline/.env[.properties]
+      - "classpath:korea-investment.properties"
 
 server:
   port: 8084

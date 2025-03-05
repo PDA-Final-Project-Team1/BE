@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-@FeignClient(name = "ET-user", path = "/api/user")
+@FeignClient(name = "ET-user", path = "/api/users")
 public interface UserFeignConnector {
 
 

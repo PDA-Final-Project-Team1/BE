@@ -1,11 +1,12 @@
 package com.team1.etuser.user.service;
 
 import com.team1.etuser.user.domain.User;
-import com.team1.etuser.user.domain.UserAdditionalInfo;
 import com.team1.etuser.user.dto.UserAccountInfoRes;
 import com.team1.etuser.user.dto.UserHistoryRes;
 import com.team1.etuser.user.dto.UserInfoRes;
+import com.team1.etuser.user.dto.UserResponseDto;
 import com.team1.etuser.user.dto.UserStocksRes;
+import com.team1.etuser.user.repository.FriendRepository;
 import com.team1.etuser.user.repository.UserAdditionalInfoRepository;
 import com.team1.etuser.user.repository.UserRepository;
 import com.team1.etuser.user.repository.UserStockRepository;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +30,7 @@ public class UserServiceImpl implements UserService{
     private final UserTradeHistoryRepository userTradeHistoryRepository;
     private final StockFeignService stockFeignService;
     private final UserStockRepository userStockRepository;
+    private final FriendRepository friendRepository;
 
     /**
      * @param uid 유저의 로그인 id
@@ -115,5 +116,16 @@ public class UserServiceImpl implements UserService{
         }
 
         return userStocksResList;
+    }
+
+    /**
+    * @return User의 응답 값 반환
+    */
+    @Override
+    public UserResponseDto getUserByUid(String uid) {
+        User user = userRepository.findByUid(uid)
+                .orElseThrow(() -> new RuntimeException("User not found with uid: " + uid));
+        boolean isSubscribed = friendRepository.existsBySubscriberId(user.getId());
+        return new UserResponseDto(user.getUid(), user.getName(), isSubscribed);
     }
 }

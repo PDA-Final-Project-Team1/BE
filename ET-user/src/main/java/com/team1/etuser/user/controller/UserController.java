@@ -78,6 +78,11 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<UserResponseDto> getUserByUid(@RequestParam("uid") String uid) {
+        return ResponseEntity.ok(userService.getUserByUid(uid));
+    }
+
     @GetMapping("/points")
     public ResponseEntity<UserPointRes> getUserPoints(@RequestHeader("X-Id") Long userId) {
         userEggService.getUserPoint(userId);

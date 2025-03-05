@@ -7,9 +7,11 @@ import com.team1.etuser.user.dto.SignUpRequestDto;
 import com.team1.etuser.user.repository.UserAdditionalInfoRepository;
 import com.team1.etuser.user.repository.UserRepository;
 import com.team1.etuser.user.security.JwtTokenProvider;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
 import java.math.BigDecimal;
 import java.security.SecureRandom;
@@ -24,7 +26,7 @@ public class AuthService {
 
     public void signup(SignUpRequestDto requestDto) {
         if (userRepository.existsByUid(requestDto.getUid())) {
-            throw new RuntimeException("User already exists");
+            throw new RuntimeException("이미 사용 중인 아이디입니다.");
         }
         User user = User.builder()
                 .uid(requestDto.getUid())
@@ -36,8 +38,8 @@ public class AuthService {
         String accountNumber = generateAccount();
         UserAdditionalInfo userAdditionalInfo = UserAdditionalInfo.builder()
                 .user(user)
-                .deposit(BigDecimal.ZERO)
-                .point(0)
+                .deposit(BigDecimal.valueOf(5000000))
+                .point(50000)
                 .account(accountNumber)
                 .build();
         userAdditionalInfoRepository.save(userAdditionalInfo);
@@ -45,15 +47,11 @@ public class AuthService {
 
     public String login(LoginRequestDto requestDto) {
         User user = userRepository.findByUid(requestDto.getUid())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElseThrow(() -> new RuntimeException("등록되지 않은 아이디입니다."));
         if (!passwordEncoder.matches(requestDto.getPwd(), user.getPwd())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new RuntimeException("아이디와 비밀번호가 일치하지 않습니다.");
         }
         return jwtTokenProvider.createToken(user.getId());
-    }
-
-    public void logout(String token) {
-        // JWT 블랙리스트 처리 (예: Redis에 저장)
     }
 
     public String generateAccount() {
