@@ -1,6 +1,7 @@
 package com.team1.etuser.user.service;
 
 import com.team1.etuser.user.domain.User;
+import com.team1.etuser.user.dto.StockDTO;
 import com.team1.etuser.user.dto.UserAccountInfoRes;
 import com.team1.etuser.user.dto.UserHistoryRes;
 import com.team1.etuser.user.dto.UserInfoRes;
@@ -75,7 +76,6 @@ public class UserServiceImpl implements UserService{
      */
     @Override
     public List<UserHistoryRes> getUserHistory(String userId) {
-//        Long id = 1L;
         Long id = Long.valueOf(userId);
 
         User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("사용자를 찾지 못했습니다."));
@@ -85,8 +85,14 @@ public class UserServiceImpl implements UserService{
         log.info(userHistoryResList.toString());
 
         for (UserHistoryRes u : userHistoryResList) {
-            String stockName = stockFeignService.getStock(u.getStockCode()).getName();
-            u.setStockName(stockName);
+            StockDTO stockDTO = stockFeignService.getStock(u.getStockCode());
+            if (stockDTO != null && stockDTO.getName() != null) {
+                u.setStockName(stockDTO.getName());
+            } else {
+                // stockName을 기본값 또는 알림 메시지를 설정
+                u.setStockName("Unknown Stock");
+                log.warn("Stock name not found for stockCode: {}", u.getStockCode());
+            }
         }
 
         return userHistoryResList;
