@@ -3,10 +3,7 @@ package com.team1.etuser.user.domain;
 import com.team1.etcommon.domain.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -39,7 +36,8 @@ public class UserTradeHistory extends BaseEntity {
     @Column(nullable = false)
     private int amount;
 
+    @Setter
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "trade_status", nullable = false)
     private TradeStatus tradeStatus = TradeStatus.PENDING;
 }
