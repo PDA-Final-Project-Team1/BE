@@ -16,17 +16,17 @@ public class ChartDataService {
     private final RestTemplate restTemplate;
     private final ChartDataRepository chartDataRepository;
 
-    public StockResponseDto getStockData(String stockId) {
+    public StockResponseDto getStockData(String stockCode) {
         String today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String redisKey = stockId + ":" + today;
+        String redisKey = stockCode + ":" + today;
 
         // Redis에서 데이터 조회
         return chartDataRepository.getStockData(redisKey)
-                .orElseGet(() -> fetchAndCacheStockData(stockId, redisKey));
+                .orElseGet(() -> fetchAndCacheStockData(stockCode, redisKey));
     }
 
-    private StockResponseDto fetchAndCacheStockData(String stockId, String redisKey) {
-        String apiUrl = "https://api.stock.naver.com/chart/domestic/item/" + stockId + "?periodType=dayCandle";
+    private StockResponseDto fetchAndCacheStockData(String stockCode, String redisKey) {
+        String apiUrl = "https://api.stock.naver.com/chart/domestic/item/" + stockCode + "?periodType=dayCandle";
         StockResponseDto stockData = restTemplate.getForObject(apiUrl, StockResponseDto.class);
 
         if (stockData != null) {
