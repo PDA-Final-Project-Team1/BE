@@ -1,6 +1,7 @@
 package com.team1.etuser.user.dto;
 
 import com.team1.etuser.user.domain.Position;
+import com.team1.etuser.user.domain.TradeStatus;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -18,4 +19,6 @@ public class UserHistoryRes {
     private Position position;
     private int amount;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private TradeStatus tradeStatus;
 }
