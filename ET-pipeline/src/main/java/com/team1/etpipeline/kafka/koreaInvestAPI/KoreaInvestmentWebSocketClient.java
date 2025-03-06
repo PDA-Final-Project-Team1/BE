@@ -23,7 +23,8 @@ public class KoreaInvestmentWebSocketClient {
     private String tradeKey;
     private String askKey;
     private final List<String> trKeys = List.of(
-            "005930", "000660", "373220", "207940", "005380", "005935"
+            "005930"
+//            "005930", "000660", "373220", "207940", "005380", "005935"
 //            "000270", "068270", "105560", "035420", "055550", "012330",
 //            "005490", "028260", "032830", "010130", "051910", "329180",
 //            "138040", "006400", "012450", "000810", "086790", "011200",
@@ -109,8 +110,6 @@ public class KoreaInvestmentWebSocketClient {
                         String datas = message.substring(22);
                         kafkaProducerService.sendMessage("H0STASP0", stockCode, datas);
 
-                        log.info("종목코드 = " + stockCode);
-                        log.info("전처리 후 = " + datas);
                     }
                 }
 
