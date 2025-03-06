@@ -1,6 +1,8 @@
 package com.team1.etarcade.pet.service;
 
 import com.team1.etarcade.pet.domain.Pet;
+import com.team1.etarcade.pet.dto.PetGrantRequestDTO;
+import com.team1.etarcade.pet.dto.PetGrantResponseDTO;
 import com.team1.etarcade.pet.dto.SubscriptionResponseDTO;
 import com.team1.etarcade.pet.dto.UserPetResponseDTO;
 import com.team1.etarcade.pet.connector.FriendFeignConnector;
@@ -49,13 +51,13 @@ public class PetService {
     }
 
     // 기존 랜덤 펫 지급 로직
-    public void grantRandomPet(Long userId) {
+    public PetGrantResponseDTO grantRandomPet(Long userId) {
         List<Pet> allPets = petRepository.findAll();
         if (allPets.isEmpty()) {
             throw new RuntimeException("No available pets to grant.");
         }
         int randomIndex = (int) (Math.random() * allPets.size());
         Pet selectedPet = allPets.get(randomIndex);
-        userFeignConnector.grantPet(userId, new com.team1.etarcade.pet.dto.PetGrantRequestDTO(selectedPet.getId()));
+        return userFeignConnector.grantPet(userId, new PetGrantRequestDTO(selectedPet.getId()));
     }
 }

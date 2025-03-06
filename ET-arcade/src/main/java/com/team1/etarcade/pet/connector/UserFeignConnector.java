@@ -1,6 +1,7 @@
 package com.team1.etarcade.pet.connector;
 
 import com.team1.etarcade.pet.dto.PetGrantRequestDTO;
+import com.team1.etarcade.pet.dto.PetGrantResponseDTO;
 import com.team1.etarcade.pet.dto.UserPetResponseDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,6 @@ public interface UserFeignConnector {
     List<UserPetResponseDTO> getUserPets(@RequestHeader("X-Id") Long userId);
 
     @PostMapping("/pets")
-    void grantPet(@RequestHeader("X-Id") Long userId, @RequestBody PetGrantRequestDTO requestDto);
+    PetGrantResponseDTO grantPet(@RequestHeader("X-Id") Long userId, @RequestBody PetGrantRequestDTO requestDto);
 }
 
