@@ -27,7 +27,7 @@ spring:
           - id: ARCADE-SERVICE
             uri: lb://ET-arcade
             predicates:
-              - Path=/api/pets/**, /api/quizs/**, /api/eggs/**
+              - Path=/api/pets/**, /api/quizs/**, /api/eggs/**, /api/chat/**
 
 eureka:
   client:
