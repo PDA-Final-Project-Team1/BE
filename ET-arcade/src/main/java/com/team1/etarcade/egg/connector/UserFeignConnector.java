@@ -1,10 +1,10 @@
 package com.team1.etarcade.egg.connector;
 
 
-import com.team1.etarcade.egg.dto.UserFeignPointResponseDTO;
+import com.team1.etarcade.egg.dto.UserFeignPointReq;
+import com.team1.etarcade.egg.dto.UserFeignPointRes;
 import com.team1.etarcade.egg.dto.UserFeignStockResponseDTO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -19,8 +19,11 @@ public interface UserFeignConnector {
 
     //유저포인트 받아오기
     @GetMapping("/api/users/userpoint")
-    UserFeignPointResponseDTO getUserPointInfo(@RequestHeader("X-Id") Long userId);
+    UserFeignPointRes getUserPointInfo(@RequestHeader("X-Id") Long userId);
 
+    //유저포인트 차감하기
+    @PostMapping("/api/users/userpoint")
+    UserFeignPointReq setUserPointInfo(@RequestHeader("X-Id") Long userId);
 
 }
 
