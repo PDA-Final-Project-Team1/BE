@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .cors(cors -> cors.configurationSource(corsConfig()))
                 .authorizeHttpRequests(auth->
-                                auth.requestMatchers("/api/auth/signup", "/api/auth/login").permitAll()
+                                auth.requestMatchers("/api/auth/signup", "/api/auth/login", "/api/users/duplicate").permitAll()
                                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtGatewayFilter, UsernamePasswordAuthenticationFilter.class);
@@ -36,7 +36,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfig() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*");
+        configuration.addAllowedOrigin("http://localhost:5173");
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
