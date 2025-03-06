@@ -1,11 +1,12 @@
 package com.team1.etarcade.egg.connector;
 
 
-import com.team1.etarcade.egg.dto.UserFeignPointReq;
 import com.team1.etarcade.egg.dto.UserFeignPointRes;
 import com.team1.etarcade.egg.dto.UserFeignStockResponseDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
+
 
 
 @FeignClient(name = "ET-user" , path = "/api/users" ,contextId = "userEggFeignConnector")
@@ -21,9 +22,10 @@ public interface UserFeignConnector {
     @GetMapping("/points")
     UserFeignPointRes getUserPointInfo(@RequestHeader("X-Id") Long userId);
 
+
     //유저포인트 차감하기
-    @PostMapping("/points")
-    UserFeignPointReq setUserPointInfo(@RequestHeader("X-Id") Long userId);
+    @PatchMapping("/points")
+    void deductUserPoints(@RequestHeader("X-Id") Long userId,@RequestParam("amount") int amount);
 
 }
 
