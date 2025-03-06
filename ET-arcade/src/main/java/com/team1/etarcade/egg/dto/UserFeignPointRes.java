@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserFeignPointRes {
-    private Long userId;
+
     private int point;
+    private Boolean hasEnoughPoints;
+
+
 }

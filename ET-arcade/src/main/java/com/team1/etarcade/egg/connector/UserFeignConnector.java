@@ -8,7 +8,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 
-@FeignClient(name = "ET-user", path = "/api/user-stocks")
+@FeignClient(name = "ET-user" , path = "/api/users" ,contextId = "userEggFeignConnector")
 public interface UserFeignConnector {
 
 
@@ -18,11 +18,11 @@ public interface UserFeignConnector {
 
 
     //유저포인트 받아오기
-    @GetMapping("/api/users/userpoint")
+    @GetMapping("/points")
     UserFeignPointRes getUserPointInfo(@RequestHeader("X-Id") Long userId);
 
     //유저포인트 차감하기
-    @PostMapping("/api/users/userpoint")
+    @PostMapping("/points")
     UserFeignPointReq setUserPointInfo(@RequestHeader("X-Id") Long userId);
 
 }

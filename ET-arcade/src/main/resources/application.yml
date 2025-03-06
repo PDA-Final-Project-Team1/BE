@@ -24,12 +24,12 @@ eureka:
     prefer-ip-address: true
     ip-address: ${HOST_NAME}
 
-#feign:
-#  client:
-#    config:
-#      default:
-#        connectTimeout: 5000
-#        readTimeout: 5000
-#        loggerLevel: full
-#
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: full
+
 

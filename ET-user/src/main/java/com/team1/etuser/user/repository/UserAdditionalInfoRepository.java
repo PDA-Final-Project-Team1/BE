@@ -16,4 +16,10 @@ public interface UserAdditionalInfoRepository extends JpaRepository<UserAddition
 
     @Query(value = "SELECT deposit FROM user_additional_info u WHERE u.user_id = :userId",nativeQuery = true)
     BigDecimal findByUserDeposit(@Param("userId") Long userId);
+
+    @Query("SELECT u.point FROM UserAdditionalInfo u WHERE u.user_id = :userId")
+    Integer findUserPointByUserId(@Param("userId") Long userId);
+
+
+
 }
