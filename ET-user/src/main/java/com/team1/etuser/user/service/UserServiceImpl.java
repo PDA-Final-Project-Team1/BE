@@ -132,6 +132,6 @@ public class UserServiceImpl implements UserService{
         User user = userRepository.findByUid(uid)
                 .orElseThrow(() -> new RuntimeException("User not found with uid: " + uid));
         boolean isSubscribed = friendRepository.existsBySubscriberId(user.getId());
-        return new UserResponseDto(user.getUid(), user.getName(), isSubscribed);
+        return new UserResponseDto(user.getId(), user.getUid(), user.getName(), isSubscribed);
     }
 }
