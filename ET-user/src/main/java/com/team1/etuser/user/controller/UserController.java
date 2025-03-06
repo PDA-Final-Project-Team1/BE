@@ -1,6 +1,7 @@
 package com.team1.etuser.user.controller;
 
 
+import com.team1.etuser.user.domain.UserPet;
 import com.team1.etuser.user.dto.*;
 import com.team1.etuser.user.service.UserFavoriteService;
 import com.team1.etuser.user.service.UserPetService;
@@ -70,10 +71,10 @@ public class UserController {
     }
 
     @PostMapping("/pets")
-    public ResponseEntity<Void> grantPet(@RequestHeader("X-Id") Long userId,
+    public ResponseEntity<UserPet> grantPet(@RequestHeader("X-Id") Long userId,
                                          @RequestBody PetGrantRequestDto requestDto) {
-        userPetService.grantPet(userId, requestDto);
-        return ResponseEntity.ok().build();
+        UserPet userPet = userPetService.grantPet(userId, requestDto);
+        return ResponseEntity.ok(userPet);
     }
 
     @GetMapping("/search")

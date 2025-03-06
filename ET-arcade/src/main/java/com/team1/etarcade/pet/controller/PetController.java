@@ -1,6 +1,8 @@
 package com.team1.etarcade.pet.controller;
 
 import com.team1.etarcade.pet.domain.Pet;
+import com.team1.etarcade.pet.dto.PetGrantResponseDTO;
+import com.team1.etarcade.pet.repository.PetRepository;
 import com.team1.etarcade.pet.service.PetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.util.List;
 public class PetController {
 
     private final PetService petService;
+    private final PetRepository petRepository;
 
     @GetMapping
     public ResponseEntity<List<Pet>> getUserPets(@RequestHeader("X-Id") Long userId) {
@@ -26,9 +29,10 @@ public class PetController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> grantRandomPet(@RequestHeader("X-Id") Long userId) {
-        petService.grantRandomPet(userId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<PetGrantResponseDTO> grantRandomPet(@RequestHeader("X-Id") Long userId) {
+        Long petId = petService.grantRandomPet(userId).getPetId();
+        String img = petRepository.findPetById(petId).getImg();
+        return ResponseEntity.ok(new PetGrantResponseDTO(petId, img));
     }
 
     @GetMapping("/{subscribedId}")
