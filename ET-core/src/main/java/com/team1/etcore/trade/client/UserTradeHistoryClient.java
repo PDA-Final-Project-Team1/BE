@@ -35,7 +35,7 @@ public interface UserTradeHistoryClient {
     /**
      * 주문상태 업데이트
      */
-    @PatchMapping("/api/users/feign/trade/order/update")
+    @PutMapping("/api/users/feign/trade/order/update")
     boolean updateHistoryStatus(@RequestParam("orderId") Long historyId,
                                 @RequestParam("status") TradeStatus tradeStatus);
 

@@ -1,5 +1,6 @@
 package com.team1.etcore.trade.controller;
 
+import com.team1.etcore.trade.dto.TradeCancelReq;
 import com.team1.etcore.trade.dto.TradeReq;
 import com.team1.etcore.trade.dto.TradeRes;
 import com.team1.etcore.trade.dto.Position;
@@ -50,6 +51,17 @@ public class TradeController {
         } catch (Exception e) {
             log.error("매도 주문 처리 중 오류 발생 (사용자: {}): {}", userId, e.getMessage(), e);
             throw new RuntimeException("매도 주문 생성 실패", e);
+        }
+    }
+
+    @PostMapping("/cancel")
+    public void cancel(@RequestHeader("X-Id") String userId, @RequestBody TradeCancelReq tradeCancelReq) {
+        try {
+            tradeService.cancelOrder(tradeCancelReq.getTradeId(), tradeCancelReq.getPosition(), tradeCancelReq.getStockCode(), tradeCancelReq.getPrice());
+            log.info("거래 취소 성공: userId={}, tradeId={}", userId, tradeCancelReq.getTradeId());
+        } catch (Exception e) {
+            log.error("거래 취소 중 오류 발생: userId={}, tradeId={}, error={}", userId, tradeCancelReq.getTradeId(), e.getMessage(), e);
+            throw new RuntimeException("거래 취소 중 오류가 발생했습니다.", e);
         }
     }
 }
