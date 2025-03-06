@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserFeignPointResponseDTO {
-    private Long userId;
+public class UserFeignPointRes {
+
     private int point;
+    private Boolean hasEnoughPoints;
+
+
 }

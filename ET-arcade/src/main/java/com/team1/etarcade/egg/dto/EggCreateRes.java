@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EggResponseDTO {
+public class EggCreateRes {
     private Long eggId;
     private Long userId;
     private String hatchableStatus;

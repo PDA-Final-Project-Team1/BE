@@ -1,6 +1,7 @@
 package com.team1.etuser.user.service;
 
 import com.team1.etuser.user.domain.UserAdditionalInfo;
+import com.team1.etuser.user.dto.feign.PointRes;
 import com.team1.etuser.user.repository.UserAdditionalInfoRepository;
 import com.team1.etuser.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -41,4 +42,24 @@ public class UserAdditionalService {
 
         return true;
     }
+
+    /**
+     * 유저 포인트 받아오기 및 충분한지 체크
+     */
+
+    public PointRes getUserPoints(Long userId) {
+        System.out.println("userId 값 확인: " + userId);
+
+        Integer userPoint = userAdditionalInfoRepository.findUserPointByUserId(userId);
+        boolean hasEnough = userPoint >= 100;
+
+        log.info("유저 포인트 조회 - userId: {}, points: {}, hasEnough: {}", userId, userPoint, hasEnough);
+
+        return PointRes.builder()
+                .point(userPoint)
+                .hasEnoughPoints(hasEnough) // 결과 포함
+                .build();
+    }
+
+
 }

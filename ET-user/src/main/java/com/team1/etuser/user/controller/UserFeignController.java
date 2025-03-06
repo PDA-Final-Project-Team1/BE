@@ -3,6 +3,7 @@ package com.team1.etuser.user.controller;
 import com.team1.etuser.user.domain.Position;
 import com.team1.etuser.user.domain.TradeStatus;
 import com.team1.etuser.user.domain.UserTradeHistory;
+import com.team1.etuser.user.dto.feign.PointRes;
 import com.team1.etuser.user.dto.feign.TradeReq;
 import com.team1.etuser.user.dto.feign.TradeRes;
 import com.team1.etuser.user.service.UserAdditionalService;
@@ -70,5 +71,6 @@ public class UserFeignController {
         log.info("ET-user: 보유 주식 요청 수신 (사용자: {}): {}", userId, stockCode);
         return userStockService.updateUserStock(userId, stockCode, amount, price, position);
     }
+
 
 }

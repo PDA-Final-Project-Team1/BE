@@ -21,4 +21,6 @@ public interface UserService {
     List<UserStocksRes> getUserStocks(String userId);
 
     UserResponseDto getUserByUid(String uid);
+
+  
 }
