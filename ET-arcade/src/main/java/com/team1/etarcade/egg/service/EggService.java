@@ -42,8 +42,7 @@ public class EggService {
                 .build();
         Egg savedEgg = eggRepository.save(newEgg);
 
-        // 포인트 차감 (별도의 Feign API 필요할 수 있음)
-        // userClient.deductPoints(userId, 100);  <- 추후 구현
+        userFeignConnector.deductUserPoints(userId, 100);
 
 
         //알DTO 반환
