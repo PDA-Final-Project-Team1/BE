@@ -13,4 +13,6 @@ public interface UserTradeHistoryRepository extends JpaRepository<UserTradeHisto
     @Query("SELECT new com.team1.etuser.user.dto.UserHistoryRes(u.stockCode, '', u.price, u.position, u.amount, u.createdAt, u.updatedAt, u.tradeStatus) " +
             "FROM UserTradeHistory u WHERE u.user = :user")
     List<UserHistoryRes> findUserHistory(@Param("user") User user);
+
+
 }

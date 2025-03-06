@@ -20,13 +20,13 @@ public class EggController {
 
 
     //알 습득
-    @PostMapping("/{userId}")
-    public ResponseEntity<EggResponseDTO> acquireEgg(@PathVariable Long userId) {
+    @PostMapping
+    public ResponseEntity<EggResponseDTO> acquireEgg(@RequestHeader("X-Id") Long userId) {
         EggResponseDTO response = eggService.acquireEgg(userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-    @GetMapping({"/{userId}"})
-    public ResponseEntity<List<EggResponseDTO>> getAllEggs(@PathVariable Long userId) {
+    @GetMapping
+    public ResponseEntity<List<EggResponseDTO>> getAllEggs(@RequestHeader("X-Id") Long userId) {
         List<EggResponseDTO> eggs = eggService.getAllEggs(userId);
         return ResponseEntity.ok(eggs);
     }
