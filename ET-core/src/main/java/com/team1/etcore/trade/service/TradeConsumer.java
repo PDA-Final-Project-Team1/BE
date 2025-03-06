@@ -1,5 +1,6 @@
 package com.team1.etcore.trade.service;
 
+import com.team1.etcore.trade.dto.QuoteDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -19,23 +20,24 @@ public class TradeConsumer {
     public void consumeTradeMessage(ConsumerRecord<String, String> record) {
         try {
             String stockCode = record.key();
-            String data = record.value();
-            log.info("Kafka 메시지 수신 - 종목코드: {}, 데이터: {}", stockCode, data);
-            // 예시로 체결 가격을 매도호가 배열의 첫번째 값(최저 매도호가)로 가정
-            String[] fields = data.split("\\^");
-            if (fields.length < 42) {
-                log.warn("필드 개수가 부족합니다: {}", data);
+            String value = record.value();
+//            log.info("Kafka 메시지 수신 - 종목코드: {}, 데이터: {}", stockCode, value);
+
+            String[] quoteData = value.split("\\^");
+            if (quoteData.length < 42) {
+                log.warn("필드 개수가 부족합니다: {}", value);
                 return;
             }
-            // 첫 번째 매도호가(fields[2])를 체결 가격으로 사용
-            BigDecimal buyPrice = new BigDecimal(fields[2]);
-            log.info("매수 체결용 체결 가격 (최저 매도호가): {}", buyPrice);
-            // 첫 번째 매수호가(fields[12])를 체결 가격으로 사용
-            BigDecimal sellPrice = new BigDecimal(fields[12]);
-            log.info("매도 체결용 체결 가격 (첫 번째 매수호가): {}", sellPrice);
 
+            QuoteDTO quoteDTO = QuoteDTO.builder()
+                    .stockCode(stockCode)
+                    .buyPrice(new BigDecimal(quoteData[2]))
+                    .buyAmount(Integer.parseInt(quoteData[22]))
+                    .sellPrice(new BigDecimal(quoteData[12]))
+                    .sellAmount(Integer.parseInt(quoteData[32]))
+                    .build();
             // 체결 처리
-            tradeService.processTrade(stockCode, buyPrice, sellPrice);
+            tradeService.processTrade(quoteDTO);
         } catch (Exception e) {
             log.error("Kafka 메시지 처리 중 오류 발생: {}", e.getMessage(), e);
         }

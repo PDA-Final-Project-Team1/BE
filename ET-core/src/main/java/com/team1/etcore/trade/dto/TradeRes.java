@@ -1,11 +1,15 @@
 package com.team1.etcore.trade.dto;
 
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TradeRes {
     private Long id;
     private LocalDateTime createdAt;
@@ -16,4 +20,19 @@ public class TradeRes {
     private String stockCode;
     private Long userId;
     private TradeStatus status;
+
+    @Override
+    public String toString() {
+        return "TradeRes{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", amount=" + amount +
+                ", position=" + position +
+                ", price=" + price +
+                ", stockCode='" + stockCode + '\'' +
+                ", userId=" + userId +
+                ", status=" + status +
+                '}';
+    }
 }
