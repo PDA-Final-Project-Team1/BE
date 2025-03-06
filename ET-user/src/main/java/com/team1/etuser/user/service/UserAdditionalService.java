@@ -49,9 +49,6 @@ public class UserAdditionalService {
 
     public PointRes getUserPoints(Long userId) {
         System.out.println("userId 값 확인: " + userId);
-        UserAdditionalInfo userAdditionalInfo = userAdditionalInfoRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("유저 추가정보를 찾을 수 없습니다."));
-        log.info(userAdditionalInfo.toString());
 
         Integer userPoint = userAdditionalInfoRepository.findUserPointByUserId(userId);
         boolean hasEnough = userPoint >= 100;

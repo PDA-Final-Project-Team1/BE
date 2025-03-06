@@ -32,7 +32,7 @@ public class EggService {
         UserFeignPointRes userInfo = userFeignConnector.getUserPointInfo(userId);
 
         //유저가 가진 포인트 조회
-        if (userInfo.getHasEnoughPoints()) {
+        if (!userInfo.getHasEnoughPoints()) {
             throw new IllegalStateException("포인트가 부족합니다.");
         }
 
