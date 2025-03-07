@@ -37,7 +37,7 @@ public class UserFeignController {
         return userTradeHistoryService.createOrder(userId, tradeReq);
     }
 
-    @PutMapping("/api/users/feign/trade/order/update")
+    @PutMapping("/trade/order/update")
     boolean updateHistoryStatus(@RequestParam("orderId") Long historyId,
                               @RequestParam("status") TradeStatus tradeStatus) {
         log.info("ET-user: 주문 생성 요청 수신 (historyId: {}): {}", historyId, tradeStatus.toString());
