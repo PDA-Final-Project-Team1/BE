@@ -45,18 +45,7 @@ public class UserFeignController {
         return userTradeHistoryService.updateHistoryStatus(historyId, tradeStatus);
     }
 
-//    @PatchMapping("/account/deduct")
-//    boolean deductDeposit(@RequestParam("userId") Long userId, @RequestParam("amount") BigDecimal amount) {
-//        log.info("ET-user: 예치금 차감 요청 수신 (사용자: {}): {}", userId, amount);
-//        return userTradeHistoryService.deductDeposit(userId, amount);
-//    }
-//
-//    @PatchMapping("/api/users/feign/account/credit")
-//    boolean creditDeposit(@RequestParam("userId") Long userId, @RequestParam("amount") BigDecimal amount) {
-//        log.info("ET-user: 예치금 추가 요청 수신 (사용자: {}): {}", userId, amount);
-//        return userTradeHistoryService.creditDeposit(userId, amount);
-//    }
-    @PatchMapping("/account/update")
+    @PutMapping("/account/update")
     boolean updateDeposit(@RequestParam("userId") Long userId, @RequestParam("amount") BigDecimal amount) {
         log.info("ET-user: 예치금 업데이트 요청 수신 (사용자: {}): {}", userId, amount);
         return userAdditionalService.updateDeposit(userId, amount);

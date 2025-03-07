@@ -24,14 +24,6 @@ public interface UserTradeHistoryClient {
     @PostMapping("/api/users/feign/trade/order")
     TradeRes createOrder(@RequestParam("userId") Long userId, @RequestBody TradeReq tradeReq);
 
-
-//    /**
-//     * 특정 종목과 체결 가격(주문 가격)으로 미체결(PENDING) 주문 목록을 조회합니다.
-//     */
-//    @GetMapping("/api/users/feign/trade/order/pending")
-//    List<TradeRes> getPendingOrders(@RequestParam("stockCode") String stockCode,
-//                                    @RequestParam("tradePrice") BigDecimal tradePrice);
-
     /**
      * 주문상태 업데이트
      */
@@ -39,23 +31,10 @@ public interface UserTradeHistoryClient {
     boolean updateHistoryStatus(@RequestParam("orderId") Long historyId,
                                 @RequestParam("status") TradeStatus tradeStatus);
 
-//    /**
-//     * 사용자 예치금 차감 API (BUY)
-//     */
-//    @PatchMapping("/api/users/feign/account/deduct")
-//    boolean deductDeposit(@RequestParam("userId") Long userId,
-//                          @RequestParam("amount") BigDecimal amount);
-//    /**
-//     * 사용자 예치금 충전 API (SELL)
-//     */
-//    @PatchMapping("/api/users/feign/account/credit")
-//    boolean creditDeposit(@RequestParam("userId") Long userId,
-//                          @RequestParam("amount") BigDecimal amount);
-
     /**
      * 사용자 예치금 업데이트
      */
-    @PatchMapping("/api/users/feign/account/update")
+    @PutMapping("/api/users/feign/account/update")
     boolean updateDeposit(@RequestParam("userId") Long userId, @RequestParam("amount") BigDecimal amount);
 
     /**
