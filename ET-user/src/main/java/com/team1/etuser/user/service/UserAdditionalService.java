@@ -44,7 +44,8 @@ public class UserAdditionalService {
     }
 
     /**
-     * 유저 포인트 받아오기 및 충분한지 체크
+     * FEGIN- 유저 포인트 받아오기 및 충분한지 체크
+     *
      */
 
     public PointRes getUserPoints(Long userId) {
@@ -65,6 +66,12 @@ public class UserAdditionalService {
                 .point(userPoint)
                 .hasEnoughPoints(hasEnough) // 결과 포함
                 .build();
+    }
+    // API 연결용 유저포인트 함수
+    public Integer UserPoints(Long userId) {
+        System.out.println("userId 값 확인22: " + userId);
+
+        return userAdditionalInfoRepository.findUserPointByUserId(userId);
     }
 
 
