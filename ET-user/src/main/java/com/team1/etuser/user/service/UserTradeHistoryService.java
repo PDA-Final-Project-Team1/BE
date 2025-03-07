@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -54,15 +55,15 @@ public class UserTradeHistoryService {
     }
 
     public boolean updateHistoryStatus(Long historyId, TradeStatus tradeStatus) {
-        UserTradeHistory userTradeHistory = userTradeHistoryRepository.findById(historyId)
-                .orElseThrow(() -> new EntityNotFoundException("거래 내역을 찾지 못했습니다."));
+        Optional<UserTradeHistory> userTradeHistory = userTradeHistoryRepository.findById(historyId);
 
-        userTradeHistory.setTradeStatus(tradeStatus);
-        userTradeHistoryRepository.save(userTradeHistory);
+        if (userTradeHistory.isEmpty()) {
+            return false;
+        }
+
+        userTradeHistory.get().setTradeStatus(tradeStatus);
+        userTradeHistoryRepository.save(userTradeHistory.get());
 
         return true;
     }
-
-
-
 }

@@ -5,7 +5,6 @@ import com.team1.etuser.user.domain.User;
 import com.team1.etuser.user.domain.UserStock;
 import com.team1.etuser.user.repository.UserRepository;
 import com.team1.etuser.user.repository.UserStockRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -24,9 +24,13 @@ public class UserStockService {
 
     public boolean updateUserStock(Long userId, String stockCode, int amount, BigDecimal price, Position position) {
         // 유저 조회
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다"));
+        Optional<User> user = userRepository.findById(userId);
+
+        if (user.isEmpty()) {
+            return false;
+        }
         // 유저 보유 주식이 존재하는지 조회
-        UserStock userStock = userStockRepository.findByUserAndStockCode(user, stockCode);
+        UserStock userStock = userStockRepository.findByUserAndStockCode(user.get(), stockCode);
 
         if (position.equals(Position.BUY)) {
             if (userStock == null) {
@@ -35,7 +39,7 @@ public class UserStockService {
                         .amount(amount)
                         .averagePrice(price)
                         .stockCode(stockCode)
-                        .user(user)
+                        .user(user.get())
                         .build();
             } else {
                 // 기존 보유 수량과 평단가를 기준으로 새로운 평단가 계산
@@ -58,12 +62,12 @@ public class UserStockService {
             return true;
         } else if (position.equals(Position.SELL)) {
             if (userStock == null) {
-                throw new IllegalStateException("보유 주식이 없습니다.");
+                return false;
             }
 
             int existingAmount = userStock.getAmount();
             if (existingAmount < amount) {
-                throw new IllegalArgumentException("판매할 주식 수량이 보유 수량보다 많습니다.");
+                return false;
             }
 
             int newAmount = existingAmount - amount;
@@ -77,7 +81,7 @@ public class UserStockService {
             }
             return true;
         } else {
-            throw new IllegalArgumentException("알 수 없는 포지션입니다: " + position);
+            return false;
         }
     }
 }

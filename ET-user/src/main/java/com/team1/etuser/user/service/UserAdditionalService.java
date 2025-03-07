@@ -3,20 +3,18 @@ package com.team1.etuser.user.service;
 import com.team1.etuser.user.domain.UserAdditionalInfo;
 import com.team1.etuser.user.dto.feign.PointRes;
 import com.team1.etuser.user.repository.UserAdditionalInfoRepository;
-import com.team1.etuser.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserAdditionalService {
     private final UserAdditionalInfoRepository userAdditionalInfoRepository;
-    private final UserRepository userRepository;
 
     /**
      * @return 보유 예치금보다 가격이 높을 시 false
@@ -32,13 +30,17 @@ public class UserAdditionalService {
      */
     public boolean updateDeposit(Long userId, BigDecimal amount) {
 
-        UserAdditionalInfo userAdditionalInfo = userAdditionalInfoRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("유저 추가정보를 찾을 수 없습니다."));
+        Optional<UserAdditionalInfo> userAdditionalInfo = userAdditionalInfoRepository.findById(userId);
 
-        BigDecimal result = userAdditionalInfo.getDeposit().add(amount);
+        if (userAdditionalInfo.isEmpty()) {
+            return false;
+        }
 
-        userAdditionalInfo.setDeposit(result);
-        userAdditionalInfoRepository.save(userAdditionalInfo);
+        BigDecimal result = userAdditionalInfo.get().getDeposit().add(amount);
+
+        userAdditionalInfo.get().setDeposit(result);
+
+        userAdditionalInfoRepository.save(userAdditionalInfo.get());
 
         return true;
     }
@@ -60,6 +62,4 @@ public class UserAdditionalService {
                 .hasEnoughPoints(hasEnough) // 결과 포함
                 .build();
     }
-
-
 }
