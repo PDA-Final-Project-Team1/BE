@@ -1,5 +1,7 @@
 package com.team1.etcore.trade.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team1.etcore.stock.service.SseService;
 import com.team1.etcore.trade.client.UserTradeHistoryClient;
 import com.team1.etcore.trade.dto.*;
 import jakarta.transaction.Transactional;
@@ -20,7 +22,10 @@ public class TradeService {
 
     private final UserTradeHistoryClient userTradeHistoryClient;
     private final RedisTemplate<String, TradeRes> redisTemplate;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final TradeSettlement tradeSettlement;
+    private final SseService sseService;
+
     /**
      * 사용자의 주문(거래) 생성 요청을 받아 ET-user 모듈에 주문 기록을 생성하고, Redis에 캐싱합니다.
      * @param tradeReq 주문 요청 정보
@@ -50,7 +55,85 @@ public class TradeService {
         }
     }
 
+    /**
+     * 거래 취소:
+     * 1. MySQL DB에 저장된 거래 내역(UserTradeHistory)의 status를 CANCELLED로 업데이트
+     * 2. Redis에서 key(orders:{position}:{stockCode}:{price})로 조회한 후,
+     *    반환된 값들 중 tradeId와 일치하는 항목을 삭제
+     * 위 2가지 작업이 모두 성공되어야 트랜잭션이 커밋됩니다.
+     *
+     * @param tradeId   거래 ID
+     * @param position  주문 포지션 (BUY/SELL)
+     * @param stockCode 주식 코드
+     * @param price     주식 가격
+     */
 
+    @Transactional
+    public void cancelOrder(Long tradeId, Position position, String stockCode, BigDecimal price) {
+        // 1. DB 업데이트: UserTradeHistory의 상태를 CANCELLED로 변경
+        boolean updateResult = userTradeHistoryClient.updateHistoryStatus(tradeId, TradeStatus.CANCELLED);
+        if (!updateResult) {
+            throw new RuntimeException("DB 거래 상태 업데이트에 실패했습니다. tradeId=" + tradeId);
+        }
+        log.info("DB 거래 상태 업데이트 완료: tradeId={}", tradeId);
+
+        // 2. Redis에서 해당 값 삭제: 해당 주문을 캐싱한 ZSet에서 tradeId에 해당하는 항목을 제거
+        String formattedPrice = price.stripTrailingZeros().toPlainString();
+
+        String key = "orders:" + position.name() + ":" + stockCode + ":" + formattedPrice;
+        Set<TradeRes> tradeSet = redisTemplate.opsForZSet().range(key, 0, -1);
+        if (tradeSet == null || tradeSet.isEmpty()) {
+            throw new RuntimeException("Redis key [" + key + "]에 데이터가 없습니다. tradeId=" + tradeId);
+        }
+
+        boolean removed = false;
+        for (Object obj : tradeSet) {
+            Long parsedTradeId = parseTradeId(obj);
+            if (parsedTradeId != null && parsedTradeId.equals(tradeId)) {
+                Long removedCount = redisTemplate.opsForZSet().remove(key, obj);
+                if (removedCount == null || removedCount == 0) {
+                    throw new RuntimeException("Redis에서 tradeId 제거에 실패했습니다. tradeId=" + tradeId);
+                }
+                removed = true;
+                log.info("Redis에서 tradeId 제거 완료: tradeId={}", tradeId);
+                break;
+            }
+        }
+        if (!removed) {
+            throw new RuntimeException("Redis에서 tradeId를 찾지 못했습니다. tradeId=" + tradeId);
+        }
+    }
+    /**
+     * Redis에 저장된 데이터에서 tradeId를 추출합니다.
+     * 데이터는 두 가지 형태로 저장될 수 있습니다.
+     * 1) JSON 형태: "{\"id\":2, ...}"
+     * 2) 숫자 문자열: "1741252398"
+     *
+     * @param obj Redis에서 반환된 데이터
+     * @return 추출된 tradeId, 실패 시 null
+     */
+    private Long parseTradeId(Object obj) {
+        if (obj instanceof TradeRes) {
+            return ((TradeRes) obj).getId();
+        }
+        if (obj instanceof String) {
+            String data = (String) obj;
+            try {
+                // JSON 형태의 문자열인 경우
+                if (data.startsWith("{")) {
+                    TradeHistoryRedisRes tradeHistoryRedisRes = objectMapper.readValue(data, TradeHistoryRedisRes.class);
+                    return tradeHistoryRedisRes.getTradeId();
+                }
+                // 숫자 문자열인 경우
+                else if (data.matches("\\d+")) {
+                    return Long.valueOf(data);
+                }
+            } catch (Exception e) {
+                log.error("Redis 데이터 파싱 중 오류 발생: {}", e.getMessage(), e);
+            }
+        }
+        return null;
+    }
 
 
 
@@ -90,6 +173,9 @@ public class TradeService {
             log.info("체결 성공: 주문 ID {} 체결 완료", historyId);
             // 체결 완료되었으므로 Redis SortedSet에서 해당 주문 삭제
             redisTemplate.opsForZSet().remove(redisKey, tradeRes);
+
+            // 거래 알림 전송: tradeRes 혹은 별도의 DTO를 만들어 필요한 정보를 담아 전송
+            sseService.sendTradeNotification(tradeRes.getUserId(), tradeRes);
         }
     }
 
