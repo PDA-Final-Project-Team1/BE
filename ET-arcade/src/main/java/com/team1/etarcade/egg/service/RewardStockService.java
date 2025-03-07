@@ -3,7 +3,6 @@ package com.team1.etarcade.egg.service;
 import com.team1.etarcade.egg.connector.StockFeignConnector;
 import com.team1.etarcade.egg.connector.UserFeignConnector;
 import com.team1.etarcade.egg.dto.StockPriceResponseDTO;
-import com.team1.etarcade.egg.dto.UserFeignPointResponseDTO;
 import com.team1.etarcade.egg.dto.UserFeignStockResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

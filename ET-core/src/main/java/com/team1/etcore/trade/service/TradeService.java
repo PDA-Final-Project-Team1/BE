@@ -71,7 +71,6 @@ public class TradeService {
         }
 
         for (ZSetOperations.TypedTuple<TradeRes> order : orders) {
-            log.info("드디어 된거야??? = " + order.getValue().toString());
             TradeRes tradeRes = order.getValue();
 
             Long userId = tradeRes.getUserId();

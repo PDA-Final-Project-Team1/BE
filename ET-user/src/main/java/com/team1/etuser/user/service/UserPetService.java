@@ -24,7 +24,7 @@ public class UserPetService {
                 .collect(Collectors.toList());
     }
 
-    public void grantPet(Long userId, PetGrantRequestDto requestDto) {
+    public UserPet grantPet(Long userId, PetGrantRequestDto requestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         UserPet userPet = UserPet.builder()
@@ -32,6 +32,8 @@ public class UserPetService {
                 .petId(requestDto.getPetId())
                 .build();
         userPetRepository.save(userPet);
+
+        return userPet;
     }
 }
 
