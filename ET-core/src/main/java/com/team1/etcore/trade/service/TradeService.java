@@ -19,13 +19,14 @@ import java.util.Set;
 public class TradeService {
 
     private final UserTradeHistoryClient userTradeHistoryClient;
-    private final RedisService redisService;
     private final RedisTemplate<String, TradeRes> redisTemplate;
+    private final TradeSettlement tradeSettlement;
     /**
      * 사용자의 주문(거래) 생성 요청을 받아 ET-user 모듈에 주문 기록을 생성하고, Redis에 캐싱합니다.
      * @param tradeReq 주문 요청 정보
      * @return 생성된 주문(거래) 정보
      */
+    @Transactional
     public TradeRes createOrder(Long userId, TradeReq tradeReq) {
         try {
             BigDecimal totalPrice = tradeReq.getPrice().multiply(new BigDecimal(tradeReq.getAmount()));
@@ -49,26 +50,8 @@ public class TradeService {
         }
     }
 
-    @Transactional
-    public void processTrade(QuoteDTO quoteDTO) {
-        try {
-            // 매수 주문 처리: "orders:BUY:{stockCode}:{tradePrice}"
-            processMatching(Position.BUY,
-                    quoteDTO.getStockCode(),
-                    quoteDTO.getBuyPrice(),
-                    quoteDTO.getBuyAmount()
-            );
-            // 매도 주문 처리: "orders:SELL:{stockCode}:{tradePrice}"
-            processMatching(Position.SELL,
-                    quoteDTO.getStockCode(),
-                    quoteDTO.getSellPrice(),
-                    quoteDTO.getSellAmount()
-            );
-        } catch (Exception e) {
-            log.error("체결 처리 중 오류 발생: {}", e.getMessage(), e);
-            throw new RuntimeException("체결 처리 실패", e);
-        }
-    }
+
+
 
 
     /**
@@ -78,6 +61,7 @@ public class TradeService {
      * @param stockCode  체결된 종목 코드
      * @param tradePrice 체결 가격
      */
+    @Transactional
     public void processMatching(Position position, String stockCode, BigDecimal tradePrice, int tradeAmount) {
         String redisKey = buildRedisKey(position, stockCode, tradePrice);
         Set<ZSetOperations.TypedTuple<TradeRes>> orders = redisTemplate.opsForZSet().rangeWithScores(redisKey, 0, -1);
@@ -93,17 +77,16 @@ public class TradeService {
             Long userId = tradeRes.getUserId();
             Long historyId = tradeRes.getId();
 
-            if (!redisService.saveDuplicateKey(historyId)) continue;
             if (isPriceDifferent(tradePrice, tradeRes.getPrice())) continue;
             if (tradeRes.getAmount() > tradeAmount) continue;
 
-            updateDeposit(position, userId, historyId,
+            tradeSettlement.updateDeposit(position, userId, historyId,
                     tradeRes.getPrice(), tradeRes.getAmount());
 
-            updateUserStock(userId, stockCode, tradeRes.getAmount(),
+            tradeSettlement.updateUserStock(userId, stockCode, tradeRes.getAmount(),
                     tradeRes.getPrice(), tradeRes.getPosition());
 
-            updateHistoryStatus(historyId);
+            tradeSettlement.updateHistoryStatus(historyId);
 
             log.info("체결 성공: 주문 ID {} 체결 완료", historyId);
             // 체결 완료되었으므로 Redis SortedSet에서 해당 주문 삭제
@@ -111,57 +94,12 @@ public class TradeService {
         }
     }
 
+    // 체결가와 주문 가격이 같은지?
     private boolean isPriceDifferent(BigDecimal price1, BigDecimal price2) {
         return price1.compareTo(price2) != 0;
     }
 
-    // 예치금 업데이트
-    private void updateDeposit(Position position, Long userId, Long historyId, BigDecimal price, int amount) {
-        // 주문 총액 = 가격 * 개수
-        BigDecimal totalPrice = price.multiply(BigDecimal.valueOf(amount));
-
-        if (position.equals(Position.BUY)) {
-            boolean depositDeducted = userTradeHistoryClient.updateDeposit(userId, totalPrice.negate());
-            if (!depositDeducted) {
-                log.warn("예치금 차감에 실패했습니다: 주문 ID {}", historyId);
-                throw new RuntimeException("예치금 차감 실패. 주문 ID: " + historyId);
-            }
-        } else if (position.equals(Position.SELL)) {
-            boolean depositCredited = userTradeHistoryClient.updateDeposit(userId, totalPrice);
-            if (!depositCredited) {
-                log.warn("예치금 충전에 실패했습니다: 주문 ID {}", historyId);
-                throw new RuntimeException("예치금 충전 실패. 주문 ID: " + historyId);
-            }
-        } else {
-            throw new RuntimeException("잘못된 주문 유형입니다.");
-        }
-    }
-
-    // 사용자 보유 주식 업데이트
-    private void updateUserStock(Long userId, String stockCode, int amount, BigDecimal price, Position position) {
-        // 보유 주식 업데이트
-        boolean isStockUpdated = userTradeHistoryClient.updateUserStock(
-                userId,
-                stockCode,
-                amount,
-                price,
-                position);
-
-        if (!isStockUpdated) {
-            log.warn("보유 주식 업데이트에 실패했습니다: 유저 ID {}", userId);
-            throw new RuntimeException("보유 주식 업데이트 실패. 유저 ID: " + userId);
-        }
-    }
-
-    // 거래내역 업데이트
-    private void updateHistoryStatus(Long historyId) {
-        boolean isStatusUpdated = userTradeHistoryClient.updateHistoryStatus(historyId, TradeStatus.EXECUTED);
-        if (!isStatusUpdated) {
-            log.warn("최종 주문 상태 업데이트에 실패했습니다: 주문 ID {}", historyId);
-            throw new RuntimeException("최종 주문 상태 업데이트 실패. 주문 ID: " + historyId);
-        }
-    }
-
+    // 주문내역 Redis Key
     private String buildRedisKey(Position position, String stockCode, BigDecimal tradePrice) {
         String formattedPrice = tradePrice.stripTrailingZeros().toPlainString();
         return "orders:" + position.toString() + ":" + stockCode + ":" + formattedPrice;
