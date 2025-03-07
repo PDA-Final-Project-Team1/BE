@@ -176,7 +176,7 @@ public class TradeService {
             redisTemplate.opsForZSet().remove(redisKey, tradeRes);
 
             // 거래 알림 전송: tradeRes 혹은 별도의 DTO를 만들어 필요한 정보를 담아 전송
-            sseService.sendTradeNotification(tradeRes.getUserId(), tradeRes);
+//            sseService.sendTradeNotification(tradeRes.getUserId(), tradeRes);
         }
     }
 
