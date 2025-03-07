@@ -27,5 +27,9 @@ public class SseController {
         return sseService.getAskBidPrice(stockCode);
 
     }
+    @GetMapping("/cur-price/{stockCode}")
+    public SseEmitter StockCurPrice(@PathVariable String stockCode) {
+        return sseService.getStockCurPrice(stockCode);
+    }
 
 }
