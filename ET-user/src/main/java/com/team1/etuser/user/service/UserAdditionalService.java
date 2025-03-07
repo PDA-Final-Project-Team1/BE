@@ -55,11 +55,19 @@ public class UserAdditionalService {
 
         log.info("유저 포인트 조회 - userId: {}, points: {}, hasEnough: {}", userId, userPoint, hasEnough);
 
+        //그냥 여기서 포인트 차감해버리기
+        if (hasEnough) {
+            BigDecimal newPoints = new BigDecimal(userPoint).subtract(BigDecimal.valueOf(100));
+            userAdditionalInfoRepository.updateUserPoints(userId, newPoints.intValue()); // 포인트 업데이트 쿼리 필요
+        }
+
         return PointRes.builder()
                 .point(userPoint)
                 .hasEnoughPoints(hasEnough) // 결과 포함
                 .build();
     }
+
+
 
 
 }

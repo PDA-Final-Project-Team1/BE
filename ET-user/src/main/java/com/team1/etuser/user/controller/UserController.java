@@ -90,4 +90,5 @@ public class UserController {
         log.info("ET-User: 포인트 조회 요청 수신 (사용자: {})", userId);
         return userAdditionalService.getUserPoints(userId);
     }
+
 }
