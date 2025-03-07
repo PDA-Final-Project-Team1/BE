@@ -18,7 +18,7 @@ public class RewardStockService { // 소수점 주식 지급 서비스입니다.
     private final UserFeignConnector userFeignConnector;
 
     //알 한번에 지급할 금액
-    private static  final Double REWARD_MONEY = 10000.000;
+    private static  final Double REWARD_MONEY = 100.000;
 
     // 지급할 대표주 7개의 이름입니다.
     private static final List<String> PREFERRED_STOCKS = List.of(
