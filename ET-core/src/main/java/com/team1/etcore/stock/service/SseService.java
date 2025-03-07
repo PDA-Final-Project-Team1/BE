@@ -1,5 +1,6 @@
 package com.team1.etcore.stock.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team1.etcore.trade.dto.TradeRes;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -12,6 +13,9 @@ public class SseService {
     private final Map<String, List<SseEmitter>> interestSubscribers = new ConcurrentHashMap<>();//현재가
     private final Map<String, List<SseEmitter>> portfolioSubscribers = new ConcurrentHashMap<>();//현재가
     private final Map<String, List<SseEmitter>> askBidSubscribers = new ConcurrentHashMap<>();//현재가
+
+    // 거래 알림용 SSE 구독자 관리 Map (userId를 key로 사용)
+    private final Map<Long, SseEmitter> tradeSubscribers = new ConcurrentHashMap<>();
 
     public SseEmitter getInterestStockPrice(String userId) {//관심종목 현재가
         SseEmitter emitter = new SseEmitter(200_000L); // 60초 타임아웃
@@ -109,4 +113,32 @@ public class SseService {
             }
         }
     }
+
+    // 거래 알림 구독 메서드
+    public SseEmitter subscribeTradeNotifications(Long userId) {
+        SseEmitter emitter = new SseEmitter(200_000L);
+
+        tradeSubscribers.put(userId, emitter);
+
+        emitter.onCompletion(() -> tradeSubscribers.remove(userId));
+        emitter.onTimeout(() -> tradeSubscribers.remove(userId));
+
+        return emitter;
+    }
+
+    // 거래 알림 전송 메서드
+    public void sendTradeNotification(Long userId, TradeRes data) {
+        SseEmitter emitter = tradeSubscribers.get(userId);
+        if (emitter != null) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                String jsonData = objectMapper.writeValueAsString(data);
+                emitter.send(SseEmitter.event().data(jsonData));
+            } catch (IOException e) {
+                emitter.complete();
+                tradeSubscribers.remove(userId);
+            }
+        }
+    }
+
 }
