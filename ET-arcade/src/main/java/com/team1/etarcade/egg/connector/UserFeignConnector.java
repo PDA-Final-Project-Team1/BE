@@ -1,6 +1,7 @@
 package com.team1.etarcade.egg.connector;
 
 
+import com.team1.etarcade.egg.dto.PointUpdateReq;
 import com.team1.etarcade.egg.dto.UserFeignPointRes;
 import com.team1.etarcade.egg.dto.UserFeignStockResponseDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +24,6 @@ public interface UserFeignConnector {
     UserFeignPointRes getUserPointInfo(@RequestHeader("X-Id") Long userId);
 
 
-    //유저포인트 차감하기
-    @PatchMapping("/points")
-    void deductUserPoints(@RequestHeader("X-Id") Long userId,@RequestParam("amount") int amount);
 
 }
 

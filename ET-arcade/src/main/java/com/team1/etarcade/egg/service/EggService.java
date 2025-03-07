@@ -31,7 +31,7 @@ public class EggService {
         // FeignClient를 통해 사용자 정보 조회
         UserFeignPointRes userInfo = userFeignConnector.getUserPointInfo(userId);
 
-        //유저가 가진 포인트 조회
+        //유저가 가진 포인트 조회 및 차감.
         if (!userInfo.getHasEnoughPoints()) {
             throw new IllegalStateException("포인트가 부족합니다.");
         }
@@ -44,7 +44,7 @@ public class EggService {
                 .build();
         Egg savedEgg = eggRepository.save(newEgg);
 
-        userFeignConnector.deductUserPoints(userId, 100);
+
 
 
         //알DTO 반환
