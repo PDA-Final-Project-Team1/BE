@@ -84,11 +84,20 @@ public class UserController {
     public ResponseEntity<UserResponseDto> getUserByUid(@RequestParam("uid") String uid) {
         return ResponseEntity.ok(userService.getUserByUid(uid));
     }
-
-    @GetMapping("/points")
+    //feign 연결용 포인트 매핑
+    @GetMapping("/feign/points")
     public PointRes getUserPoints(@RequestHeader("X-Id") Long userId) {
         log.info("ET-User: 포인트 조회 요청 수신 (사용자: {})", userId);
         return userAdditionalService.getUserPoints(userId);
     }
+    //api 연결용
+    @GetMapping("/points")
+    public ResponseEntity<Integer> userPoints(@RequestHeader("X-Id") Long userId) {
+        log.info("API: 포인트 조회 요청 수신 (사용자: {})", userId);
+
+        return ResponseEntity.ok(userAdditionalService.UserPoints(userId));
+    }
+
+
 
 }

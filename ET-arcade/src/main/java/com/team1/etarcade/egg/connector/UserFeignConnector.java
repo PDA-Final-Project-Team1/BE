@@ -20,7 +20,7 @@ public interface UserFeignConnector {
 
 
     //유저포인트 받아오기
-    @GetMapping("/points")
+    @GetMapping("/feign/points")
     UserFeignPointRes getUserPointInfo(@RequestHeader("X-Id") Long userId);
 
 

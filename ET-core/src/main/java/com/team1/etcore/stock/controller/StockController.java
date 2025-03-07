@@ -31,7 +31,9 @@ public class StockController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/feign/price")
-    public ResponseEntity<Set<StockResponseDTO>> getStockPrice(@RequestParam String stockCode) {}
+//    @GetMapping("/feign/price")
+//    public ResponseEntity<Set<StockResponseDTO>> getStockPrice(@RequestParam String stockCode) {
+//
+//    }
 
 }
