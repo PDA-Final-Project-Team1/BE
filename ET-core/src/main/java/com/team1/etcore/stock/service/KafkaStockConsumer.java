@@ -29,6 +29,7 @@ public class KafkaStockConsumer {
 
             sseService.sendToClientsInterestStockPrice(stockCode,cur);
             sseService.sendToClientsPortfolioStockPrice(stockCode,cur);
+            sseService.sendToClientsStockCurPrice(stockCode,cur);
 
         } else {
             System.out.println("Received data is not of type String.");
@@ -39,7 +40,7 @@ public class KafkaStockConsumer {
     @KafkaListener(topics = "H0STASP0", groupId = "stock-group")
     public void StockAskBidData(ConsumerRecord<String, Object> record) {
         String stockCode = record.key(); // 종목 코드 (ex: "005930")
-        Object askBidData = record.value(); // 주식 현재가 데이터
+        Object askBidData = record.value(); // 주식 호가 데이터
         if (askBidData instanceof String) {
             String data = (String) askBidData;  // Object를 String으로 캐스팅
 
