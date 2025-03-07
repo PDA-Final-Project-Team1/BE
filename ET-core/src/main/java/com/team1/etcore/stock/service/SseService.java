@@ -13,6 +13,7 @@ public class SseService {
     private final Map<String, List<SseEmitter>> interestSubscribers = new ConcurrentHashMap<>();//현재가
     private final Map<String, List<SseEmitter>> portfolioSubscribers = new ConcurrentHashMap<>();//현재가
     private final Map<String, List<SseEmitter>> askBidSubscribers = new ConcurrentHashMap<>();//현재가
+    private final Map<String, List<SseEmitter>> curPriceSubscribers = new ConcurrentHashMap<>();//현재가
 
     // 거래 알림용 SSE 구독자 관리 Map (userId를 key로 사용)
     private final Map<Long, SseEmitter> tradeSubscribers = new ConcurrentHashMap<>();
@@ -99,6 +100,32 @@ public class SseService {
     public void sendToClientsAskBidStockPrice(String stockCode, Object data) {
 
         List<SseEmitter> emitters = askBidSubscribers.getOrDefault(stockCode, new ArrayList<>());
+
+        for (SseEmitter emitter : emitters) {
+            try {
+                // 객체를 JSON 문자열로 변환
+                ObjectMapper objectMapper = new ObjectMapper();
+                String jsonData = objectMapper.writeValueAsString(data);
+
+                // JSON 문자열을 보내기
+                emitter.send(SseEmitter.event().data(jsonData));
+            } catch (IOException e) {
+                emitter.complete();
+            }
+        }
+    }
+    public SseEmitter getStockCurPrice(String stockCode) {
+        SseEmitter emitter = new SseEmitter(200_000L);
+        curPriceSubscribers.computeIfAbsent(stockCode, k -> new ArrayList<>()).add(emitter);
+
+        emitter.onCompletion(() -> curPriceSubscribers.get(stockCode).remove(emitter));
+        emitter.onTimeout(() -> curPriceSubscribers.get(stockCode).remove(emitter));
+
+        return emitter;
+    }
+    public void sendToClientsStockCurPrice(String stockCode, Object data) {
+
+        List<SseEmitter> emitters = curPriceSubscribers.getOrDefault(stockCode, new ArrayList<>());
 
         for (SseEmitter emitter : emitters) {
             try {

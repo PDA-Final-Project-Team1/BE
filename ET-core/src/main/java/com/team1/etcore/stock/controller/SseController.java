@@ -27,6 +27,10 @@ public class SseController {
     public SseEmitter StockAskBid(@PathVariable String stockCode) {
         return sseService.getAskBidPrice(stockCode);
     }
+    @GetMapping("/cur-price/{stockCode}")
+    public SseEmitter StockCurPrice(@PathVariable String stockCode) {
+        return sseService.getStockCurPrice(stockCode);
+    }
 
     @GetMapping(value = "/subscribe/trade", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribeTrade(HttpServletResponse response) {
