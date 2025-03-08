@@ -40,34 +40,6 @@ jobs:
           key: ${{ secrets.AWS_SSH_KEY }}      # SSH 접속용 비밀키
           script: |
             cd /home/ubuntu
-            
-            echo 'USER_DB_HOST=${{ secrets.USER_DB_HOST }}' >> .env
-            echo 'USER_DB_PORT=${{ secrets.USER_DB_PORT }}' >> .env
-            echo 'USER_DB=${{ secrets.USER_DB }}' >> .env
-            echo 'USER_DB_USER=${{ secrets.DB_USER }}' >> .env
-            echo 'USER_DB_PWD=${{ secrets.DB_PWD }}' >> .env
-            
-            echo 'CORE_DB_HOST=${{ secrets.CORE_DB_HOST }}' >> .env
-            echo 'CORE_DB_PORT=${{ secrets.CORE_DB_PORT }}' >> .env
-            echo 'CORE_DB=${{ secrets.CORE_DB }}' >> .env
-            echo 'CORE_DB_USER=${{ secrets.DB_USER }}' >> .env
-            echo 'CORE_DB_PWD=${{ secrets.DB_PWD }}' >> .env
-            
-            echo 'ARCADE_DB_HOST=${{ secrets.ARCADE_DB_HOST }}' >> .env
-            echo 'ARCADE_DB_PORT=${{ secrets.ARCADE_DB_PORT }}' >> .env
-            echo 'ARCADE_DB=${{ secrets.ARCADE_DB }}' >> .env
-            echo 'ARCADE_DB_USER=${{ secrets.DB_USER }}' >> .env
-            echo 'ARCADE_DB_PWD=${{ secrets.DB_PWD }}' >> .env
-            
-            echo "EUREKA_HOST=${{ secrets.EUREKA_HOST }}" >> .env
-            
-            echo 'REDIS_HOST=${{ secrets.REDIS_HOST }}' >> .env
-            echo 'REDIS_PORT=${{ secrets.REDIS_PORT }}' >> .env
-            
-            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-            
-            echo "HOST_NAME=${{ secrets.API_GATEWAY_HOST }}" >> .env
-                        
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
             docker rm -f ET-api-gateway || true
             docker run -d --name ET-api-gateway --env-file .env -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/et-api-gateway:latest
