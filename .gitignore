@@ -43,7 +43,6 @@ out/
 **/._.DS_Store
 
 .env
-korea-investment.properties
 
 ### log ###
 logs/
