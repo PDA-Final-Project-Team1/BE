@@ -171,8 +171,6 @@ public class TradeService {
             }
 
             log.info("체결 성공: 주문 ID {} 체결 완료", historyId);
-            // 체결 완료되었으므로 Redis SortedSet에서 해당 주문 삭제
-
         }
     }
 
