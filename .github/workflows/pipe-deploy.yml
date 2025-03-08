@@ -1,4 +1,4 @@
-name: Deploy Arcade Module
+name: Deploy Pipeline Module
 on:
   workflow_dispatch:
 
@@ -6,10 +6,10 @@ on:
     branches:
       - main
     paths:
-      - 'ET-arcade/**'
+      - 'ET-pipeline/**'
 
 jobs:
-  deploy-arcade-module:
+  deploy-pipeline-module:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -23,24 +23,24 @@ jobs:
           # 도커 로그인
 
 
-      - name: Build and Push Arcade Image
+      - name: Build and Push Pipeline Image
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./ET-arcade/Dockerfile
+          file: ./ET-pipeline/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/et-arcade:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/et-pipeline:latest
 
 
 
-      - name: Create .env and Deploy Arcade
+      - name: Deploy Pipeline
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.AWS_SSH_KEY }}
           script: |
-            ssh -tt arcade-mod "cd /home/ubuntu && \
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-arcade:latest && \
-            docker rm -f ET-arcade || true && \
-            docker run -d --name ET-arcade --env-file .env -p 8083:8083 ${{ secrets.DOCKERHUB_USERNAME }}/et-arcade:latest"
+            ssh -tt pipe-mod "cd /home/ubuntu && \
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-pipeline:latest && \
+            docker rm -f ET-pipeline || true && \
+            docker run -d --name ET-pipeline --env-file .env -p 8084:8084 ${{ secrets.DOCKERHUB_USERNAME }}/et-pipeline:latest"
