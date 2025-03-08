@@ -124,4 +124,7 @@ public class EggService {
         // 2️⃣ 알 삭제
         eggRepository.delete(egg);
     }
+
+
+
 }
