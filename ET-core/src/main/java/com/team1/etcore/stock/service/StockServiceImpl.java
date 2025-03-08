@@ -10,6 +10,7 @@ import com.team1.etcore.stock.util.StockData;
 import com.team1.etcore.stock.util.Trie;
 import jakarta.annotation.PostConstruct;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -58,13 +59,15 @@ public class StockServiceImpl implements StockService{
     private List<StockResponseDTO> loadStocks() {
         List<StockResponseDTO> stocks = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
-        // 'StockData.json' 파일은 클래스패스의 /com/team1/etcore/stock/util/ 경로에 위치
-        Path path = Paths.get("ET-core/src/main/java/com/team1/etcore/stock/util/", "StockData.json");
 
-        try (InputStream inputStream = new FileInputStream(path.toFile())) {
+        // 클래스패스에서 파일 읽기
+        try (InputStream inputStream = getClass().getResourceAsStream("/stock/StockData.json")) {
+            if (inputStream == null) {
+                throw new FileNotFoundException("StockData.json 을 경로에서 찾지 못했습니다.");
+            }
+
             List<StockData> stockDataList = objectMapper.readValue(inputStream, new TypeReference<>() {});
             for (StockData stockData : stockDataList) {
-                // 주식 코드에 해당하는 이미지를 동적으로 생성
                 String imageUrl = "https://static.toss.im/png-icons/securities/icn-sec-fill-" + stockData.getCode() + ".png";
                 stocks.add(new StockResponseDTO(stockData.getCode(), stockData.getName(), imageUrl));
             }
