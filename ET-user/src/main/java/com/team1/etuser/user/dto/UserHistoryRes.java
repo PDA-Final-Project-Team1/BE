@@ -1,9 +1,11 @@
 package com.team1.etuser.user.dto;
 
 import com.team1.etuser.user.domain.Position;
+import com.team1.etuser.user.domain.TradeStatus;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,15 +18,7 @@ public class UserHistoryRes {
     private BigDecimal price;
     private Position position;
     private int amount;
-
-    @Override
-    public String toString() {
-        return "UserHistoryRes{" +
-                "stockCode='" + stockCode + '\'' +
-                ", stockName='" + stockName + '\'' +
-                ", price=" + price +
-                ", position=" + position +
-                ", amount=" + amount +
-                '}';
-    }
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private TradeStatus tradeStatus;
 }

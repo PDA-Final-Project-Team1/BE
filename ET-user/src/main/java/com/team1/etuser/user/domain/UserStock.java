@@ -3,10 +3,7 @@ package com.team1.etuser.user.domain;
 import com.team1.etcommon.domain.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -28,9 +25,11 @@ public class UserStock extends BaseEntity {
     @Column(name = "stock_code", nullable = false, length = 6)
     private String stockCode;
 
+    @Setter
     @Column(name = "amount", nullable = false)
     private int amount;
 
+    @Setter
     @DecimalMin(value = "0.0")
     @Column(name = "average_price", nullable = false, precision = 65, scale = 3)
     private BigDecimal averagePrice;

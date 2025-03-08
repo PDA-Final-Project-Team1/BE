@@ -1,4 +1,4 @@
-package com.team1.etarcade.egg.dto;
+package com.team1.etarcade.pet.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserFeignPointResponseDTO {
-    private Long userId;
-    private int point;
+public class PetGrantResponseDTO {
+    private Long petId;
+    private String img;
 }

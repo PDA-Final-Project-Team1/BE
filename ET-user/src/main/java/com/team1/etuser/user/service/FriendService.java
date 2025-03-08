@@ -26,9 +26,9 @@ public class FriendService {
     }
 
     // 구독하는 사람 목록 조회
-    public SubscriptionResponseDto getSubscriptionsByName(Long id) {
+    public SubscriptionResponseDto getSubscriptions(Long id) {
 
-        List<FriendResponseDto> friends = friendRepository.findBySubscriber_Id(id)
+        List<FriendResponseDto> friends = friendRepository.findBySubscriberId(id)
                 .stream()
                 .map(FriendResponseDto::new)
                 .collect(Collectors.toList());
@@ -73,4 +73,7 @@ public class FriendService {
         friendRepository.deleteById(friendId);
     }
 
+    public boolean isSubscribedByUser(Long subscriberId) {
+        return friendRepository.existsBySubscriberId(subscriberId);
+    }
 }

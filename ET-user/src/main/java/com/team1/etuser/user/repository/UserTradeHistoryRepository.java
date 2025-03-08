@@ -10,7 +10,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface UserTradeHistoryRepository extends JpaRepository<UserTradeHistory, Long> {
-    @Query("SELECT new com.team1.etuser.user.dto.UserHistoryRes(u.stockCode, '', u.price, u.position, u.amount) " +
+    @Query("SELECT new com.team1.etuser.user.dto.UserHistoryRes(u.stockCode, '', u.price, u.position, u.amount, u.createdAt, u.updatedAt, u.tradeStatus) " +
             "FROM UserTradeHistory u WHERE u.user = :user")
     List<UserHistoryRes> findUserHistory(@Param("user") User user);
+
+
 }
