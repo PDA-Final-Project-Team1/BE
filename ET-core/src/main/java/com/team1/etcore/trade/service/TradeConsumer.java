@@ -22,7 +22,6 @@ public class TradeConsumer {
         try {
             String stockCode = record.key();
             String value = record.value();
-//            log.info("Kafka 메시지 수신 - 종목코드: {}, 데이터: {}", stockCode, value);
 
             String[] quoteData = value.split("\\^");
             if (quoteData.length < 42) {
@@ -30,13 +29,14 @@ public class TradeConsumer {
                 return;
             }
 
-            QuoteDTO quoteDTO = QuoteDTO.builder()
-                    .stockCode(stockCode)
+            QuoteDTO quoteDTO = QuoteDTO.builder().
+                    stockCode(stockCode)
                     .buyPrice(new BigDecimal(quoteData[2]))
                     .buyAmount(Integer.parseInt(quoteData[22]))
                     .sellPrice(new BigDecimal(quoteData[12]))
                     .sellAmount(Integer.parseInt(quoteData[32]))
                     .build();
+
             // 체결 처리
             processTrade(quoteDTO);
         } catch (Exception e) {
@@ -46,18 +46,13 @@ public class TradeConsumer {
 
     public void processTrade(QuoteDTO quoteDTO) {
         try {
-            // 매수 주문 처리: "orders:BUY:{stockCode}:{tradePrice}"
-            tradeService.processMatching(Position.BUY,
-                    quoteDTO.getStockCode(),
-                    quoteDTO.getBuyPrice(),
-                    quoteDTO.getBuyAmount()
-            );
-            // 매도 주문 처리: "orders:SELL:{stockCode}:{tradePrice}"
-            tradeService.processMatching(Position.SELL,
-                    quoteDTO.getStockCode(),
-                    quoteDTO.getSellPrice(),
-                    quoteDTO.getSellAmount()
-            );
+            // 매수 주문 처리
+            tradeService.processMatching(Position.BUY, quoteDTO.getStockCode(),
+                    quoteDTO.getBuyPrice(), quoteDTO.getBuyAmount());
+
+            // 매도 주문 처리
+            tradeService.processMatching(Position.SELL, quoteDTO.getStockCode(),
+                    quoteDTO.getSellPrice(), quoteDTO.getSellAmount());
         } catch (Exception e) {
             log.error("체결 처리 중 오류 발생: {}", e.getMessage(), e);
             throw new RuntimeException("체결 처리 실패", e);
