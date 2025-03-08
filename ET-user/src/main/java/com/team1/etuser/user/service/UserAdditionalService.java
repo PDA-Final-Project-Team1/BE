@@ -1,7 +1,8 @@
 package com.team1.etuser.user.service;
 
 import com.team1.etuser.user.domain.UserAdditionalInfo;
-import com.team1.etuser.user.dto.feign.PointRes;
+import com.team1.etuser.user.dto.PointResponse;
+import com.team1.etuser.user.dto.feign.FeginPointRes;
 import com.team1.etuser.user.repository.UserAdditionalInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,10 +47,11 @@ public class UserAdditionalService {
     }
 
     /**
-     * 유저 포인트 받아오기 및 충분한지 체크
+     * FEGIN- 유저 포인트 받아오기 및 충분한지 체크
+     *
      */
 
-    public PointRes getUserPoints(Long userId) {
+    public FeginPointRes getUserPoints(Long userId) {
         System.out.println("userId 값 확인: " + userId);
 
         Integer userPoint = userAdditionalInfoRepository.findUserPointByUserId(userId);
@@ -57,9 +59,35 @@ public class UserAdditionalService {
 
         log.info("유저 포인트 조회 - userId: {}, points: {}, hasEnough: {}", userId, userPoint, hasEnough);
 
-        return PointRes.builder()
+        //포인트 차감.
+        if (hasEnough) {
+            BigDecimal newPoints = new BigDecimal(userPoint).subtract(BigDecimal.valueOf(100));
+            userAdditionalInfoRepository.updateUserPoints(userId, newPoints.intValue()); // 포인트 업데이트 쿼리 필요
+        }
+
+        return FeginPointRes.builder()
                 .point(userPoint)
                 .hasEnoughPoints(hasEnough) // 결과 포함
                 .build();
     }
-}
+
+    // API 연결용 유저포인트 함수
+    public PointResponse UserPoints(Long userId) {
+        System.out.println("userId 값 확인: " + userId);
+       int  userPoint = userAdditionalInfoRepository.findUserPointByUserId(userId);
+        return PointResponse.builder()
+                .point(userPoint)
+                .build();
+    }
+
+    //유저 포인트 업데이트
+    public void updateUserPoint(Long userId, int amount) {
+
+        UserAdditionalInfo userAdditionalInfo = userAdditionalInfoRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("유저 추가정보를 찾을 수 없습니다."));
+
+        int userPoint = userAdditionalInfoRepository.findUserPointByUserId(userId);
+        int newPoints = userPoint + amount;
+        userAdditionalInfoRepository.updateUserPoints(userId, newPoints); // 포인트 업데이트 쿼리 필요
+    }
+

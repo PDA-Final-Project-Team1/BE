@@ -23,15 +23,15 @@ public class QuizController {
 //        QuizStatusResponseDto response = quizService.getQuizStatus(userId);
 //        return ResponseEntity.ok(response);
 //    }
-    @GetMapping("")
-    public ResponseEntity<QuizDTO> getQuizByDifficulty(@RequestParam Difficulty difficulty) {
+    @GetMapping
+    public ResponseEntity<QuizDTO> getQuizByDifficulty(@RequestHeader("X-Id") Long userId, @RequestParam Difficulty difficulty) {
 
-        QuizDTO quiz = quizService.getQuizByDifficulty(difficulty);
+        QuizDTO quiz = quizService.getQuizByDifficulty(userId,difficulty);
         return ResponseEntity.ok(quiz);
     }
-    @PostMapping("/submit")
-    public ResponseEntity<QuizSubmitResponseDTO> submitQuiz(@RequestBody QuizSubmitRequestDTO request) {
-        QuizSubmitResponseDTO response = quizService.submitQuiz(request);
+    @PostMapping()
+    public ResponseEntity<QuizSubmitResponseDTO> submitQuiz(@RequestHeader("X-Id") Long userId, @RequestBody QuizSubmitRequestDTO request) {
+        QuizSubmitResponseDTO response = quizService.submitQuiz(userId,request);
         return ResponseEntity.ok(response);
     }
 
