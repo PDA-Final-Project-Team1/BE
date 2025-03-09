@@ -52,13 +52,13 @@ public class UserAdditionalService {
         System.out.println("userId 값 확인: " + userId);
 
         Integer userPoint = userAdditionalInfoRepository.findUserPointByUserId(userId);
-        boolean hasEnough = userPoint >= 100;
+        boolean hasEnough = userPoint >= 500;
 
         log.info("유저 포인트 조회 - userId: {}, points: {}, hasEnough: {}", userId, userPoint, hasEnough);
 
         //그냥 여기서 포인트 차감해버리기
         if (hasEnough) {
-            BigDecimal newPoints = new BigDecimal(userPoint).subtract(BigDecimal.valueOf(100));
+            BigDecimal newPoints = new BigDecimal(userPoint).subtract(BigDecimal.valueOf(500));
             userAdditionalInfoRepository.updateUserPoints(userId, newPoints.intValue()); // 포인트 업데이트 쿼리 필요
         }
 
