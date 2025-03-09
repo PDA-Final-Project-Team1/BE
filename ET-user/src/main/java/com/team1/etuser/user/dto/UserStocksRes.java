@@ -15,4 +15,5 @@ public class UserStocksRes {
     private String stockName;
     private BigDecimal amount;
     //보유종목
+    private BigDecimal averagePrice;
 }
