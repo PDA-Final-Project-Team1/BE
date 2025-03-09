@@ -22,7 +22,7 @@ public class UserStockService {
     private final UserStockRepository userStockRepository;
     private final UserRepository userRepository;
 
-    public boolean updateUserStock(Long userId, String stockCode, int amount, BigDecimal price, Position position) {
+    public boolean updateUserStock(Long userId, String stockCode, BigDecimal amount, BigDecimal price, Position position) {
         // 유저 조회
         Optional<User> user = userRepository.findById(userId);
 
@@ -43,16 +43,16 @@ public class UserStockService {
                         .build();
             } else {
                 // 기존 보유 수량과 평단가를 기준으로 새로운 평단가 계산
-                int existingAmount = userStock.getAmount();
+                BigDecimal existingAmount = userStock.getAmount();
                 BigDecimal existingAveragePrice = userStock.getAveragePrice();
 
-                int newAmount = existingAmount + amount;
+                BigDecimal newAmount = existingAmount.add(amount);
                 // (기존 평단가 * 기존 개수) + (새로운 가격 + 새로운 개수)
-                BigDecimal totalCost = existingAveragePrice.multiply(BigDecimal.valueOf(existingAmount))
-                        .add(price.multiply(BigDecimal.valueOf(amount)));
+                BigDecimal totalCost = existingAveragePrice.multiply(existingAmount)
+                        .add(price.multiply(amount));
 
                 // 새로운 평단가
-                BigDecimal newAveragePrice = totalCost.divide(BigDecimal.valueOf(newAmount), MathContext.DECIMAL128);
+                BigDecimal newAveragePrice = totalCost.divide(newAmount, MathContext.DECIMAL128);
 
                 // setter를 사용하여 amount와 averagePrice만 수정
                 userStock.setAmount(newAmount);
@@ -65,13 +65,13 @@ public class UserStockService {
                 return false;
             }
 
-            int existingAmount = userStock.getAmount();
-            if (existingAmount < amount) {
+            BigDecimal existingAmount = userStock.getAmount();
+            if (existingAmount.compareTo(amount) < 0) {
                 return false;
             }
 
-            int newAmount = existingAmount - amount;
-            if (newAmount == 0) {
+            BigDecimal newAmount = existingAmount.subtract(amount);
+            if (newAmount.compareTo(BigDecimal.ZERO) == 0) { // newAmount == 0
                 // 매도 후 수량이 0이면 해당 row 삭제
                 userStockRepository.delete(userStock);
             } else {

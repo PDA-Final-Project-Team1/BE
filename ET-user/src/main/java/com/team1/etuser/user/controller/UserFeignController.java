@@ -52,7 +52,7 @@ public class UserFeignController {
     @PostMapping("/stock/update")
     boolean updateUserStock(@RequestParam("userId") Long userId,
                             @RequestParam("stockCode") String stockCode,
-                            @RequestParam("amount") int amount,
+                            @RequestParam("amount") BigDecimal amount,
                             @RequestParam("price") BigDecimal price,
                             @RequestParam("position") Position position) {
         log.info("ET-user: 보유 주식 요청 수신 (사용자: {}): {}", userId, stockCode);
