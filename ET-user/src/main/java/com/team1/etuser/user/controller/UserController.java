@@ -90,6 +90,13 @@ public class UserController {
         log.info("ET-User: 포인트 조회 요청 수신 (사용자: {})", userId);
         return userAdditionalService.getUserPoints(userId);
     }
+
+    @GetMapping("/pets/dex")
+    public ResponseEntity<List<UserUniquePetsRes>> getUniquePetsByUser(@RequestHeader("X-Id") Long userId) {
+        List<UserUniquePetsRes> pets = userPetService.getUniquePetsByUser(userId);
+        return ResponseEntity.ok(pets);
+    }
+  
     //api 연결용
     @GetMapping("/points")
     public ResponseEntity<PointResponse> userPoints(@RequestHeader("X-Id") Long userId) {
@@ -98,7 +105,5 @@ public class UserController {
         log.info("반환할 PointResponse: {}", response);
         return ResponseEntity.ok(response);
     }
-
-
 
 }
