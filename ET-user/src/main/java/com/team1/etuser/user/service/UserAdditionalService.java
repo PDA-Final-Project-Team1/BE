@@ -4,6 +4,7 @@ import com.team1.etuser.user.domain.UserAdditionalInfo;
 import com.team1.etuser.user.dto.PointResponse;
 import com.team1.etuser.user.dto.feign.FeginPointRes;
 import com.team1.etuser.user.repository.UserAdditionalInfoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,6 @@ public class UserAdditionalService {
 
     /**
      * FEGIN- 유저 포인트 받아오기 및 충분한지 체크
-     *
      */
 
     public FeginPointRes getUserPoints(Long userId) {
@@ -74,7 +74,7 @@ public class UserAdditionalService {
     // API 연결용 유저포인트 함수
     public PointResponse UserPoints(Long userId) {
         System.out.println("userId 값 확인: " + userId);
-       int  userPoint = userAdditionalInfoRepository.findUserPointByUserId(userId);
+        int userPoint = userAdditionalInfoRepository.findUserPointByUserId(userId);
         return PointResponse.builder()
                 .point(userPoint)
                 .build();
@@ -90,4 +90,5 @@ public class UserAdditionalService {
         int newPoints = userPoint + amount;
         userAdditionalInfoRepository.updateUserPoints(userId, newPoints); // 포인트 업데이트 쿼리 필요
     }
+}
 
