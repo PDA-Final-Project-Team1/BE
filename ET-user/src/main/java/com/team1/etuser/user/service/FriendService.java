@@ -3,8 +3,7 @@ package com.team1.etuser.user.service;
 import com.team1.etuser.user.domain.Friend;
 import com.team1.etuser.user.domain.FriendId;
 import com.team1.etuser.user.domain.User;
-import com.team1.etuser.user.dto.FriendResponseDto;
-import com.team1.etuser.user.dto.SubscriptionRequestDto;
+import com.team1.etuser.user.dto.FriendRes;
 import com.team1.etuser.user.dto.SubscriptionResponseDto;
 import com.team1.etuser.user.repository.FriendRepository;
 import com.team1.etuser.user.repository.UserRepository;
@@ -28,9 +27,9 @@ public class FriendService {
     // 구독하는 사람 목록 조회
     public SubscriptionResponseDto getSubscriptions(Long id) {
 
-        List<FriendResponseDto> friends = friendRepository.findBySubscriberId(id)
+        List<FriendRes> friends = friendRepository.findBySubscriberId(id)
                 .stream()
-                .map(FriendResponseDto::new)
+                .map(FriendRes::new)
                 .collect(Collectors.toList());
 
         return new SubscriptionResponseDto(friends.size(), friends);
