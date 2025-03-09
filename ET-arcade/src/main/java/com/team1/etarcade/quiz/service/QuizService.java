@@ -3,18 +3,17 @@ package com.team1.etarcade.quiz.service;
 import com.team1.etarcade.quiz.connector.QuizUserConnector;
 import com.team1.etarcade.quiz.domain.Difficulty;
 import com.team1.etarcade.quiz.domain.Quiz;
-import com.team1.etarcade.quiz.dto.QuizDTO;
-import com.team1.etarcade.quiz.dto.QuizSubmitRequestDTO;
-import com.team1.etarcade.quiz.dto.QuizSubmitResponseDTO;
+import com.team1.etarcade.quiz.dto.*;
 import com.team1.etarcade.quiz.repository.QuizRepository;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Random;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class QuizService {
@@ -44,15 +43,12 @@ public class QuizService {
         );
 
 
-
-
     }
-
 
 
     // 사용자 ID를 통해 POINT 증가하는 로직도 필요.
 
-    public QuizSubmitResponseDTO submitQuiz(Long userid,QuizSubmitRequestDTO request) {
+    public QuizSubmitResponseDTO submitQuiz(Long userid, QuizSubmitRequestDTO request) {
         Quiz quiz = quizRepository.findById(request.getQuizId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 퀴즈를 찾을 수 없습니다."));
 
@@ -95,4 +91,24 @@ public class QuizService {
 
 
     }
+    // solvedQuizService
+    public SolvedQuizRes getSolvedQuiz(Long userid, SolvedQuizReq solvedQuizReq){
+        log.info("getSolvedQuiz() 호출됨 - userId: {}, quizId: {}", userid, solvedQuizReq.getQuizId());
+
+        Quiz quiz = quizRepository.findById(solvedQuizReq.getQuizId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 퀴즈를 찾을 수 없습니다."));
+
+        Integer userPoint = quizUserConnector.getUserPoints(userid).getNowUserPoint();
+        log.info("사용자 ID: {}, 현재 포인트: {}", userid, userPoint);
+
+        // `SolvedQuizRes` 객체 반환
+        return new SolvedQuizRes(
+                quiz.getId(),
+                quiz.getTitle(),
+                quiz.getDifficulty(),
+                userPoint
+        );
+    }
+
+
 }
