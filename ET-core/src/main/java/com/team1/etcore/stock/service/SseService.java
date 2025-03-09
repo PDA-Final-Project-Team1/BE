@@ -52,6 +52,11 @@ public class SseService {
         //이부분은 for 문으로 userId 로 종목들 조회해서 맵에 넣어야될듯
         portfolioSubscribers.computeIfAbsent("005930", k -> new ArrayList<>()).add(emitter);
 
+        try {
+            emitter.send("연결 성공: 테스트 이벤트");
+        } catch (IOException e) {
+            emitter.completeWithError(e);
+        }
         //sse emitter는 사용자
         /**
          * 키값 변경예정 db요청해서 값 받아서
