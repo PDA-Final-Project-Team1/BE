@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserFriendResponseDTO {
-    private Long subscribedId;
+    private Long id;
 }

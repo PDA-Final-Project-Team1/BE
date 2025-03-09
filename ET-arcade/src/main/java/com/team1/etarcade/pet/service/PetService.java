@@ -38,7 +38,7 @@ public class PetService {
         boolean isSubscribed = false;
         if (subscriptionResponse.getFriends() != null) {
             isSubscribed = subscriptionResponse.getFriends().stream()
-                    .anyMatch(friend -> friend.getSubscribedId().equals(subscribeId));
+                    .anyMatch(friend -> friend.getId().equals(subscribeId));
         }
         if (!isSubscribed) {
             throw new RuntimeException("The specified user is not subscribed.");
