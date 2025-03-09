@@ -19,4 +19,5 @@ public interface UserFavoriteStockRepository extends JpaRepository<UserFavoriteS
     boolean existsByUserAndStockCode(User user, String stockCode);
 
     Optional<UserFavoriteStock> findByUserAndStockCode(User user, String stockCode);
+
 }

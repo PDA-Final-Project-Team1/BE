@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class PointRes {
+public class FeginPointRes {
 
     private int point;
     private boolean hasEnoughPoints;
