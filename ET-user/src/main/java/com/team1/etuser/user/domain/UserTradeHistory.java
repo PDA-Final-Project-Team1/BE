@@ -34,7 +34,7 @@ public class UserTradeHistory extends BaseEntity {
     private Position position;
 
     @Column(nullable = false)
-    private int amount;
+    private BigDecimal amount;
 
     @Setter
     @Enumerated(EnumType.STRING)
