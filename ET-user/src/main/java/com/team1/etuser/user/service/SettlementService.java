@@ -35,9 +35,9 @@ public class SettlementService {
     }
 
     // 예치금 정산
-    private void settlementDeposit(Position position, Long userId, Long historyId, BigDecimal price, int amount) {
+    private void settlementDeposit(Position position, Long userId, Long historyId, BigDecimal price, BigDecimal amount) {
         // 주문 총액 = 가격 * 개수
-        BigDecimal totalPrice = price.multiply(BigDecimal.valueOf(amount));
+        BigDecimal totalPrice = price.multiply(amount);
 
         if (position.equals(Position.BUY)) {
             boolean depositDeducted = userAdditionalService.updateDeposit(userId, totalPrice.negate());
@@ -59,7 +59,7 @@ public class SettlementService {
     }
 
     // 보유주식 정산
-    private void settlementUserStock(Long userId, String stockCode, int amount, BigDecimal price, Position position) {
+    private void settlementUserStock(Long userId, String stockCode, BigDecimal amount, BigDecimal price, Position position) {
         boolean isStockUpdated = userStockService.updateUserStock(
                 userId,
                 stockCode,

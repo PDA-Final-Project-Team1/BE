@@ -17,7 +17,7 @@ public class UserHistoryRes {
     private String stockName;
     private BigDecimal price;
     private Position position;
-    private int amount;
+    private BigDecimal amount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private TradeStatus tradeStatus;
