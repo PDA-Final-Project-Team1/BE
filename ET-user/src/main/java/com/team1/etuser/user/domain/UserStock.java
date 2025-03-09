@@ -26,8 +26,8 @@ public class UserStock extends BaseEntity {
     private String stockCode;
 
     @Setter
-    @Column(name = "amount", nullable = false)
-    private int amount;
+    @Column(name = "amount", nullable = false, precision = 65, scale = 8)
+    private BigDecimal amount;
 
     @Setter
     @DecimalMin(value = "0.0")

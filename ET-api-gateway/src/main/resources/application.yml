@@ -22,7 +22,7 @@ spring:
           - id: CORE-SERVICE
             uri: lb://ET-core
             predicates:
-              - Path=/api/stocks/**, /api/charts/**, /api/trades/**
+              - Path=/api/stocks/**, /api/charts/**, /api/trades/**, /sse/**
 
           - id: ARCADE-SERVICE
             uri: lb://ET-arcade

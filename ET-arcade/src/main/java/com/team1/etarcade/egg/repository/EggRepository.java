@@ -14,4 +14,5 @@ public interface EggRepository extends JpaRepository<Egg, Long> {
     List<Egg> findByUserId(Long userId);
 
 
+
 }

@@ -4,6 +4,7 @@ import com.team1.etapigateway.filter.JwtGatewayFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -26,7 +27,9 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .cors(cors -> cors.configurationSource(corsConfig()))
                 .authorizeHttpRequests(auth->
-                                auth.requestMatchers("/api/auth/signup", "/api/auth/login", "/api/users/duplicate").permitAll()
+                                auth
+                                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                        .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/users/duplicate").permitAll()
                                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtGatewayFilter, UsernamePasswordAuthenticationFilter.class);

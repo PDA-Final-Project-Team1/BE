@@ -9,7 +9,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 @EnableFeignClients(basePackages = {
         "com.team1.etarcade.egg.connector",
-        "com.team1.etarcade.pet.connector"
+        "com.team1.etarcade.pet.connector",
+        "com.team1.etarcade.quiz.connector"
 })public class EtArcadeApplication {
 
     public static void main(String[] args) {

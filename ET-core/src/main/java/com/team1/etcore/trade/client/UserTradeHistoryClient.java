@@ -1,13 +1,17 @@
 package com.team1.etcore.trade.client;
 
+import com.team1.etcore.stock.dto.UserFavoriteStocksRes;
+import com.team1.etcore.stock.dto.UserStocksRes;
 import com.team1.etcore.trade.dto.TradeReq;
 import com.team1.etcore.trade.dto.TradeRes;
 import com.team1.etcore.trade.dto.TradeStatus;
 import com.team1.etcore.trade.dto.Position;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @FeignClient(name = "ET-user")
 public interface UserTradeHistoryClient {
@@ -31,19 +35,11 @@ public interface UserTradeHistoryClient {
     boolean updateHistoryStatus(@RequestParam("orderId") Long historyId,
                                 @RequestParam("status") TradeStatus tradeStatus);
 
-    /**
-     * 사용자 예치금 업데이트
-     */
-    @PutMapping("/api/users/feign/account/update")
-    boolean updateDeposit(@RequestParam("userId") Long userId, @RequestParam("amount") BigDecimal amount);
 
-    /**
-     * 보유 주식 업데이트 API
-     */
-    @PostMapping("/api/users/feign/stock/update")
-    boolean updateUserStock(@RequestParam("userId") Long userId,
-                            @RequestParam("stockCode") String stockCode,
-                            @RequestParam("amount") int amount,
-                            @RequestParam("price") BigDecimal price,
-                            @RequestParam("position") Position position);
+    @GetMapping("/api/users/stocks")
+    ResponseEntity<List<UserStocksRes>> getUserStocks(@RequestHeader("X-Id") String userId);
+
+    @GetMapping("/api/users/favorite")
+    ResponseEntity<List<UserFavoriteStocksRes>> getUserFavoriteStocks(@RequestHeader("X-Id") String userId);
+
 }

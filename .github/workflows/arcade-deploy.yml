@@ -41,15 +41,6 @@ jobs:
           key: ${{ secrets.AWS_SSH_KEY }}
           script: |
             ssh -tt arcade-mod "cd /home/ubuntu && \
-            echo 'EUREKA_HOST=${{ secrets.EUREKA_HOST }}' >> .env && \
-            echo 'ARCADE_DB_HOST=${{ secrets.ARCADE_DB_HOST }}' >> .env && \
-            echo 'ARCADE_DB_PORT=${{ secrets.ARCADE_DB_PORT }}' >> .env && \
-            echo 'ARCADE_DB=${{ secrets.ARCADE_DB }}' >> .env && \
-            echo 'ARCADE_DB_USER=${{ secrets.DB_USER }}' >> .env && \
-            echo 'ARCADE_DB_PWD=${{ secrets.DB_PWD }}' >> .env && \
-            echo 'REDIS_HOST=${{ secrets.REDIS_HOST }}' >> .env && \
-            echo 'REDIS_PORT=${{ secrets.REDIS_PORT }}' >> .env && \
-            echo 'HOST_NAME=${{ secrets.ARCADE_HOST }}' >> .env && \
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/et-arcade:latest && \
             docker rm -f ET-arcade || true && \
             docker run -d --name ET-arcade --env-file .env -p 8083:8083 ${{ secrets.DOCKERHUB_USERNAME }}/et-arcade:latest"

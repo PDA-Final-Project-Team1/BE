@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 @RequestMapping("/sse")
 @Controller
-@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = "http://localhost:5173")
 public class SseController {
     private final SseService sseService;
 
@@ -26,6 +26,10 @@ public class SseController {
     @GetMapping("/ask-bid/{stockCode}")
     public SseEmitter StockAskBid(@PathVariable String stockCode) {
         return sseService.getAskBidPrice(stockCode);
+    }
+    @GetMapping("/cur-price/{stockCode}")
+    public SseEmitter StockCurPrice(@PathVariable String stockCode) {
+        return sseService.getStockCurPrice(stockCode);
     }
 
     @GetMapping(value = "/subscribe/trade", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

@@ -22,5 +22,6 @@ public interface UserService {
 
     UserResponseDto getUserByUid(String uid);
 
+
   
 }

@@ -2,8 +2,6 @@ package com.team1.etuser.user.controller;
 
 import com.team1.etuser.user.domain.Position;
 import com.team1.etuser.user.domain.TradeStatus;
-import com.team1.etuser.user.domain.UserTradeHistory;
-import com.team1.etuser.user.dto.feign.PointRes;
 import com.team1.etuser.user.dto.feign.TradeReq;
 import com.team1.etuser.user.dto.feign.TradeRes;
 import com.team1.etuser.user.service.UserAdditionalService;
@@ -54,12 +52,20 @@ public class UserFeignController {
     @PostMapping("/stock/update")
     boolean updateUserStock(@RequestParam("userId") Long userId,
                             @RequestParam("stockCode") String stockCode,
-                            @RequestParam("amount") int amount,
+                            @RequestParam("amount") BigDecimal amount,
                             @RequestParam("price") BigDecimal price,
                             @RequestParam("position") Position position) {
         log.info("ET-user: 보유 주식 요청 수신 (사용자: {}): {}", userId, stockCode);
         return userStockService.updateUserStock(userId, stockCode, amount, price, position);
     }
+
+    @PutMapping("/points/update")
+    void updateUserPoints(@RequestHeader("X-Id") Long userId,@RequestParam("points") int points) {
+        log.info("ET-user: 보유포인트 갱신요청 수신 (사용자: {}): {}", userId, points);
+        userAdditionalService.updateUserPoint(userId,points);
+    }
+
+
 
 
 }
