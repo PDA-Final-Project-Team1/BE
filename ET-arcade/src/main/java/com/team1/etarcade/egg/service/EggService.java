@@ -119,7 +119,7 @@ public class EggService {
         }
 
         // 1️⃣ 주식 지급
-        rewardStockService.giveRandomStockToUser(userId, 10000); // 10,000원어치 주식 지급
+        rewardStockService.giveRandomStockToUser(userId); // 주식 지급
 
         // 2️⃣ 알 삭제
         eggRepository.delete(egg);
