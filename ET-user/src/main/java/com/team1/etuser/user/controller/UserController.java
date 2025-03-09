@@ -91,7 +91,7 @@ public class UserController {
         return userAdditionalService.getUserPoints(userId);
     }
 
-    @GetMapping("/pets/dex")
+    @GetMapping("/petdex")
     public ResponseEntity<List<UserUniquePetsRes>> getUniquePetsByUser(@RequestHeader("X-Id") Long userId) {
         List<UserUniquePetsRes> pets = userPetService.getUniquePetsByUser(userId);
         return ResponseEntity.ok(pets);
