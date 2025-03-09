@@ -1,7 +1,7 @@
 package com.team1.etcore.trade.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.team1.etcore.stock.service.SseService;
 import com.team1.etcore.trade.client.UserTradeHistoryClient;
 import com.team1.etcore.trade.dto.*;
 import jakarta.transaction.Transactional;
@@ -9,10 +9,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
+import java.util.Objects;
 import java.util.Set;
 
 @Slf4j
@@ -23,14 +25,9 @@ public class TradeService {
     private final UserTradeHistoryClient userTradeHistoryClient;
     private final RedisTemplate<String, TradeRes> redisTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final TradeSettlement tradeSettlement;
-    private final SseService sseService;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
-    /**
-     * 사용자의 주문(거래) 생성 요청을 받아 ET-user 모듈에 주문 기록을 생성하고, Redis에 캐싱합니다.
-     * @param tradeReq 주문 요청 정보
-     * @return 생성된 주문(거래) 정보
-     */
+    // 거래 생성 및 Redis 저장
     @Transactional
     public TradeRes createOrder(Long userId, TradeReq tradeReq) {
         try {
@@ -67,7 +64,6 @@ public class TradeService {
      * @param stockCode 주식 코드
      * @param price     주식 가격
      */
-
     @Transactional
     public void cancelOrder(Long tradeId, Position position, String stockCode, BigDecimal price) {
         // 1. DB 업데이트: UserTradeHistory의 상태를 CANCELLED로 변경
@@ -137,13 +133,7 @@ public class TradeService {
 
 
 
-    /**
-     * Kafka에서 전달받은 체결 데이터를 기반으로 미체결 주문(PENDING)들을 조회하여 체결 조건에 맞으면 처리합니다.
-     * 트랜잭션 내에서 주문 상태 업데이트, 예치금 처리, 보유 주식 업데이트를 진행하고,
-     * 체결 완료 시 Redis 캐시에서 해당 주문 정보를 삭제합니다.
-     * @param stockCode  체결된 종목 코드
-     * @param tradePrice 체결 가격
-     */
+    // Kafka에서 전달받은 호가 데이터를 기반으로 미체결 주문들을 조회하여 체결 조건에 맞으면 처리합니다.
     @Transactional
     public void processMatching(Position position, String stockCode, BigDecimal tradePrice, int tradeAmount) {
         String redisKey = buildRedisKey(position, stockCode, tradePrice);
@@ -154,29 +144,33 @@ public class TradeService {
         }
 
         for (ZSetOperations.TypedTuple<TradeRes> order : orders) {
-            log.info("드디어 된거야??? = " + order.getValue().toString());
             TradeRes tradeRes = order.getValue();
 
-            Long userId = tradeRes.getUserId();
+            Long userId = Objects.requireNonNull(tradeRes).getUserId();
             Long historyId = tradeRes.getId();
 
             if (isPriceDifferent(tradePrice, tradeRes.getPrice())) continue;
             if (tradeRes.getAmount() > tradeAmount) continue;
 
-            tradeSettlement.updateDeposit(position, userId, historyId,
-                    tradeRes.getPrice(), tradeRes.getAmount());
+            SettlementDTO settlementDTO = SettlementDTO.builder()
+                    .userId(userId)
+                    .historyId(historyId)
+                    .stockCode(stockCode)
+                    .position(position)
+                    .orderPrice(tradeRes.getPrice())
+                    .orderAmount(tradeRes.getAmount())
+                    .orderPosition(tradeRes.getPosition())
+                    .build();
 
-            tradeSettlement.updateUserStock(userId, stockCode, tradeRes.getAmount(),
-                    tradeRes.getPrice(), tradeRes.getPosition());
-
-            tradeSettlement.updateHistoryStatus(historyId);
-
-            log.info("체결 성공: 주문 ID {} 체결 완료", historyId);
-            // 체결 완료되었으므로 Redis SortedSet에서 해당 주문 삭제
             redisTemplate.opsForZSet().remove(redisKey, tradeRes);
 
-            // 거래 알림 전송: tradeRes 혹은 별도의 DTO를 만들어 필요한 정보를 담아 전송
-            sseService.sendTradeNotification(tradeRes.getUserId(), tradeRes);
+            try {
+                kafkaTemplate.send("settlement", objectMapper.writeValueAsString(settlementDTO));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("JSON 파싱에 실패했습니다.");
+            }
+
+            log.info("체결 성공: 주문 ID {} 체결 완료", historyId);
         }
     }
 

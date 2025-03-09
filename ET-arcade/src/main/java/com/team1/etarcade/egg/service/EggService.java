@@ -3,9 +3,10 @@ package com.team1.etarcade.egg.service;
 
 import com.team1.etarcade.egg.connector.UserFeignConnector;
 import com.team1.etarcade.egg.domain.Egg;
-import com.team1.etarcade.egg.dto.EggResponseDTO;
-import com.team1.etarcade.egg.dto.UserFeignPointResponseDTO;
+import com.team1.etarcade.egg.dto.EggCreateRes;
+import com.team1.etarcade.egg.dto.UserFeignPointRes;
 import com.team1.etarcade.egg.repository.EggRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,15 +22,16 @@ public class EggService {
 
     private final EggRepository eggRepository;
     private final UserFeignConnector userFeignConnector;
-    private static final Duration INCUBATION_DURATION = Duration.ofMinutes(1); // 부화 시간 24시간 현재 임시로 1분
+    private static final Duration INCUBATION_DURATION = Duration.ofMinutes(1); // 부화 시간 24시간
     private final RewardStockService rewardStockService;
 
     @Transactional
     //알 얻는 과정
-    public EggResponseDTO acquireEgg(Long userId) { //알얻기
+    public EggCreateRes acquireEgg(Long userId) { //알얻기
         // FeignClient를 통해 사용자 정보 조회
-        UserFeignPointResponseDTO userInfo = userFeignConnector.getUserPointInfo(userId);
-        //유저가 가진 포인트 조회
+        UserFeignPointRes userInfo = userFeignConnector.getUserPointInfo(userId);
+
+        //유저가 가진 포인트 조회 및 차감.
         if (!userInfo.getHasEnoughPoints()) {
             throw new IllegalStateException("포인트가 부족합니다.");
         }
@@ -42,11 +44,11 @@ public class EggService {
                 .build();
         Egg savedEgg = eggRepository.save(newEgg);
 
-        userFeignConnector.deductUserPoints(userId, 100);
+
 
 
         //알DTO 반환
-        return new EggResponseDTO(
+        return new EggCreateRes(
                 savedEgg.getId(),
                 userId,
                 "부화 대기 중",
@@ -58,15 +60,15 @@ public class EggService {
 
 
     // 유저의 모든 알 조회
-    public List<EggResponseDTO> getAllEggs(Long userId) {
+    public List<EggCreateRes> getAllEggs(Long userId) {
 
 
 
-            return eggRepository.findByUserId(userId).stream()
-                    .map(egg -> {updateEggStatus(egg);
+        return eggRepository.findByUserId(userId).stream()
+                .map(egg -> {updateEggStatus(egg);
 
 
-                return new EggResponseDTO(
+                    return new EggCreateRes(
 
                             egg.getId(),
                             egg.getUserId(),
@@ -77,7 +79,7 @@ public class EggService {
                             calculateTimeRemaining(egg.getCreatedAt())
 
                     );})
-                    .toList();
+                .toList();
 
     }
 
@@ -92,7 +94,7 @@ public class EggService {
     }
 
 
-        // 남은 시간 계산 함수
+    // 남은 시간 계산 함수
     private String calculateTimeRemaining(LocalDateTime createdAt) {
         LocalDateTime expirationTime = createdAt.plus(INCUBATION_DURATION);
         Duration remaining = Duration.between(LocalDateTime.now(), expirationTime);
@@ -116,10 +118,13 @@ public class EggService {
             throw new IllegalStateException("부화할 수 없는 알입니다.");
         }
 
-        // 1.주식 지급
+        // 1️⃣ 주식 지급
         rewardStockService.giveRandomStockToUser(userId, 10000); // 10,000원어치 주식 지급
 
-        // 2.알 삭제
+        // 2️⃣ 알 삭제
         eggRepository.delete(egg);
     }
+
+
+
 }

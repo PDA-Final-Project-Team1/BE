@@ -3,7 +3,8 @@ package com.team1.etuser.user.controller;
 
 import com.team1.etuser.user.domain.UserPet;
 import com.team1.etuser.user.dto.*;
-import com.team1.etuser.user.service.UserEggService;
+import com.team1.etuser.user.dto.feign.FeginPointRes;
+import com.team1.etuser.user.service.UserAdditionalService;
 import com.team1.etuser.user.service.UserFavoriteService;
 import com.team1.etuser.user.service.UserPetService;
 import com.team1.etuser.user.service.UserService;
@@ -24,7 +25,7 @@ public class UserController {
     private final UserService userService;
     private final UserFavoriteService userFavoriteService;
     private final UserPetService userPetService;
-    private final UserEggService userEggService;
+    private final UserAdditionalService userAdditionalService;
 
     @PostMapping("/duplicate")
     public ResponseEntity<Boolean> isDuplicateUid(@RequestBody Map<String, String> uid) {
@@ -83,11 +84,21 @@ public class UserController {
     public ResponseEntity<UserResponseDto> getUserByUid(@RequestParam("uid") String uid) {
         return ResponseEntity.ok(userService.getUserByUid(uid));
     }
-
-    @GetMapping("/points")
-    public ResponseEntity<UserPointRes> getUserPoints(@RequestHeader("X-Id") Long userId) {
-        userEggService.getUserPoint(userId);
-        return ResponseEntity.ok().body(new UserPointRes());
+    //feign 연결용 포인트 매핑
+    @GetMapping("/feign/points")
+    public FeginPointRes getUserPoints(@RequestHeader("X-Id") Long userId) {
+        log.info("ET-User: 포인트 조회 요청 수신 (사용자: {})", userId);
+        return userAdditionalService.getUserPoints(userId);
     }
+    //api 연결용
+    @GetMapping("/points")
+    public ResponseEntity<PointResponse> userPoints(@RequestHeader("X-Id") Long userId) {
+        log.info("API: 포인트 조회 요청 수신 (사용자: {})", userId);
+        PointResponse response = userAdditionalService.UserPoints(userId);
+        log.info("반환할 PointResponse: {}", response);
+        return ResponseEntity.ok(response);
+    }
+
+
 
 }
