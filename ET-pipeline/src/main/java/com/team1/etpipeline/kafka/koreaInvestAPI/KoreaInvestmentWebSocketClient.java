@@ -23,12 +23,12 @@ public class KoreaInvestmentWebSocketClient {
     private String tradeKey;
     private String askKey;
     private final List<String> trKeys = List.of(
-            "005930"
-//            "005930", "000660", "373220", "207940", "005380", "005935"
-//            "000270", "068270", "105560", "035420", "055550", "012330",
-//            "005490", "028260", "032830", "010130", "051910", "329180",
-//            "138040", "006400", "012450", "000810", "086790", "011200",
-//            "035720", "015760", "033780", "066570", "259960", "034020"
+            //"005930"
+            "005930", "000660", "373220", "207940", "005380", "005935",
+            "000270", "068270", "105560", "035420", "055550", "012330",
+            "005490", "028260", "032830", "010130", "051910", "329180",
+            "138040", "006400", "012450", "000810", "086790", "011200",
+            "035720", "015760", "033780", "066570", "259960", "034020"
     );
 
     public KoreaInvestmentWebSocketClient(ApprovalService approvalService, KafkaProducerService kafkaProducerService) {
@@ -80,6 +80,7 @@ public class KoreaInvestmentWebSocketClient {
                 @Override
                 public void onClose(int code, String reason, boolean remote) {
                     log.warn("WebSocket connection closed: {}", reason);
+                    this.connect();
                 }
 
                 @Override
@@ -116,6 +117,7 @@ public class KoreaInvestmentWebSocketClient {
                 @Override
                 public void onClose(int code, String reason, boolean remote) {
                     log.warn("WebSocket connection closed: {}", reason);
+                    this.connect();
                 }
                 @Override
                 public void onError(Exception ex) {
