@@ -5,6 +5,7 @@ import com.team1.etarcade.egg.connector.StockFeignConnector;
 import com.team1.etarcade.egg.connector.UserFeignConnector;
 import com.team1.etarcade.egg.domain.Egg;
 import com.team1.etarcade.egg.dto.EggCreateRes;
+import com.team1.etarcade.egg.dto.StockAmountDTO;
 import com.team1.etarcade.egg.dto.UserFeignPointRes;
 import com.team1.etarcade.egg.repository.EggRepository;
 import jakarta.transaction.Transactional;
@@ -108,9 +109,20 @@ public class EggService {
                 remaining.toSecondsPart());
     }
 
+    //유저의 알인지 확인
+    private boolean isUserEgg(Long userId, Long eggId) {
+        return eggRepository.existsByIdAndUserId(eggId, userId);
+    }
 
     //알 부화 및 주식 지급 로직
-    public void hatchEggAndGiveStock(Long userId, Long eggId) {
+    public void hatchEggAndRewardStock(Long userId, Long eggId) {
+
+
+        if (!isUserEgg(userId, eggId)) {
+            throw new IllegalStateException("해당 알은 사용자의 것이 아닙니다.");
+        }
+
+        //알이 존재하는지 확인
         Egg egg = eggRepository.findById(eggId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 알을 찾을 수 없습니다."));
 
@@ -118,13 +130,16 @@ public class EggService {
             throw new IllegalStateException("부화할 수 없는 알입니다.");
         }
 
-        //
         //1. feign으로, Stock 단에서 랜덤뽑기, 뽑힌주식 (전일종가)고려해서 주식 양  전달해주기.
-        stockFeignConnector.getStockAmount();
-        //2.가져온 주식 및 양으로 유저에 추가하기.
+        StockAmountDTO stockAmount = stockFeignConnector.getStockAmount();
 
-        // 3.. 알 삭제
+        //2.가져온 주식 및 양으로 유저에 추가하기.
+        userFeignConnector.addStockToUser(stockAmount);
+
+        // 3.. 알 부화 처리 후 삭제
+
         eggRepository.delete(egg);
+
     }
 
 
