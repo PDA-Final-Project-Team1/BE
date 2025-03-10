@@ -1,7 +1,6 @@
 package com.team1.etcore.stock.controller;
 
 import com.team1.etcore.stock.service.SseService;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -32,12 +31,9 @@ public class SseController {
         return sseService.getStockCurPrice(stockCode);
     }
 
-    @GetMapping(value = "/subscribe/trade", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribeTrade(HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Content-Type", "text/event-stream");
+    @GetMapping(value = "/subscribe/trade/{userId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribeTrade(@PathVariable Long userId) {
 
-        return sseService.subscribeTradeNotifications(1L);
+        return sseService.subscribeTradeNotifications(userId);
     }
 }

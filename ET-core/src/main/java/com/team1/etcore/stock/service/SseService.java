@@ -1,10 +1,13 @@
 package com.team1.etcore.stock.service;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team1.etcore.stock.dto.TradeResult;
 import com.team1.etcore.stock.dto.UserFavoriteStocksRes;
 import com.team1.etcore.stock.dto.UserStocksRes;
 import com.team1.etcore.trade.client.UserTradeHistoryClient;
-import com.team1.etcore.trade.dto.TradeRes;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -198,7 +201,7 @@ public class SseService {
 
     // 거래 알림 구독 메서드
     public SseEmitter subscribeTradeNotifications(Long userId) {
-        SseEmitter emitter = new SseEmitter(200_000L);
+        SseEmitter emitter = new SseEmitter(null);
 
         tradeSubscribers.put(userId, emitter);
 
@@ -209,12 +212,18 @@ public class SseService {
     }
 
     // 거래 알림 전송 메서드
-    public void sendTradeNotification(Long userId, TradeRes data) {
+    @KafkaListener(topics = "tradeResult", groupId = "trade-alert")
+    public void sendTradeNotification(ConsumerRecord<String, String> record) throws JsonProcessingException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        TradeResult tradeResult = objectMapper.readValue(record.value(), TradeResult.class);
+
+        Long userId = tradeResult.getUserId();
+
         SseEmitter emitter = tradeSubscribers.get(userId);
         if (emitter != null) {
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                String jsonData = objectMapper.writeValueAsString(data);
+                String jsonData = objectMapper.writeValueAsString(tradeResult);
                 emitter.send(SseEmitter.event().data(jsonData));
             } catch (IOException e) {
                 emitter.complete();
