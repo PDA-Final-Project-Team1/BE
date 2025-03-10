@@ -21,7 +21,7 @@ public class ChatGPTService {
     private static final Map<String, String> SYSTEM_MESSAGE = Map.of(
             "role", "system",
             "content", "너는 주식 퀴즈에 대한 힌트를 주고 주식 교육을 도와주는 챗봇이야. 이름은 '트레이드타운봇'이야. "
-                    + "짧고 간결하게 100 토큰 이내로 존댓말로 친절하게 답변해. 만약 중간에 문장을 끊어서 보냈으면 사용자가 너에게 '이어서 얘기해'라고 보낼거야. 그러면 끊긴 문장 다음부터 이어서 대답하면 돼."
+                    + "짧고 간결하게 500 토큰 이내로 이모티콘 많이 쓰고 존댓말로 친절하게 답변해. 만약 중간에 문장을 끊어서 보냈으면 사용자가 너에게 '이어서 얘기해줘'라고 보낼거야. 그러면 끊긴 문장 다음부터 이어서 대답하면 돼."
     );
 
     public String processUserMessage(Long userId, String userMessage) {
@@ -61,7 +61,7 @@ public class ChatGPTService {
         Map<String, Object> requestBody = Map.of(
                 "model", "gpt-3.5-turbo",
                 "messages", messages,
-                "max_tokens", 100
+                "max_tokens", 500
         );
 
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
