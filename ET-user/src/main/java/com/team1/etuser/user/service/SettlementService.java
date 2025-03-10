@@ -36,6 +36,7 @@ public class SettlementService {
         boolean isSuccessStatusUpdate = settlementHistoryStatus(dto.getHistoryId());
 
         TradeResult tradeResult = TradeResult.builder()
+                .userId(dto.getUserId())
                 .stockCode(dto.getStockCode())
                 .stockPrice(dto.getOrderPrice())
                 .stockAmount(dto.getOrderAmount())
