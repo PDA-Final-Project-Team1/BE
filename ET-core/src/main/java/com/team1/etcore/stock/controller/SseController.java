@@ -33,7 +33,6 @@ public class SseController {
 
     @GetMapping(value = "/subscribe/trade", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribeTrade(@RequestHeader("X-Id") Long userId) {
-
         return sseService.subscribeTradeNotifications(userId);
     }
 }

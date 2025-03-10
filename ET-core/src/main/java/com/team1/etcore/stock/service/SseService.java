@@ -226,7 +226,7 @@ public SseEmitter getPortfolioStockPrice(String userId) {
     // 거래 알림 구독 메서드
     public SseEmitter subscribeTradeNotifications(Long userId) {
 
-        SseEmitter emitter = new SseEmitter(null);
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
 
 
         tradeSubscribers.put(userId, emitter);
