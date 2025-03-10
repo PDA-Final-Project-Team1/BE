@@ -12,8 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserFeignStockRes {
-    private Long userId;
-    private String randomstock;
+    private String stockName;
     private BigDecimal quantity;
 
 

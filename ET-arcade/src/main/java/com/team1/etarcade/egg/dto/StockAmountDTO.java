@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 //주식과 가격을 전달하는 DTO입니다.
-public class StockAmoutRes {
+public class StockAmountDTO {
 
     private String stockname;
     private BigDecimal Amount;
