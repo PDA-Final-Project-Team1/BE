@@ -74,9 +74,8 @@ public class TradeService {
         log.info("DB 거래 상태 업데이트 완료: tradeId={}", tradeId);
 
         // 2. Redis에서 해당 값 삭제: 해당 주문을 캐싱한 ZSet에서 tradeId에 해당하는 항목을 제거
-        String formattedPrice = price.stripTrailingZeros().toPlainString();
+        String key = buildRedisKey(position, stockCode, price);
 
-        String key = "orders:" + position.name() + ":" + stockCode + ":" + formattedPrice;
         Set<TradeRes> tradeSet = redisTemplate.opsForZSet().range(key, 0, -1);
         if (tradeSet == null || tradeSet.isEmpty()) {
             throw new RuntimeException("Redis key [" + key + "]에 데이터가 없습니다. tradeId=" + tradeId);
@@ -130,7 +129,6 @@ public class TradeService {
         }
         return null;
     }
-
 
 
     // Kafka에서 전달받은 호가 데이터를 기반으로 미체결 주문들을 조회하여 체결 조건에 맞으면 처리합니다.
