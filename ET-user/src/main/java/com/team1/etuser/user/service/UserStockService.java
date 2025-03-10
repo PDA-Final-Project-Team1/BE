@@ -1,18 +1,25 @@
 package com.team1.etuser.user.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.team1.etuser.user.domain.Position;
 import com.team1.etuser.user.domain.User;
 import com.team1.etuser.user.domain.UserStock;
+import com.team1.etuser.user.dto.StockPreviousCloseDto;
 import com.team1.etuser.user.repository.UserRepository;
 import com.team1.etuser.user.repository.UserStockRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -21,7 +28,9 @@ import java.util.Optional;
 public class UserStockService {
     private final UserStockRepository userStockRepository;
     private final UserRepository userRepository;
-
+    private final RedisTemplate<String, String> redisTemplate;
+    private final RestTemplate restTemplate;
+    private static final long REDIS_TTL_HOURS = 6;
     public boolean updateUserStock(Long userId, String stockCode, BigDecimal amount, BigDecimal price, Position position) {
         // 유저 조회
         Optional<User> user = userRepository.findById(userId);
@@ -82,6 +91,85 @@ public class UserStockService {
             return true;
         } else {
             return false;
+        }
+    }
+
+    // 보유 주식의 전일 종가 가져오기
+    public List<StockPreviousCloseDto> getUserStockClosingPrice(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
+
+        List<StockPreviousCloseDto> stockList = userStockRepository.findStockCodeByUser(user);
+
+        for (StockPreviousCloseDto stock : stockList) {
+            String redisKey = CloseKey(stock.getStockCode());
+            String closingPriceStr = redisTemplate.opsForValue().get(redisKey);
+
+            if (closingPriceStr == null) {
+                closingPriceStr = fetchClosingPriceFromApi(stock.getStockCode());
+                if (closingPriceStr != null) {
+                    redisTemplate.opsForValue().set(redisKey, closingPriceStr, REDIS_TTL_HOURS, TimeUnit.HOURS);
+                }
+            }
+
+            BigDecimal closingPrice = parsePrice(closingPriceStr);
+            stock.setClosingPrice(closingPrice);
+        }
+        return stockList;
+    }
+
+
+    // 특정 종목의 전일 종가 가져오기
+    public StockPreviousCloseDto getStockClosingPrice(String stockCode) {
+        String redisKey = CloseKey(stockCode);
+        String closingPriceStr = redisTemplate.opsForValue().get(redisKey);
+
+        if (closingPriceStr == null) {
+            closingPriceStr = fetchClosingPriceFromApi(stockCode);
+            if (closingPriceStr != null) {
+                redisTemplate.opsForValue().set(redisKey, closingPriceStr, REDIS_TTL_HOURS, TimeUnit.HOURS);
+            }
+        }
+
+        BigDecimal closingPrice = parsePrice(closingPriceStr);
+
+        return StockPreviousCloseDto.builder()
+                .stockCode(stockCode)
+                .closingPrice(closingPrice)
+                .build();
+    }
+
+    // 전일 종가를 담을 redis key
+    private String CloseKey(String stockCode) {
+        return "close:"+stockCode;
+    }
+
+    // 전일 종가를 네이버 크롤링을 통해 조회
+    private String fetchClosingPriceFromApi(String stockCode) {
+        String url = "https://m.stock.naver.com/api/stock/" + stockCode + "/integration";
+        JsonNode root = restTemplate.getForObject(url, JsonNode.class);
+
+        if (root != null && root.has("totalInfos")) {
+            for (JsonNode node : root.get("totalInfos")) {
+                if ("전일".equals(node.get("key").asText())) {
+                    return node.get("value").asText();
+                }
+            }
+        }
+        return null;
+    }
+
+    // 전일 종가가 57,000과 같이 들어오는 것을 파싱
+    private BigDecimal parsePrice(String priceStr) {
+        if (priceStr == null || priceStr.isEmpty()) {
+            return null;
+        }
+        try {
+            String normalized = priceStr.replaceAll(",", "");
+            return new BigDecimal(normalized);
+        } catch (NumberFormatException e) {
+            // 필요한 경우 로그 처리
+            return null;
         }
     }
 }
