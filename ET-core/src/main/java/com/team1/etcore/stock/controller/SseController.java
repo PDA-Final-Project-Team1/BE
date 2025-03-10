@@ -31,8 +31,8 @@ public class SseController {
         return sseService.getStockCurPrice(stockCode);
     }
 
-    @GetMapping(value = "/subscribe/trade/{userId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribeTrade(@PathVariable Long userId) {
+    @GetMapping(value = "/subscribe/trade", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribeTrade(@RequestHeader("X-Id") Long userId) {
 
         return sseService.subscribeTradeNotifications(userId);
     }
