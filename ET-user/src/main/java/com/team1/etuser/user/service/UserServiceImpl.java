@@ -88,6 +88,7 @@ public class UserServiceImpl implements UserService{
             StockDTO stockDTO = stockFeignService.getStock(u.getStockCode());
             if (stockDTO != null && stockDTO.getName() != null) {
                 u.setStockName(stockDTO.getName());
+                u.setImg(stockDTO.getImg());
             } else {
                 // stockName을 기본값 또는 알림 메시지를 설정
                 u.setStockName("Unknown Stock");
