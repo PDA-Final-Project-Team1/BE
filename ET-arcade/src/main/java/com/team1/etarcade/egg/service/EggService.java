@@ -5,13 +5,15 @@ import com.team1.etarcade.egg.connector.StockFeignConnector;
 import com.team1.etarcade.egg.connector.UserFeignConnector;
 import com.team1.etarcade.egg.domain.Egg;
 import com.team1.etarcade.egg.dto.EggCreateRes;
-import com.team1.etarcade.egg.dto.StockAmountDTO;
+import com.team1.etarcade.egg.dto.StockPriceDTO;
 import com.team1.etarcade.egg.dto.UserFeignPointRes;
 import com.team1.etarcade.egg.repository.EggRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -131,10 +133,12 @@ public class EggService {
         }
 
         //1. feign으로, Stock 단에서 랜덤뽑기, 뽑힌주식 (전일종가)고려해서 주식 양  전달해주기.
-        StockAmountDTO stockAmount = stockFeignConnector.getStockAmount();
+        StockPriceDTO stockPrice = stockFeignConnector.getStockAmount();
+
 
         //2.가져온 주식 및 양으로 유저에 추가하기.
-        userFeignConnector.addStockToUser(stockAmount);
+        userFeignConnector.updateUserStock(userid,stockCode,amount,price,position);
+
 
         // 3.. 알 부화 처리 후 삭제
 

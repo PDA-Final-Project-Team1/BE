@@ -1,7 +1,7 @@
 package com.team1.etarcade.egg.connector;
 
 
-import com.team1.etarcade.egg.dto.StockAmountDTO;
+import com.team1.etarcade.egg.dto.StockPriceDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public interface StockFeignConnector {
 
     @GetMapping("/fegin")
-    StockAmountDTO getStockAmount();
+    StockPriceDTO getStockAmount();
 
 }
