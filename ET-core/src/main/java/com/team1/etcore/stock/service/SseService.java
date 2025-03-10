@@ -32,7 +32,7 @@ public class SseService {
     }
 
     public SseEmitter getInterestStockPrice(String userId) {
-        SseEmitter emitter = new SseEmitter(200_000L); // 200초 타임아웃 설정
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE); // 200초 타임아웃 설정
 
         // 사용자의 관심 종목 정보 조회
         ResponseEntity<List<UserFavoriteStocksRes>> response = userTradeHistoryClient.getUserFavoriteStocks(userId);
@@ -53,7 +53,7 @@ public class SseService {
                 try {
                     emitter.send("연결 성공: " + stockCode);
                 } catch (IOException e) {
-                    emitter.completeWithError(e);
+                    //emitter.completeWithError(e);
                 }
             }
         }
@@ -65,6 +65,8 @@ public class SseService {
 
         List<SseEmitter> emitters = interestSubscribers.getOrDefault(stockCode, new ArrayList<>());
 
+        // 리스트에서 제거될 때 반복문 내에서 제거하지 않도록 별도의 리스트로 처리
+//        List<SseEmitter> completedEmitters = new ArrayList<>();
         for (SseEmitter emitter : emitters) {
             try {
                 // 객체를 JSON 문자열로 변환
@@ -74,44 +76,58 @@ public class SseService {
                 // JSON 문자열을 보내기
                 emitter.send(SseEmitter.event().data(jsonData));
             } catch (IOException e) {
-                emitter.complete();
+//                emitter.complete();
+//                completedEmitters.add(emitter); // 완료된 emitter를 추적
             }
         }
+        // 완료된 emitter들 제거
+//        for (SseEmitter emitter : completedEmitters) {
+//            removeEmitter(portfolioSubscribers, stockCode, emitter);
+//        }
     }
 
-    public SseEmitter getPortfolioStockPrice(String userId) {
-        SseEmitter emitter = new SseEmitter(200_000L); // 200초 타임아웃 설정
+public SseEmitter getPortfolioStockPrice(String userId) {
+    SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+    System.out.println(portfolioSubscribers.size());
 
-        // 사용자의 포트폴리오 종목 정보 조회
-        ResponseEntity<List<UserStocksRes>> response = userTradeHistoryClient.getUserStocks(userId);
-        List<UserStocksRes> userStocks = response.getBody();
+    // 사용자의 포트폴리오 종목 정보 조회
+    ResponseEntity<List<UserStocksRes>> response = userTradeHistoryClient.getUserStocks(userId);
+    List<UserStocksRes> userStocks = response.getBody();
 
-        // 포트폴리오 종목에 대한 구독자 등록
-        if (userStocks != null) {
-            for (UserStocksRes stock : userStocks) {
-                String stockCode = stock.getStockCode(); // 종목 코드 가져오기
+    // 포트폴리오 종목에 대한 구독자 등록
+    if (userStocks != null) {
+        for (UserStocksRes stock : userStocks) {
+            String stockCode = stock.getStockCode(); // 종목 코드 가져오기
 
-                // 포트폴리오 종목별 구독자 리스트에 Emitter 추가
-                portfolioSubscribers.computeIfAbsent(stockCode, k -> new ArrayList<>()).add(emitter);
+            // 포트폴리오 종목별 구독자 리스트에 Emitter 추가
+            portfolioSubscribers.computeIfAbsent(stockCode, k -> new ArrayList<>()).add(emitter);
 
-                // SSE 연결이 종료되거나 타임아웃될 때 해당 종목 코드에서 Emitter 제거
-                emitter.onCompletion(() -> removeEmitter(portfolioSubscribers, stockCode, emitter));
-                emitter.onTimeout(() -> removeEmitter(portfolioSubscribers, stockCode, emitter));
+            // SSE 연결이 종료되거나 타임아웃될 때 해당 종목 코드에서 Emitter 제거
+            emitter.onCompletion(() -> removeEmitter(portfolioSubscribers, stockCode, emitter));
+            emitter.onTimeout(() -> removeEmitter(portfolioSubscribers, stockCode, emitter));
 
-                try {
-                    emitter.send("연결 성공: " + stockCode);
-                } catch (IOException e) {
-                    emitter.completeWithError(e);
-                }
+            // 오류 발생 시 emitter 제거
+//            emitter.onError(e -> {
+//                removeEmitter(portfolioSubscribers, stockCode, emitter);
+//                System.out.println("연결 오류 발생: " + e.getMessage());
+//            });
+
+            try {
+                emitter.send("연결 성공: " + stockCode);
+            } catch (IOException e) {
             }
         }
 
-        return emitter;
     }
+
+    return emitter;
+}
 
     public void sendToClientsPortfolioStockPrice(String stockCode, Object data) {
-
         List<SseEmitter> emitters = portfolioSubscribers.getOrDefault(stockCode, new ArrayList<>());
+
+        // 완료된 emitter를 추적하기 위한 리스트
+//        List<SseEmitter> completedEmitters = new ArrayList<>();
 
         for (SseEmitter emitter : emitters) {
             try {
@@ -121,11 +137,19 @@ public class SseService {
 
                 // JSON 문자열을 보내기
                 emitter.send(SseEmitter.event().data(jsonData));
+
             } catch (IOException e) {
-                emitter.complete();
+//                // 오류 발생 시 emitter 완료 처리
+//                removeEmitter(portfolioSubscribers, stockCode, emitter); // 리스트에서 제거
+//                emitter.complete();
+//                completedEmitters.add(emitter); // 완료된 emitter를 추적
             }
         }
+//        for (SseEmitter emitter : completedEmitters) {
+//            removeEmitter(portfolioSubscribers, stockCode, emitter);
+//        }
     }
+
 
     // 구독자 목록에서 SSE Emitter 제거하는 메서드
     private void removeEmitter(Map<String, List<SseEmitter>> subscribersMap, String stockCode, SseEmitter emitter) {
@@ -142,7 +166,7 @@ public class SseService {
 
 
     public SseEmitter getAskBidPrice(String stockCode) {//호가
-        SseEmitter emitter = new SseEmitter(200_000L); // 60초 타임아웃
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
 
         askBidSubscribers.computeIfAbsent(stockCode, k -> new ArrayList<>()).add(emitter);
 
@@ -165,7 +189,7 @@ public class SseService {
                 // JSON 문자열을 보내기
                 emitter.send(SseEmitter.event().data(jsonData));
             } catch (IOException e) {
-                emitter.complete();
+//                emitter.complete();
             }
         }
     }
@@ -173,7 +197,7 @@ public class SseService {
 
 
     public SseEmitter getStockCurPrice(String stockCode) {
-        SseEmitter emitter = new SseEmitter(200_000L);
+        SseEmitter emitter = new SseEmitter();
         curPriceSubscribers.computeIfAbsent(stockCode, k -> new ArrayList<>()).add(emitter);
 
         emitter.onCompletion(() -> curPriceSubscribers.get(stockCode).remove(emitter));
@@ -194,14 +218,16 @@ public class SseService {
                 // JSON 문자열을 보내기
                 emitter.send(SseEmitter.event().data(jsonData));
             } catch (IOException e) {
-                emitter.complete();
+//                emitter.complete();
             }
         }
     }
 
     // 거래 알림 구독 메서드
     public SseEmitter subscribeTradeNotifications(Long userId) {
+
         SseEmitter emitter = new SseEmitter(null);
+
 
         tradeSubscribers.put(userId, emitter);
 
