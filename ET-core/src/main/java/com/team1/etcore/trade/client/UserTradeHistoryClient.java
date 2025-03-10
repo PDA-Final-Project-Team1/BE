@@ -5,7 +5,6 @@ import com.team1.etcore.stock.dto.UserStocksRes;
 import com.team1.etcore.trade.dto.TradeReq;
 import com.team1.etcore.trade.dto.TradeRes;
 import com.team1.etcore.trade.dto.TradeStatus;
-import com.team1.etcore.trade.dto.Position;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

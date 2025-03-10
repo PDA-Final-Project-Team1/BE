@@ -17,6 +17,6 @@ public class SettlementDTO {
     private String stockCode;
     private Position position;
     private BigDecimal orderPrice;
-    private int orderAmount;
+    private BigDecimal orderAmount;
     private Position orderPosition;
 }

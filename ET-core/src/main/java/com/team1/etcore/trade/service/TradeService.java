@@ -31,7 +31,7 @@ public class TradeService {
     @Transactional
     public TradeRes createOrder(Long userId, TradeReq tradeReq) {
         try {
-            BigDecimal totalPrice = tradeReq.getPrice().multiply(new BigDecimal(tradeReq.getAmount()));
+            BigDecimal totalPrice = tradeReq.getPrice().multiply(tradeReq.getAmount());
             if (!userTradeHistoryClient.enoughDeposit(userId, totalPrice)) {
                 throw new RuntimeException("예치금이 부족합니다.");
             }
@@ -135,7 +135,7 @@ public class TradeService {
 
     // Kafka에서 전달받은 호가 데이터를 기반으로 미체결 주문들을 조회하여 체결 조건에 맞으면 처리합니다.
     @Transactional
-    public void processMatching(Position position, String stockCode, BigDecimal tradePrice, int tradeAmount) {
+    public void processMatching(Position position, String stockCode, BigDecimal tradePrice, BigDecimal tradeAmount) {
         String redisKey = buildRedisKey(position, stockCode, tradePrice);
         Set<ZSetOperations.TypedTuple<TradeRes>> orders = redisTemplate.opsForZSet().rangeWithScores(redisKey, 0, -1);
 
@@ -150,7 +150,9 @@ public class TradeService {
             Long historyId = tradeRes.getId();
 
             if (isPriceDifferent(tradePrice, tradeRes.getPrice())) continue;
-            if (tradeRes.getAmount() > tradeAmount) continue;
+            if (isQuantityOver(tradeAmount, tradeRes.getAmount())) {
+                continue;
+            }
 
             SettlementDTO settlementDTO = SettlementDTO.builder()
                     .userId(userId)
@@ -177,6 +179,10 @@ public class TradeService {
     // 체결가와 주문 가격이 같은지?
     private boolean isPriceDifferent(BigDecimal price1, BigDecimal price2) {
         return price1.compareTo(price2) != 0;
+    }
+
+    private boolean isQuantityOver(BigDecimal tradeAmount, BigDecimal orderAmount) {
+        return tradeAmount.compareTo(orderAmount) < 0;
     }
 
     // 주문내역 Redis Key

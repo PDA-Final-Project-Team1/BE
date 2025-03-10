@@ -14,7 +14,7 @@ public class TradeRes {
     private Long id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private int amount;
+    private BigDecimal amount;
     private Position position;            // "BUY" 또는 "SELL"
     private BigDecimal price;
     private String stockCode;
