@@ -1,7 +1,6 @@
 spring:
   config:
-    import:
-      - optional:file:ET-user/.env[.properties]
+    import: optional:file:ET-user/.env[.properties]
   application:
     name: ET-user
   datasource:

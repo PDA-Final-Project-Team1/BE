@@ -4,15 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 
 // 유저에게 지급할 소수점주식입니다.
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserFeignStockResponseDTO {
-    private Long userId;
-    private String randomstock;
-    private Double quantity;
+public class UserFeignStockRes {
+    private String stockName;
+    private BigDecimal quantity;
 
 
 }

@@ -32,9 +32,9 @@ public class TradeConsumer {
             QuoteDTO quoteDTO = QuoteDTO.builder().
                     stockCode(stockCode)
                     .buyPrice(new BigDecimal(quoteData[2]))
-                    .buyAmount(Integer.parseInt(quoteData[22]))
+                    .buyAmount(new BigDecimal(quoteData[22]))
                     .sellPrice(new BigDecimal(quoteData[12]))
-                    .sellAmount(Integer.parseInt(quoteData[32]))
+                    .sellAmount(new BigDecimal(quoteData[32]))
                     .build();
 
             // 체결 처리

@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 public class QuoteDTO {
     private String stockCode;
     private BigDecimal buyPrice;
-    private int buyAmount;
+    private BigDecimal buyAmount;
     private BigDecimal sellPrice;
-    private int sellAmount;
+    private BigDecimal sellAmount;
 }

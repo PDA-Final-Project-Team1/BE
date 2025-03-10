@@ -1,4 +1,5 @@
-package com.team1.etarcade.pet.dto;
+package com.team1.etarcade.quiz.dto;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +8,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserFriendResponseDTO {
-    private Long id;
+public class UserPointRes {
+    private int nowUserPoint;
 }

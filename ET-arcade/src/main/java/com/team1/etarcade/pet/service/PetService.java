@@ -8,6 +8,7 @@ import com.team1.etarcade.pet.dto.UserPetResponseDTO;
 import com.team1.etarcade.pet.connector.FriendFeignConnector;
 import com.team1.etarcade.pet.connector.UserFeignConnector;
 import com.team1.etarcade.pet.repository.PetRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -37,7 +38,7 @@ public class PetService {
         boolean isSubscribed = false;
         if (subscriptionResponse.getFriends() != null) {
             isSubscribed = subscriptionResponse.getFriends().stream()
-                    .anyMatch(friend -> friend.getSubscribedId().equals(subscribeId));
+                    .anyMatch(friend -> friend.getId().equals(subscribeId));
         }
         if (!isSubscribed) {
             throw new RuntimeException("The specified user is not subscribed.");
@@ -59,5 +60,9 @@ public class PetService {
         int randomIndex = (int) (Math.random() * allPets.size());
         Pet selectedPet = allPets.get(randomIndex);
         return userFeignConnector.grantPet(userId, new PetGrantRequestDTO(selectedPet.getId()));
+    }
+
+    public Optional<Pet> getPetById(Long petId) {
+        return petRepository.findById(petId);
     }
 }
