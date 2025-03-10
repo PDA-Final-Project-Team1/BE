@@ -42,4 +42,11 @@ public class PetController {
         return ResponseEntity.ok(pets);
     }
 
+    @GetMapping("/search/{petId}")
+    public ResponseEntity<Pet> getPetById(@PathVariable("petId") Long petId) {
+        Pet pet = petService.getPetById(petId)
+                .orElseThrow(() -> new RuntimeException("Pet not found with ID: " + petId));
+        return ResponseEntity.ok(pet);
+    }
+
 }
