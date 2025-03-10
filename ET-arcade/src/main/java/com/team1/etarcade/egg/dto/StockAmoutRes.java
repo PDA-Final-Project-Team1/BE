@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 //주식과 가격을 전달하는 DTO입니다.
-public class StockPriceResponseDTO {
+public class StockAmoutRes {
 
     private String stockname;
-    private Double price;
+    private BigDecimal Amount;
 }

@@ -92,10 +92,10 @@ public class QuizService {
 
     }
     // solvedQuizService
-    public SolvedQuizRes getSolvedQuiz(Long userid, SolvedQuizReq solvedQuizReq){
-        log.info("getSolvedQuiz() 호출됨 - userId: {}, quizId: {}", userid, solvedQuizReq.getQuizId());
+    public SolvedQuizRes getSolvedQuiz(Long userid, Long quizId,boolean userAnswer){
+        log.info("getSolvedQuiz() 호출됨 - userId: {}, quizId: {}", userid, quizId);
 
-        Quiz quiz = quizRepository.findById(solvedQuizReq.getQuizId())
+        Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 퀴즈를 찾을 수 없습니다."));
 
         Integer userPoint = quizUserConnector.getUserPoints(userid).getNowUserPoint();

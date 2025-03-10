@@ -32,10 +32,10 @@ public class QuizController {
     }
 
     @GetMapping("/solved")
-    public ResponseEntity<SolvedQuizRes> getSolvedQuiz(@RequestHeader("X-Id") Long userId,@RequestBody SolvedQuizReq request) {
-        log.info("getSolvedQuiz() 요청 - userId: {}, quizId: {}", userId, request.getQuizId());
+    public ResponseEntity<SolvedQuizRes> getSolvedQuiz(@RequestHeader("X-Id") Long userId,@RequestParam Long quizId,@RequestParam boolean userAnswer) {
+        log.info("getSolvedQuiz() 요청 - userId: {}, quizId: {}", userId, quizId);
 
-        SolvedQuizRes response = quizService.getSolvedQuiz(userId,request);
+        SolvedQuizRes response = quizService.getSolvedQuiz(userId,quizId, userAnswer);
 
         return ResponseEntity.ok(response);
 
