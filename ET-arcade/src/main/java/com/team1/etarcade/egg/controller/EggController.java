@@ -30,9 +30,9 @@ public class EggController {
         List<EggCreateRes> eggs = eggService.getAllEggs(userId);
         return ResponseEntity.ok(eggs);
     }
-    @PostMapping(/hatching)
-    public ResponseEntity<EggHatchingRes>
-
+//    @PostMapping(/hatching)
+//    public ResponseEntity<EggHatchingRes>
+//
 
 
 
