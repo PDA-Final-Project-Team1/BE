@@ -1,6 +1,7 @@
 package com.team1.etcore.stock.controller;
 
 import com.team1.etcore.stock.domain.Stock;
+import com.team1.etcore.stock.dto.StockNameAndCodeDTO;
 import com.team1.etcore.stock.dto.StockResponseDTO;
 import com.team1.etcore.stock.service.StockService;
 import java.util.Set;
@@ -10,8 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/stocks")
@@ -30,6 +29,9 @@ public class StockController {
         Set<StockResponseDTO> result = stockService.searchStocks(query);
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/randomstock")
+    public StockNameAndCodeDTO getRandomStock() {return stockService.getRandomStock();}
 
 //    @GetMapping("/feign/price")
 //    public ResponseEntity<Set<StockResponseDTO>> getStockPrice(@RequestParam String stockCode) {

@@ -1,15 +1,22 @@
 package com.team1.etcore.stock.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.etcore.stock.domain.Stock;
+import com.team1.etcore.stock.dto.StockDataDTO;
+import com.team1.etcore.stock.dto.StockNameAndCodeDTO;
 import com.team1.etcore.stock.dto.StockResponseDTO;
 import com.team1.etcore.stock.repository.StockRepository;
 import com.team1.etcore.stock.util.HangulUtils;
 import com.team1.etcore.stock.util.Trie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,5 +63,39 @@ public class StockServiceImpl implements StockService {
                         "https://static.toss.im/png-icons/securities/icn-sec-fill-" + stockData.getCode() + ".png"
                 ))
                 .collect(Collectors.toList());
+    }
+
+
+
+
+
+    @Override
+    public StockNameAndCodeDTO getRandomStock() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Random random = new Random();
+
+        try {
+            // StockData.json 파일을 읽어 리스트로 변환
+            List<StockDataDTO> stockList = objectMapper.readValue(
+                    new ClassPathResource("Stock/StockData.json").getInputStream(),
+                    new TypeReference<List<StockDataDTO>>() {}
+            );
+
+            // stockList가 비어있는지 확인
+            if (stockList.isEmpty()) {
+                throw new IllegalStateException("주식 데이터가 없습니다.");
+            }
+
+            // 랜덤한 주식 선택 후 반환
+            StockDataDTO selectedStock = stockList.get(random.nextInt(stockList.size()));
+            return new StockNameAndCodeDTO(
+                    selectedStock.getCode(),
+                    selectedStock.getName()
+
+            );
+        } catch (IOException e) {
+            throw new RuntimeException("StockData.json 파일을 읽는 중 오류 발생", e);
+        }
+
     }
 }
