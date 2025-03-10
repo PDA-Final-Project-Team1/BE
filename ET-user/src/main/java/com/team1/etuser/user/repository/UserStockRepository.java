@@ -2,6 +2,7 @@ package com.team1.etuser.user.repository;
 
 import com.team1.etuser.user.domain.User;
 import com.team1.etuser.user.domain.UserStock;
+import com.team1.etuser.user.dto.StockPreviousCloseDto;
 import com.team1.etuser.user.dto.UserStocksRes;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,5 +17,9 @@ public interface UserStockRepository extends JpaRepository<UserStock, Long> {
     List<UserStocksRes> findByUserStocks(@Param("user") User user);
 
     UserStock findByUserAndStockCode(User user, String stockCode);
+
+    @Query("SELECT new com.team1.etuser.user.dto.StockPreviousCloseDto(u.stockCode, 0) " +
+            "FROM UserStock u WHERE u.user = :user")
+    List<StockPreviousCloseDto> findStockCodeByUser(@Param("user") User user);
 
 }
