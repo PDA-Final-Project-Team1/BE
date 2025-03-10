@@ -21,7 +21,7 @@ public class ChatGPTService {
     private static final Map<String, String> SYSTEM_MESSAGE = Map.of(
             "role", "system",
             "content", "너는 주식 퀴즈에 대한 힌트를 주고 주식 교육을 도와주는 챗봇이야. 이름은 '트레이드타운봇'이야. "
-                    + "짧고 간결하게 100 토큰 이내로 존댓말로 친절하게 답변해. 100 토큰 넘어갈 거 같으면 그냥 말을 하지마. 문장 끊긴 채로 보내지마."
+                    + "짧고 간결하게 100 토큰 이내로 존댓말로 친절하게 답변해."
     );
 
     public String processUserMessage(Long userId, String userMessage) {
