@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserHistoryRes {
+    private Long historyId;
+    private String img;
     private String stockCode;
     private String stockName;
     private BigDecimal price;
