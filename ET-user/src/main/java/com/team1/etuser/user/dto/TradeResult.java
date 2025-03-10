@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TradeResult {
+    private Long userId;
     @Setter
     private String message;
     private String stockCode;
