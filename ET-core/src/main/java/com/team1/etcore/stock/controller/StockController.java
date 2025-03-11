@@ -1,8 +1,8 @@
 package com.team1.etcore.stock.controller;
 
 import com.team1.etcore.stock.domain.Stock;
-import com.team1.etcore.stock.dto.StockNameAndCodeDTO;
-import com.team1.etcore.stock.dto.StockResponseDTO;
+import com.team1.etcore.stock.dto.StockInfoRes;
+import com.team1.etcore.stock.dto.StockRes;
 import com.team1.etcore.stock.service.StockService;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -25,17 +25,11 @@ public class StockController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Set<StockResponseDTO>> search(@RequestParam("query") String query) {
-        Set<StockResponseDTO> result = stockService.searchStocks(query);
+    public ResponseEntity<Set<StockRes>> search(@RequestParam("query") String query) {
+        Set<StockRes> result = stockService.searchStocks(query);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/randomstock")
-    public StockNameAndCodeDTO getRandomStock() {return stockService.getRandomStock();}
-
-//    @GetMapping("/feign/price")
-//    public ResponseEntity<Set<StockResponseDTO>> getStockPrice(@RequestParam String stockCode) {
-//
-//    }
-
+    public StockInfoRes getRandomStock() {return stockService.getRandomStock();}
 }

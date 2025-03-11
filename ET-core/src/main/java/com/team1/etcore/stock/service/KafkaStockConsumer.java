@@ -1,7 +1,7 @@
 package com.team1.etcore.stock.service;
 
-import com.team1.etcore.stock.dto.AskStockPriceDto;
-import com.team1.etcore.stock.dto.TradeStockPriceDto;
+import com.team1.etcore.stock.dto.AskStockPriceReq;
+import com.team1.etcore.stock.dto.TradeStockPriceReq;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class KafkaStockConsumer {
             String currentPrice = splitData[1];  // 주식 현재가
             String priceChange = splitData[2];  // 전일 대비 변동 금액
             String changeRate = splitData[3];  // 전일 대비 변동률
-            TradeStockPriceDto cur = new TradeStockPriceDto(stockCode, currentPrice, priceChange, changeRate);
+            TradeStockPriceReq cur = new TradeStockPriceReq(stockCode, currentPrice, priceChange, changeRate);
 
             sseService.sendToClientsInterestStockPrice(stockCode,cur);
             sseService.sendToClientsPortfolioStockPrice(stockCode,cur);
@@ -70,14 +70,14 @@ public class KafkaStockConsumer {
             String bidRSQN4 = splitData[35];
             String bidRSQN5 = splitData[36];
 
-            AskStockPriceDto askStockPriceDto = new AskStockPriceDto(
+            AskStockPriceReq askStockPriceReq = new AskStockPriceReq(
                     stockCode,  // 종목코드
                     splitData[2], splitData[3], splitData[4], splitData[5], splitData[6],  // 매도호가
                     splitData[12], splitData[13], splitData[14], splitData[15], splitData[16],  // 매수호가
                     splitData[22], splitData[23], splitData[24], splitData[25], splitData[26],  // 매도잔량
                     splitData[32], splitData[33], splitData[34], splitData[35], splitData[36]   // 매수잔량
             );
-            sseService.sendToClientsAskBidStockPrice(stockCode,askStockPriceDto);
+            sseService.sendToClientsAskBidStockPrice(stockCode, askStockPriceReq);
 
         } else {
             System.out.println("Received data is not of type String.");

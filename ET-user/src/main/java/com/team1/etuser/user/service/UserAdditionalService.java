@@ -1,8 +1,8 @@
 package com.team1.etuser.user.service;
 
 import com.team1.etuser.user.domain.UserAdditionalInfo;
-import com.team1.etuser.user.dto.PointResponse;
-import com.team1.etuser.user.dto.feign.FeginPointRes;
+import com.team1.etuser.user.dto.PointRes;
+import com.team1.etuser.user.dto.FeginPointRes;
 import com.team1.etuser.user.repository.UserAdditionalInfoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -18,18 +18,14 @@ import java.util.Optional;
 public class UserAdditionalService {
     private final UserAdditionalInfoRepository userAdditionalInfoRepository;
 
-    /**
-     * @return 보유 예치금보다 가격이 높을 시 false
-     */
+    // @return 보유 예치금보다 가격이 높을 시 false
     public boolean enoughDeposit(Long userId, BigDecimal amount) {
         BigDecimal deposit = userAdditionalInfoRepository.findByUserDeposit(userId);
         return deposit.compareTo(amount) >= 0;
     }
 
 
-    /**
-     * 유저 예치금 업데이트
-     */
+    // 유저 예치금 업데이트
     public boolean updateDeposit(Long userId, BigDecimal amount) {
 
         Optional<UserAdditionalInfo> userAdditionalInfo = userAdditionalInfoRepository.findById(userId);
@@ -72,10 +68,10 @@ public class UserAdditionalService {
     }
 
     // API 연결용 유저포인트 함수
-    public PointResponse UserPoints(Long userId) {
+    public PointRes UserPoints(Long userId) {
         System.out.println("userId 값 확인: " + userId);
         int userPoint = userAdditionalInfoRepository.findUserPointByUserId(userId);
-        return PointResponse.builder()
+        return PointRes.builder()
                 .point(userPoint)
                 .build();
     }

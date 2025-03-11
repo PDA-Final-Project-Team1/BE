@@ -2,7 +2,7 @@ package com.team1.etcore.stock.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.etcore.stock.domain.Stock;
-import com.team1.etcore.stock.dto.TradeResult;
+import com.team1.etcore.stock.dto.TradeResultRes;
 import com.team1.etcore.stock.dto.UserFavoriteStocksRes;
 import com.team1.etcore.stock.dto.UserStocksRes;
 import com.team1.etcore.stock.repository.StockRepository;
@@ -246,12 +246,12 @@ public SseEmitter getPortfolioStockPrice(String userId) {
     // 거래 알림 전송 메서드
     @KafkaListener(topics = "tradeResult", groupId = "trade-alert")
     public void sendTradeNotification(ConsumerRecord<String, String> record) throws JsonProcessingException {
-        TradeResult tradeResult = objectMapper.readValue(record.value(), TradeResult.class);
+        TradeResultRes tradeResult = objectMapper.readValue(record.value(), TradeResultRes.class);
 
         Long userId = tradeResult.getUserId();
         Stock stock = stockRepository.findByStockCode(tradeResult.getStockCode());
 
-        TradeResult updatedTradeResult = TradeResult.builder()
+        TradeResultRes updatedTradeResult = TradeResultRes.builder()
                 .userId(tradeResult.getUserId())
                 .message(tradeResult.getMessage())
                 .stockCode(tradeResult.getStockCode())

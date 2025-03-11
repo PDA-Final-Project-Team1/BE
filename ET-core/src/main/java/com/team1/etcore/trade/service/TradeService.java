@@ -152,7 +152,7 @@ public class TradeService {
                 continue;
             }
 
-            SettlementDTO settlementDTO = SettlementDTO.builder()
+            SettlementReq settlementReq = SettlementReq.builder()
                     .userId(userId)
                     .historyId(historyId)
                     .stockCode(stockCode)
@@ -165,7 +165,7 @@ public class TradeService {
             redisTemplate.opsForZSet().remove(redisKey, tradeRes);
 
             try {
-                kafkaTemplate.send("settlement", objectMapper.writeValueAsString(settlementDTO));
+                kafkaTemplate.send("settlement", objectMapper.writeValueAsString(settlementReq));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException("JSON 파싱에 실패했습니다.");
             }

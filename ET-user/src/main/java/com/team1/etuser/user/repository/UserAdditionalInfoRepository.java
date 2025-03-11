@@ -2,7 +2,6 @@ package com.team1.etuser.user.repository;
 
 import com.team1.etuser.user.domain.UserAdditionalInfo;
 import com.team1.etuser.user.dto.UserAccountInfoRes;
-import com.team1.etuser.user.dto.UserPointInfoRes;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
