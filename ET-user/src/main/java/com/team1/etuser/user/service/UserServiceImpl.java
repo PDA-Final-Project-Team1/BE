@@ -130,10 +130,22 @@ public class UserServiceImpl implements UserService{
     * @return User의 응답 값 반환
     */
     @Override
-    public UserSearchRes getUserByUid(String uid) {
+    public UserSearchRes getUserByUid(Long userId, String uid) {
+        // 로그인한 사용자 정보 가져오기
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("현재 로그인한 사용자를 찾을 수 없습니다."));
+
+        // 본인의 uid 조회 차단
+        if (currentUser.getUid().equals(uid)) {
+            throw new RuntimeException("본인 계정은 검색할 수 없습니다.");
+        }
+
+        // 검색 대상 사용자 찾기
         User user = userRepository.findByUid(uid)
                 .orElseThrow(() -> new RuntimeException("User not found with uid: " + uid));
+
         boolean isSubscribed = friendRepository.existsBySubscriberId(user.getId());
+
         return new UserSearchRes(user.getId(), user.getUid(), user.getName(), isSubscribed);
     }
 }

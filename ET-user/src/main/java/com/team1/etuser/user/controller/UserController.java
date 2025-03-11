@@ -35,8 +35,8 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<UserSearchRes> getUserByUid(@RequestParam("uid") String uid) {
-        return ResponseEntity.ok(userService.getUserByUid(uid));
+    public ResponseEntity<UserSearchRes> getUserByUid(@RequestHeader("X-Id") Long id, @RequestParam("uid") String uid) {
+        return ResponseEntity.ok(userService.getUserByUid(id, uid));
     }
 
     //api 연결용
