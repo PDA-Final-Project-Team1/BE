@@ -2,10 +2,10 @@ package com.team1.etcore.stock.service;
 
 import com.team1.etcore.stock.domain.Stock;
 
-import com.team1.etcore.stock.dto.StockResponseDTO;
+import com.team1.etcore.stock.dto.StockRes;
 import java.util.Set;
 
 public interface StockService {
     Stock getStock(String stockCode);
-    Set<StockResponseDTO> searchStocks(String keyword);
+    Set<StockRes> searchStocks(String keyword);
 }

@@ -1,6 +1,6 @@
 package com.team1.etcore.chart;
 
-import com.team1.etcore.chart.dto.StockResponseDto;
+import com.team1.etcore.chart.dto.StockRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -13,12 +13,12 @@ import java.util.concurrent.TimeUnit;
 public class ChartDataRepository {
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public void saveStockData(String key, StockResponseDto stockData) {
+    public void saveStockData(String key, StockRes stockData) {
         redisTemplate.opsForValue().set(key, stockData, 1, TimeUnit.DAYS); // 1일 동안 캐싱
     }
 
-    public Optional<StockResponseDto> getStockData(String key) {
-        StockResponseDto stockData = (StockResponseDto) redisTemplate.opsForValue().get(key);
+    public Optional<StockRes> getStockData(String key) {
+        StockRes stockData = (StockRes) redisTemplate.opsForValue().get(key);
         return Optional.ofNullable(stockData);
     }
 }

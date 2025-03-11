@@ -1,7 +1,7 @@
 package com.team1.etcore.stock.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.team1.etcore.stock.dto.TradeResult;
+import com.team1.etcore.stock.dto.TradeResultRes;
 import com.team1.etcore.stock.dto.UserFavoriteStocksRes;
 import com.team1.etcore.stock.dto.UserStocksRes;
 import com.team1.etcore.trade.client.UserTradeHistoryClient;
@@ -242,14 +242,14 @@ public SseEmitter getPortfolioStockPrice(String userId) {
     public void sendTradeNotification(ConsumerRecord<String, String> record) throws JsonProcessingException {
 
         ObjectMapper objectMapper = new ObjectMapper();
-        TradeResult tradeResult = objectMapper.readValue(record.value(), TradeResult.class);
+        TradeResultRes tradeResultRes = objectMapper.readValue(record.value(), TradeResultRes.class);
 
-        Long userId = tradeResult.getUserId();
+        Long userId = tradeResultRes.getUserId();
 
         SseEmitter emitter = tradeSubscribers.get(userId);
         if (emitter != null) {
             try {
-                String jsonData = objectMapper.writeValueAsString(tradeResult);
+                String jsonData = objectMapper.writeValueAsString(tradeResultRes);
                 emitter.send(SseEmitter.event().data(jsonData));
             } catch (IOException e) {
                 emitter.complete();
