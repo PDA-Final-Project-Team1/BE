@@ -80,7 +80,7 @@ public class KoreaInvestmentWebSocketClient {
                 @Override
                 public void onClose(int code, String reason, boolean remote) {
                     log.warn("WebSocket connection closed: {}", reason);
-                    this.connect();
+                    KoreaInvestmentWebSocketClient.this.reconnect();
                 }
 
                 @Override
@@ -117,7 +117,8 @@ public class KoreaInvestmentWebSocketClient {
                 @Override
                 public void onClose(int code, String reason, boolean remote) {
                     log.warn("WebSocket connection closed: {}", reason);
-                    this.connect();
+
+                    KoreaInvestmentWebSocketClient.this.reconnect();
                 }
                 @Override
                 public void onError(Exception ex) {
@@ -214,6 +215,16 @@ public class KoreaInvestmentWebSocketClient {
         }
         if (askBidWebSocket != null) {
             askBidWebSocket.close();
+        }
+    }
+    private void reconnect() {
+        try {
+            log.info("Reconnecting WebSocket...");
+            Thread.sleep(1000); // 3초 대기 후 재연결 (서버 과부하 방지)
+            connect(); // 새로운 WebSocketClient 객체 생성
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("Reconnection attempt interrupted: {}", e.getMessage());
         }
     }
 }
