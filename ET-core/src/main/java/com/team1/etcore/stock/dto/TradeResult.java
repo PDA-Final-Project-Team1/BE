@@ -10,10 +10,11 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class TradeResult {
     private Long userId;
-    @Setter
     private String message;
     private String stockCode;
     private BigDecimal stockAmount;
     private BigDecimal stockPrice;
+    private String name;
+    private String img;
 }
 
