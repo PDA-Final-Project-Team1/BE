@@ -31,7 +31,7 @@ public class TradeService {
     @Transactional
     public TradeRes createOrder(Long userId, TradeReq tradeReq) {
         try {
-            BigDecimal totalPrice = tradeReq.getPrice().multiply(new BigDecimal(tradeReq.getAmount()));
+            BigDecimal totalPrice = tradeReq.getPrice().multiply(tradeReq.getAmount());
             if (!userTradeHistoryClient.enoughDeposit(userId, totalPrice)) {
                 throw new RuntimeException("예치금이 부족합니다.");
             }
@@ -74,9 +74,8 @@ public class TradeService {
         log.info("DB 거래 상태 업데이트 완료: tradeId={}", tradeId);
 
         // 2. Redis에서 해당 값 삭제: 해당 주문을 캐싱한 ZSet에서 tradeId에 해당하는 항목을 제거
-        String formattedPrice = price.stripTrailingZeros().toPlainString();
+        String key = buildRedisKey(position, stockCode, price);
 
-        String key = "orders:" + position.name() + ":" + stockCode + ":" + formattedPrice;
         Set<TradeRes> tradeSet = redisTemplate.opsForZSet().range(key, 0, -1);
         if (tradeSet == null || tradeSet.isEmpty()) {
             throw new RuntimeException("Redis key [" + key + "]에 데이터가 없습니다. tradeId=" + tradeId);
@@ -132,10 +131,9 @@ public class TradeService {
     }
 
 
-
     // Kafka에서 전달받은 호가 데이터를 기반으로 미체결 주문들을 조회하여 체결 조건에 맞으면 처리합니다.
     @Transactional
-    public void processMatching(Position position, String stockCode, BigDecimal tradePrice, int tradeAmount) {
+    public void processMatching(Position position, String stockCode, BigDecimal tradePrice, BigDecimal tradeAmount) {
         String redisKey = buildRedisKey(position, stockCode, tradePrice);
         Set<ZSetOperations.TypedTuple<TradeRes>> orders = redisTemplate.opsForZSet().rangeWithScores(redisKey, 0, -1);
 
@@ -150,9 +148,11 @@ public class TradeService {
             Long historyId = tradeRes.getId();
 
             if (isPriceDifferent(tradePrice, tradeRes.getPrice())) continue;
-            if (tradeRes.getAmount() > tradeAmount) continue;
+            if (isQuantityOver(tradeAmount, tradeRes.getAmount())) {
+                continue;
+            }
 
-            SettlementDTO settlementDTO = SettlementDTO.builder()
+            SettlementReq settlementReq = SettlementReq.builder()
                     .userId(userId)
                     .historyId(historyId)
                     .stockCode(stockCode)
@@ -165,7 +165,7 @@ public class TradeService {
             redisTemplate.opsForZSet().remove(redisKey, tradeRes);
 
             try {
-                kafkaTemplate.send("settlement", objectMapper.writeValueAsString(settlementDTO));
+                kafkaTemplate.send("settlement", objectMapper.writeValueAsString(settlementReq));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException("JSON 파싱에 실패했습니다.");
             }
@@ -177,6 +177,10 @@ public class TradeService {
     // 체결가와 주문 가격이 같은지?
     private boolean isPriceDifferent(BigDecimal price1, BigDecimal price2) {
         return price1.compareTo(price2) != 0;
+    }
+
+    private boolean isQuantityOver(BigDecimal tradeAmount, BigDecimal orderAmount) {
+        return tradeAmount.compareTo(orderAmount) < 0;
     }
 
     // 주문내역 Redis Key

@@ -1,7 +1,7 @@
 package com.team1.etuser.user.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+        import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(indexes = {
+        @Index(name = "idx_uid", columnList = "uid")
+})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

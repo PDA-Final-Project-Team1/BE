@@ -2,16 +2,14 @@ package com.team1.etuser.user.service;
 
 import com.team1.etuser.user.domain.User;
 import com.team1.etuser.user.domain.UserAdditionalInfo;
-import com.team1.etuser.user.dto.LoginRequestDto;
-import com.team1.etuser.user.dto.SignUpRequestDto;
+import com.team1.etuser.user.dto.LoginReq;
+import com.team1.etuser.user.dto.SignUpReq;
 import com.team1.etuser.user.repository.UserAdditionalInfoRepository;
 import com.team1.etuser.user.repository.UserRepository;
 import com.team1.etuser.user.security.JwtTokenProvider;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 
 import java.math.BigDecimal;
 import java.security.SecureRandom;
@@ -24,7 +22,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserAdditionalInfoRepository userAdditionalInfoRepository;
 
-    public void signup(SignUpRequestDto requestDto) {
+    public void signup(SignUpReq requestDto) {
         if (userRepository.existsByUid(requestDto.getUid())) {
             throw new RuntimeException("이미 사용 중인 아이디입니다.");
         }
@@ -45,7 +43,7 @@ public class AuthService {
         userAdditionalInfoRepository.save(userAdditionalInfo);
     }
 
-    public String login(LoginRequestDto requestDto) {
+    public String login(LoginReq requestDto) {
         User user = userRepository.findByUid(requestDto.getUid())
                 .orElseThrow(() -> new RuntimeException("등록되지 않은 아이디입니다."));
         if (!passwordEncoder.matches(requestDto.getPwd(), user.getPwd())) {

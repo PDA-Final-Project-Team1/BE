@@ -1,7 +1,7 @@
 package com.team1.etcore.trade.service;
 
 import com.team1.etcore.trade.dto.Position;
-import com.team1.etcore.trade.dto.QuoteDTO;
+import com.team1.etcore.trade.dto.QuoteReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -29,30 +29,30 @@ public class TradeConsumer {
                 return;
             }
 
-            QuoteDTO quoteDTO = QuoteDTO.builder().
+            QuoteReq quoteReq = QuoteReq.builder().
                     stockCode(stockCode)
                     .buyPrice(new BigDecimal(quoteData[2]))
-                    .buyAmount(Integer.parseInt(quoteData[22]))
+                    .buyAmount(new BigDecimal(quoteData[22]))
                     .sellPrice(new BigDecimal(quoteData[12]))
-                    .sellAmount(Integer.parseInt(quoteData[32]))
+                    .sellAmount(new BigDecimal(quoteData[32]))
                     .build();
 
             // 체결 처리
-            processTrade(quoteDTO);
+            processTrade(quoteReq);
         } catch (Exception e) {
             log.error("Kafka 메시지 처리 중 오류 발생: {}", e.getMessage(), e);
         }
     }
 
-    public void processTrade(QuoteDTO quoteDTO) {
+    public void processTrade(QuoteReq quoteReq) {
         try {
             // 매수 주문 처리
-            tradeService.processMatching(Position.BUY, quoteDTO.getStockCode(),
-                    quoteDTO.getBuyPrice(), quoteDTO.getBuyAmount());
+            tradeService.processMatching(Position.BUY, quoteReq.getStockCode(),
+                    quoteReq.getBuyPrice(), quoteReq.getBuyAmount());
 
             // 매도 주문 처리
-            tradeService.processMatching(Position.SELL, quoteDTO.getStockCode(),
-                    quoteDTO.getSellPrice(), quoteDTO.getSellAmount());
+            tradeService.processMatching(Position.SELL, quoteReq.getStockCode(),
+                    quoteReq.getSellPrice(), quoteReq.getSellAmount());
         } catch (Exception e) {
             log.error("체결 처리 중 오류 발생: {}", e.getMessage(), e);
             throw new RuntimeException("체결 처리 실패", e);

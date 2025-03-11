@@ -1,6 +1,6 @@
 package com.team1.etcore.stock.util;
 
-import com.team1.etcore.stock.dto.StockResponseDTO;
+import com.team1.etcore.stock.dto.StockRes;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,7 +12,7 @@ public class Trie {
 
     private final TrieNode root = new TrieNode();
 
-    public void insert(String key, StockResponseDTO stock) {
+    public void insert(String key, StockRes stock) {
         TrieNode node = root;
         for (char ch : key.toCharArray()) {
             node = node.getChildren().computeIfAbsent(ch, c -> new TrieNode());
@@ -21,7 +21,7 @@ public class Trie {
         }
     }
 
-    public Set<StockResponseDTO> search(String key) {
+    public Set<StockRes> search(String key) {
         TrieNode node = root;
 
         if(key.matches("[a-zA-Z]+")) {
@@ -41,7 +41,7 @@ public class Trie {
     private static class TrieNode {
         private final Map<Character, TrieNode> children = new HashMap<>();
         @Getter
-        private final Set<StockResponseDTO> stocks = new HashSet<>();
+        private final Set<StockRes> stocks = new HashSet<>();
 
     }
 }

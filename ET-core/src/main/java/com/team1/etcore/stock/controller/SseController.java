@@ -1,7 +1,6 @@
 package com.team1.etcore.stock.controller;
 
 import com.team1.etcore.stock.service.SseService;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -11,7 +10,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 @RequestMapping("/sse")
 @Controller
-@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = "http://localhost:5173")
 public class SseController {
     private final SseService sseService;
 
@@ -33,11 +32,7 @@ public class SseController {
     }
 
     @GetMapping(value = "/subscribe/trade", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribeTrade(HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Content-Type", "text/event-stream");
-
-        return sseService.subscribeTradeNotifications(1L);
+    public SseEmitter subscribeTrade(@RequestHeader("X-Id") Long userId) {
+        return sseService.subscribeTradeNotifications(userId);
     }
 }

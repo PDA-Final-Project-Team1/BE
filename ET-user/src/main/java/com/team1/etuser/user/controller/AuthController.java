@@ -1,8 +1,8 @@
 package com.team1.etuser.user.controller;
 
-import com.team1.etuser.user.dto.AuthResponseDto;
-import com.team1.etuser.user.dto.LoginRequestDto;
-import com.team1.etuser.user.dto.SignUpRequestDto;
+import com.team1.etuser.user.dto.AuthRes;
+import com.team1.etuser.user.dto.LoginReq;
+import com.team1.etuser.user.dto.SignUpReq;
 import com.team1.etuser.user.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@Valid @RequestBody SignUpRequestDto request, BindingResult bindingResult) {
+    public ResponseEntity<String> signup(@Valid @RequestBody SignUpReq request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
             bindingResult.getAllErrors().stream().findFirst().ifPresent(error -> {
@@ -32,7 +32,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto request, BindingResult bindingResult) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginReq request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
             bindingResult.getAllErrors().stream().findFirst().ifPresent(error -> {
@@ -41,7 +41,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(errorMessage.toString());
         }
         String token = authService.login(request);
-        return ResponseEntity.ok(new AuthResponseDto(token));
+        return ResponseEntity.ok(new AuthRes(token));
     }
 }
 

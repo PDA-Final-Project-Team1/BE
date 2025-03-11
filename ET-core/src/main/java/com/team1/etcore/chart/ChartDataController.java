@@ -1,6 +1,6 @@
 package com.team1.etcore.chart;
 
-import com.team1.etcore.chart.dto.StockResponseDto;
+import com.team1.etcore.chart.dto.StockRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +16,7 @@ public class ChartDataController {
 
     @GetMapping("/{stockCode}")
     public ResponseEntity<?> getStock(@PathVariable String stockCode) {
-        StockResponseDto stockResponseDto = chartDataService.getStockData(stockCode);
-        return ResponseEntity.ok().body(stockResponseDto);
+        StockRes stockRes = chartDataService.getStockData(stockCode);
+        return ResponseEntity.ok().body(stockRes);
     }
 }

@@ -1,14 +1,13 @@
 
 package com.team1.etcore.chart;
 
-import com.team1.etcore.chart.dto.StockResponseDto;
+import com.team1.etcore.chart.dto.StockRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +15,7 @@ public class ChartDataService {
     private final RestTemplate restTemplate;
     private final ChartDataRepository chartDataRepository;
 
-    public StockResponseDto getStockData(String stockCode) {
+    public StockRes getStockData(String stockCode) {
         String today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String redisKey = stockCode + ":" + today;
 
@@ -25,9 +24,9 @@ public class ChartDataService {
                 .orElseGet(() -> fetchAndCacheStockData(stockCode, redisKey));
     }
 
-    private StockResponseDto fetchAndCacheStockData(String stockCode, String redisKey) {
+    private StockRes fetchAndCacheStockData(String stockCode, String redisKey) {
         String apiUrl = "https://api.stock.naver.com/chart/domestic/item/" + stockCode + "?periodType=dayCandle";
-        StockResponseDto stockData = restTemplate.getForObject(apiUrl, StockResponseDto.class);
+        StockRes stockData = restTemplate.getForObject(apiUrl, StockRes.class);
 
         if (stockData != null) {
             chartDataRepository.saveStockData(redisKey, stockData);

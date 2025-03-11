@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(indexes = {
+        @Index(name = "idx_user_id", columnList = "user_id")
+})
 public class Egg extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
