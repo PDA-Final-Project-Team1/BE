@@ -20,7 +20,7 @@ public interface UserService {
 
     List<UserStocksRes> getUserStocks(String userId);
 
-    UserSearchRes getUserByUid(String uid);
+    UserSearchRes getUserByUid(Long id, String uid);
 
 
   
