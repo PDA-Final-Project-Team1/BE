@@ -1,6 +1,7 @@
 package com.team1.etarcade.egg.controller;
 
 import com.team1.etarcade.egg.dto.EggCreateRes;
+import com.team1.etarcade.egg.dto.EggHatchingRes;
 import com.team1.etarcade.egg.service.EggService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,9 +31,12 @@ public class EggController {
         List<EggCreateRes> eggs = eggService.getAllEggs(userId);
         return ResponseEntity.ok(eggs);
     }
-//    @PostMapping(/hatching)
-//    public ResponseEntity<EggHatchingRes>
-//
+    @PostMapping( "/hatching/{eggId}")
+    public ResponseEntity<EggHatchingRes> hatchingEgg(@RequestHeader("X-Id") Long userId, @PathVariable Long eggId){
+        EggHatchingRes res  = eggService.hatchEggAndRewardStock(userId,eggId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    }
+
 
 
 

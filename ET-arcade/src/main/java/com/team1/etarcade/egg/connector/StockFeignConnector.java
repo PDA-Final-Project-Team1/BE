@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 
 
-@FeignClient(name = "ET-user" , path = "/api/stocks" ,contextId = "StockEggFeignConnector")
+@FeignClient(name = "ET-core" , path = "/api/stocks" ,contextId = "StockEggFeignConnector")
 public interface StockFeignConnector {
 
 
