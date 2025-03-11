@@ -21,10 +21,7 @@ public class UserFavoriteService {
     private final UserRepository userRepository;
     private final UserFavoriteStockRepository userFavoriteStockRepository;
 
-    /**
-     * 즐겨찾기 주식 조회
-     * @return stockCode, stockName
-     */
+    // 즐겨찾기 주식 조회
     public List<UserFavoriteStockRes> getUserFavoriteStocks(String userId) {
 //        Long id = 1L; // JWT 토큰에서 추출한 값으로 변경
         Long id = Long.valueOf(userId);
@@ -41,11 +38,7 @@ public class UserFavoriteService {
         return lists;
     }
 
-    /**
-     *
-     * @param stockCode 종목의 코드 ex) 005930
-     * @return 성공 시 true
-     */
+    // @param stockCode 종목의 코드 ex) 005930
     public boolean addUserFavoriteStock(String stockCode, String userId) {
 //        Long id = 1L; // JWT 토큰에서 추출한 값으로 변경
         Long id = Long.valueOf(userId);

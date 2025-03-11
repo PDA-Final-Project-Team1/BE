@@ -38,4 +38,6 @@ public class UserStockController {
         log.info("특정 종목의 전날 종가 조회 (종목코드 {})", stockCode);
         return ResponseEntity.ok(userStockService.getStockClosingPrice(stockCode));
     }
+
+    // 유저 관심 종목들의 전날 종가 조회
 }

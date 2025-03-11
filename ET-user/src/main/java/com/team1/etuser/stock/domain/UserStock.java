@@ -13,7 +13,12 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_stock")
+@Table(
+        name = "user_stock",
+        indexes = {
+                @Index(name = "idx_stock_code", columnList = "stock_code")
+        }
+)
 public class UserStock extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

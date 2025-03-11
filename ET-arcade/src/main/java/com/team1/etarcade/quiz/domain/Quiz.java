@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(indexes = {
+        @Index(name = "idx_difficulty", columnList = "difficulty")
+})
 public class Quiz {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

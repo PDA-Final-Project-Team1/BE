@@ -13,7 +13,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_favorite_stock")
+@Table(
+        name = "user_favorite_stock",
+        indexes = {
+                @Index(name = "idx_stock_code", columnList = "stock_code")
+        }
+)
 public class UserFavoriteStock extends BaseEntity {
 
     @Id
