@@ -4,14 +4,16 @@ package com.team1.etarcade.egg.service;
 import com.team1.etarcade.egg.connector.StockFeignConnector;
 import com.team1.etarcade.egg.connector.UserFeignConnector;
 import com.team1.etarcade.egg.domain.Egg;
-import com.team1.etarcade.egg.dto.EggCreateRes;
-import com.team1.etarcade.egg.dto.StockAmountDTO;
-import com.team1.etarcade.egg.dto.UserFeignPointRes;
+import com.team1.etarcade.egg.dto.*;
 import com.team1.etarcade.egg.repository.EggRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.List;
 public class EggService {
 
 
+    private static final Logger log = LoggerFactory.getLogger(EggService.class);
     private final EggRepository eggRepository;
     private final UserFeignConnector userFeignConnector;
     private static final Duration INCUBATION_DURATION = Duration.ofMinutes(1); // 부화 시간 24시간
@@ -46,8 +49,6 @@ public class EggService {
         Egg savedEgg = eggRepository.save(newEgg);
 
 
-
-
         //알DTO 반환
         return new EggCreateRes(
                 savedEgg.getId(),
@@ -64,9 +65,9 @@ public class EggService {
     public List<EggCreateRes> getAllEggs(Long userId) {
 
 
-
         return eggRepository.findByUserId(userId).stream()
-                .map(egg -> {updateEggStatus(egg);
+                .map(egg -> {
+                    updateEggStatus(egg);
 
 
                     return new EggCreateRes(
@@ -79,7 +80,8 @@ public class EggService {
                             egg.getCreatedAt(),
                             calculateTimeRemaining(egg.getCreatedAt())
 
-                    );})
+                    );
+                })
                 .toList();
 
     }
@@ -115,7 +117,8 @@ public class EggService {
     }
 
     //알 부화 및 주식 지급 로직
-    public void hatchEggAndRewardStock(Long userId, Long eggId) {
+    @Transactional
+    public EggHatchingRes hatchEggAndRewardStock(Long userId, Long eggId) {
 
 
         if (!isUserEgg(userId, eggId)) {
@@ -126,22 +129,36 @@ public class EggService {
         Egg egg = eggRepository.findById(eggId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 알을 찾을 수 없습니다."));
 
-        if (!egg.isHatchable() || egg.isHatched()) {
+        if (!egg.isHatchable() || !egg.isHatched()) {
             throw new IllegalStateException("부화할 수 없는 알입니다.");
         }
+        egg.setHatched(true);
+        log.info("setHatched 부화 완료 - eggId: {}", eggId);
+        //
 
-        //1. feign으로, Stock 단에서 랜덤뽑기, 뽑힌주식 (전일종가)고려해서 주식 양  전달해주기.
-        StockAmountDTO stockAmount = stockFeignConnector.getStockAmount();
+        // 1. 랜덤 주식 가져오기
+        StockNameAndCodeDTO randomStock = stockFeignConnector.getRandomStock();
+        log.info("랜덤 주식 선택 완료 - stockCode: {}, stockName: {}", randomStock.getCode(), randomStock.getName());
 
-        //2.가져온 주식 및 양으로 유저에 추가하기.
-        userFeignConnector.addStockToUser(stockAmount);
+        // 2. 주식의 전일 종가 조회
+        StockPreviousCloseDto price = userFeignConnector.getStockClosingPrice(randomStock.getCode());
+        log.info("주식 전일 종가 조회 완료 - stockCode: {}, closingPrice: {}", randomStock.getCode(), price.getClosingPrice());
 
-        // 3.. 알 부화 처리 후 삭제
+        // 3. 지급할 주식 양 계산
+        BigDecimal amount = BigDecimal.valueOf(10000).divide(price.getClosingPrice(), 8, RoundingMode.FLOOR);
+        log.info("사용자에게 지급할 주식 계산 완료 - userId: {}, stockCode: {}, amount: {}", userId, randomStock.getCode(), amount);
 
+        // 4. 사용자 주식 업데이트
+        userFeignConnector.updateUserStock(userId, randomStock.getCode(), amount, price.getClosingPrice(), "BUY");
+        log.info("사용자 주식 업데이트 완료 - userId: {}, stockCode: {}, amount: {}", userId, randomStock.getCode(), amount);
+
+        // 5. 알 삭제
         eggRepository.delete(egg);
+        log.info("알 삭제 완료 - eggId: {}", eggId);
+
+        return new EggHatchingRes(randomStock.getName(), amount);
 
     }
-
 
 
 }

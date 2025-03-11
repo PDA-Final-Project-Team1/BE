@@ -31,16 +31,17 @@ public class UserStockService {
     private final RedisTemplate<String, String> redisTemplate;
     private final RestTemplate restTemplate;
     private static final long REDIS_TTL_HOURS = 6;
+
     public boolean updateUserStock(Long userId, String stockCode, BigDecimal amount, BigDecimal price, Position position) {
         // 유저 조회
         Optional<User> user = userRepository.findById(userId);
-
+        log.info("사용자 {}",user.get().getId());
         if (user.isEmpty()) {
             return false;
         }
         // 유저 보유 주식이 존재하는지 조회
         UserStock userStock = userStockRepository.findByUserAndStockCode(user.get(), stockCode);
-
+        log.info("유저스톡 {}",userStock);
         if (position.equals(Position.BUY)) {
             if (userStock == null) {
                 // 보유 주식이 존재하지 않으면 새로운 Row 생성
