@@ -1,9 +1,11 @@
 package com.team1.etcore.stock.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team1.etcore.stock.domain.Stock;
 import com.team1.etcore.stock.dto.TradeResult;
 import com.team1.etcore.stock.dto.UserFavoriteStocksRes;
 import com.team1.etcore.stock.dto.UserStocksRes;
+import com.team1.etcore.stock.repository.StockRepository;
 import com.team1.etcore.trade.client.UserTradeHistoryClient;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +23,19 @@ public class SseService {
     private final Map<String, List<SseEmitter>> portfolioSubscribers = new ConcurrentHashMap<>();//현재가
     private final Map<String, List<SseEmitter>> askBidSubscribers = new ConcurrentHashMap<>();//현재가
     private final Map<String, List<SseEmitter>> curPriceSubscribers = new ConcurrentHashMap<>();//현재가
+    private final ObjectMapper objectMapper = new ObjectMapper(); // 싱글톤 필드로 관리
 
     // 거래 알림용 SSE 구독자 관리 Map (userId를 key로 사용)
     private final Map<Long, SseEmitter> tradeSubscribers = new ConcurrentHashMap<>();
 //    private final UserClient userClient;
 
     private final UserTradeHistoryClient userTradeHistoryClient;
-    public SseService( UserTradeHistoryClient userTradeHistoryClient) {
+    private final StockRepository stockRepository;
+
+    public SseService(final UserTradeHistoryClient userTradeHistoryClient,
+                      final StockRepository stockRepository) {
         this.userTradeHistoryClient = userTradeHistoryClient;
+        this.stockRepository = stockRepository;
     }
 
     public SseEmitter getInterestStockPrice(String userId) {
@@ -228,7 +235,6 @@ public SseEmitter getPortfolioStockPrice(String userId) {
 
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
 
-
         tradeSubscribers.put(userId, emitter);
 
         emitter.onCompletion(() -> tradeSubscribers.remove(userId));
@@ -240,16 +246,26 @@ public SseEmitter getPortfolioStockPrice(String userId) {
     // 거래 알림 전송 메서드
     @KafkaListener(topics = "tradeResult", groupId = "trade-alert")
     public void sendTradeNotification(ConsumerRecord<String, String> record) throws JsonProcessingException {
-
-        ObjectMapper objectMapper = new ObjectMapper();
         TradeResult tradeResult = objectMapper.readValue(record.value(), TradeResult.class);
 
         Long userId = tradeResult.getUserId();
+        Stock stock = stockRepository.findByStockCode(tradeResult.getStockCode());
+
+        TradeResult updatedTradeResult = TradeResult.builder()
+                .userId(tradeResult.getUserId())
+                .message(tradeResult.getMessage())
+                .stockCode(tradeResult.getStockCode())
+                .stockAmount(tradeResult.getStockAmount())
+                .stockPrice(tradeResult.getStockPrice())
+                .name(stock.getName())
+                .img(stock.getImg())
+                .build();
+
 
         SseEmitter emitter = tradeSubscribers.get(userId);
         if (emitter != null) {
             try {
-                String jsonData = objectMapper.writeValueAsString(tradeResult);
+                String jsonData = objectMapper.writeValueAsString(updatedTradeResult);
                 emitter.send(SseEmitter.event().data(jsonData));
             } catch (IOException e) {
                 emitter.complete();
