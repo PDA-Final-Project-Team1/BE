@@ -1,74 +1,79 @@
-## 🖤 커밋 메시지 컨벤션
-
-<aside>
-  
-### 1. 커밋 유형 지정
-
-- 커밋 유형은 영어 대문자로 작성하기
-    
-    
-    | 커밋 유형 | 의미 |
-    | --- | --- |
-    | `Feat` | 새로운 기능 추가 |
-    | `Fix` | 버그 수정 |
-    | `Docs` | 문서 수정 |
-    | `Style` | 코드 formatting, 세미콜론 누락, 코드 자체의 변경이 없는 경우 |
-    | `Refactor` | 코드 리팩토링 |
-    | `Test` | 테스트 코드, 리팩토링 테스트 코드 추가 |
-    | `Chore` | 패키지 매니저 수정, 그 외 기타 수정 ex) .gitignore |
-    | `Design` | CSS 등 사용자 UI 디자인 변경 |
-    | `Comment` | 필요한 주석 추가 및 변경 |
-    | `Rename` | 파일 또는 폴더 명을 수정하거나 옮기는 작업만인 경우 |
-    | `Remove` | 파일을 삭제하는 작업만 수행한 경우 |
-    | `!BREAKING CHANGE` | 커다란 API 변경의 경우 |
-    | `!HOTFIX` | 급하게 치명적인 버그를 고쳐야 하는 경우 |
-
-### 2. 제목과 본문을 빈행으로 분리
-
-- 커밋 유형 이후 제목과 본문은 한글로 작성하여 내용이 잘 전달될 수 있도록 할 것
-- 본문에는 변경한 내용과 이유 설명 (어떻게보다는 무엇 & 왜를 설명)
-
-### 3. 제목 첫 글자는 대문자로, 끝에는 `.` 금지
-
-### 4. 제목은 영문 기준 50자 이내로 할 것
-
-### 5. 자신의 코드가 직관적으로 바로 파악할 수 있다고 생각하지 말자
-
-### 6. 여러가지 항목이 있다면 글머리 기호를 통해 가독성 높이기
-
-```
-- 변경 내용 1
-- 변경 내용 2
-- 변경 내용 3
-```
-
-</aside>
-
-### 🖤 규칙에 맞는 좋은 커밋메시지를 작성해야 하는 이유
-
-- 팀원과의 소통
-- 편리하게 과거 추적 가능
-- 나중에 실무에서 익숙해지기 위해
-
-<img src="https://github.com/user-attachments/assets/98e08976-6ca7-45bb-9655-da96ec0ad594"  width="400" height="400"/> <br/>
-☝ 안지킨 사례 <br/>
-<img src="https://github.com/user-attachments/assets/035c241d-7add-4fc2-9953-33d90eaee62c4"  width="400" height="400"/> <br/>
-☝ 지킨 사례 <br/>
-
-### 🖤 한 커밋에는 한 가지 문제만!
-
-- 추적 가능하게 유지해주기
-- 너무 많은 문제를 한 커밋에 담으면 추적하기 어렵다.
-
-### 🖤 CLI에서 커밋 메시지 여러 줄로 작성하는 방법
-
-<aside>
-✅ 쌍따옴표를 닫지 말고 개행하며 작성 → 다 작성한 후에 쌍따옴표를 닫으면 작성 완료
-
-```bash
-git commit -m "FEAT: 회원가입 기능 추가
-
-- 회원가입 기능 추가"
-```
-<img src="https://github.com/user-attachments/assets/5e39d637-55c3-40ad-9109-234e9f1ae32b"  width="1200" height="150"/> <br/>
-</aside>
+# 📈 펫과 함께 시작하는 나만의 주식 마을 Trade Town #
+![Image](https://github.com/user-attachments/assets/64cd3fe5-18e7-4e39-86f7-6001c63244e7)
+- **배포 URL**:
+- **Test ID**:
+- **Test PW**: 
+<br><br>
+## 🏡 서비스 개요 ##
+주식 투자 초보자들이 재미있게 투자 개념을 익히고 지속적으로 시장에 관심을 가질 수 있도록 돕는 서비스
+<br><br>
+## ⁉️ 기획 배경 ##
+### 기존 서비스의 한계 ###
+- **주식 초보자들이 접근하기 어려운 UI/UX**: 복잡하고 전문적인 용어와 기능들이 많고, 시각적으로 매력적인 요소가 부족함
+- **초보자 맞춤형 학습 경로 부족**: 기초부터 고급까지의 다양하고 체계적인 학습 경로를 제공하지 않아 주식 초보자가 점진적으로 투자 지식을 습득하기 어려움
+### 주식 초보자들의 Pain Point ###
+- **높은 진입 장벽**: 기존의 주식 투자 서비스는 초보자들이 쉽게 이해하고 사용할 수 있도록 설계되지 않아 주식에 대한 관심을 잃거나, 처음 시작하는 데에 큰 부담을 느낌
+- **정보의 부족**: 주식 시장에 대한 교육 콘텐츠는 너무 전문적이고 어려운 언어로 제공되는 경우가 많아 어떻게 투자 지식을 쌓아야 할지 혼란스러움
+### 핵심 목표 ###
+- **초보자 친화적인 UI/UX**
+  - 복잡한 전문 용어를 최소화하고, 쉽고 직관적인 용어 사용
+  - 시각적으로 매력적인 디자인과 인터랙티브 요소 활용
+- **쉽고 재미있는 맞춤형 교육 콘텐츠 제공**
+  - 단계별 퀴즈를 통해 기초부터 고급까지 점진적으로 투자 지식을 습득하게 함
+  - 챗봇과 대화하며 실시간으로 자유롭게 질문하고 개별 학습 수준에 맞춘 답변을 얻을 수 있음
+<br><br>
+## 🐰 주요 기능 UI ##
+### 랜딩 페이지 ###
+![Image](https://github.com/user-attachments/assets/611ce95a-9727-4993-8fa1-e097f1540770)
+<br>
+랜딩페이지
+<br>
+### 메인 페이지 ###
+![Image](https://github.com/user-attachments/assets/f99bee8d-85d0-4d9c-8536-d40568403f26)
+<br>
+매수 1회 당 게이지 1칸 채워짐 -> 5칸이 채워지면 레벨이 오르고 펫을 획득
+<br>
+### 알뽑기 페이지 ###
+![Image](https://github.com/user-attachments/assets/8955356a-b34b-443c-9199-99d4b8471855)
+<br>
+500 포인트로 알을 뽑은 후, 알이 부화되면 소수점 주식 획득
+<br>
+### 퀴즈 페이지 ###
+![Image](https://github.com/user-attachments/assets/1151c11b-d853-4408-b60b-2f6432baec50)
+<br>
+1일 1회 단계별 퀴즈를 풀고 포인트 획득
+<br>
+### 투자 페이지 ###
+![Image](https://github.com/user-attachments/assets/e59b6cf3-2d4f-4ca6-bef3-a7158d924217)
+<br>
+내 주식, 보유상품, 관심종목 조회
+<br>
+### 종목 페이지 ###
+![Image](https://github.com/user-attachments/assets/57f9746e-0569-4254-b050-1037ad1cb698)
+<br>
+특정 종목의 현재가와 차트 조회
+<br>
+### 구매/판매 페이지 ###
+![Image](https://github.com/user-attachments/assets/7390ae28-b2fb-4594-8fdb-fbe9d6b55b50)
+<br>
+구매/판매 수량을 입력하고 주문 확인 과정을 거친 후, 구매/판매 
+<br>
+### 호가 페이지 ###
+![Image](https://github.com/user-attachments/assets/05192a9b-9461-4293-8f93-106597e21e25)
+<br>
+특정 종목의 호가 조회
+<br>
+### 보유 주식 페이지 ###
+![Image](https://github.com/user-attachments/assets/33d4a825-dd5e-423e-bccf-36402513fc64)
+<br>
+보유 주식 시각화한 원그래프 및 수익률 조회
+<br>
+### 거래 내역 페이지 ###
+![Image](https://github.com/user-attachments/assets/2bdd1da9-f9a0-46be-8937-c26668cf8d8a)
+<br>
+거래 내역 상품 조회
+<br><br>
+## 👥 팀원 소개 ##
+| 권지언 | 김정택 | 라수빈 | 박준기 | 이나민 | 장성준 |
+|--------|--------|--------|--------|--------|--------|
+| ![Image](https://github.com/user-attachments/assets/98664e7d-06b2-4d7e-86ba-aa61a07898bc) <br> [@kwonjieon](https://github.com/kwonjieon) | ![Image](https://github.com/user-attachments/assets/400267bb-187e-4298-94ee-b3c7a0c9a71c) <br> [@Chaean00](https://github.com/Chaean00)  | ![Image](https://github.com/user-attachments/assets/fb635bb3-a378-417c-8fa7-257bb0630757) <br> [@govl7016](https://github.com/govl7016)  | ![Image](https://github.com/user-attachments/assets/54a577b0-ede3-48ab-9b65-ad932a9db7ac) <br> [@DrivenByCode](https://github.com/DrivenByCode) | ![Image](https://github.com/user-attachments/assets/a1c64525-167d-47db-b1c8-edef8aec86b5) <br> [@naminlee](https://github.com/naminlee) | ![Image](https://github.com/user-attachments/assets/a182ee1e-aaad-4ae4-bcb2-66b4305c83ec) <br> [@J2Jayy](https://github.com/J2Jayy)
