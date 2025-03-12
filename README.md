@@ -23,56 +23,87 @@
   - 챗봇과 대화하며 실시간으로 자유롭게 질문하고 개별 학습 수준에 맞춘 답변을 얻을 수 있음
 <br><br>
 ## 🐰 주요 기능 UI ##
-### ✔ 랜딩 페이지 ###
-![Image](https://github.com/user-attachments/assets/611ce95a-9727-4993-8fa1-e097f1540770)
-<br>
-랜딩페이지
-<br>
-### ✔ 메인 페이지 ###
-![Image](https://github.com/user-attachments/assets/f99bee8d-85d0-4d9c-8536-d40568403f26)
-<br>
-매수 1회 당 게이지 1칸 채워짐 -> 5칸이 채워지면 레벨이 오르고 펫을 획득
-<br>
-### ✔ 알뽑기 페이지 ###
-![Image](https://github.com/user-attachments/assets/8955356a-b34b-443c-9199-99d4b8471855)
-<br>
-500 포인트로 알을 뽑은 후, 알이 부화되면 소수점 주식 획득
-<br>
-### ✔ 퀴즈 페이지 ###
-![Image](https://github.com/user-attachments/assets/1151c11b-d853-4408-b60b-2f6432baec50)
-<br>
-1일 1회 단계별 퀴즈를 풀고 포인트 획득
-<br>
-### ✔ 투자 페이지 ###
-![Image](https://github.com/user-attachments/assets/e59b6cf3-2d4f-4ca6-bef3-a7158d924217)
-<br>
-내 주식, 보유상품, 관심종목 조회
-<br>
-### ✔ 종목 페이지 ###
-![Image](https://github.com/user-attachments/assets/57f9746e-0569-4254-b050-1037ad1cb698)
-<br>
-특정 종목의 현재가와 차트 조회
-<br>
-### ✔ 구매/판매 페이지 ###
-![Image](https://github.com/user-attachments/assets/7390ae28-b2fb-4594-8fdb-fbe9d6b55b50)
-<br>
-구매/판매 수량을 입력하고 주문 확인 과정을 거친 후, 구매/판매 
-<br>
-### ✔ 호가 페이지 ###
-![Image](https://github.com/user-attachments/assets/05192a9b-9461-4293-8f93-106597e21e25)
-<br>
-특정 종목의 호가 조회
-<br>
-### ✔ 보유 주식 페이지 ###
-![Image](https://github.com/user-attachments/assets/33d4a825-dd5e-423e-bccf-36402513fc64)
-<br>
-보유 주식 시각화한 원그래프 및 수익률 조회
-<br>
-### ✔ 거래 내역 페이지 ###
-![Image](https://github.com/user-attachments/assets/2bdd1da9-f9a0-46be-8937-c26668cf8d8a)
-<br>
-거래 내역 상품 조회
-<br><br>
+<details>
+  <summary><b>랜딩 페이지</b></summary>
+  <div markdown="1">
+    <img src="https://github.com/user-attachments/assets/611ce95a-9727-4993-8fa1-e097f1540770">
+    <br>
+    랜딩페이지
+  </div>
+</details>
+<details>
+  <summary><b>메인 페이지</b></summary>
+  <div markdown="1">
+    <img src="https://github.com/user-attachments/assets/f99bee8d-85d0-4d9c-8536-d40568403f26">
+    <br>
+    매수 1회 당 게이지 1칸 채워짐 -> 5칸이 채워지면 레벨이 오르고 펫을 획득
+  </div>
+</details>
+<details>
+  <summary><b>알뽑기 페이지</b></summary>
+  <div markdown="1">
+    <img src="https://github.com/user-attachments/assets/8955356a-b34b-443c-9199-99d4b8471855">
+    <br>
+    500 포인트로 알을 뽑은 후, 알이 부화되면 소수점 주식 획득
+  </div>
+</details>
+<details>
+  <summary><b>퀴즈 페이지</b></summary>
+  <div markdown="1">
+    <img src="https://github.com/user-attachments/assets/1151c11b-d853-4408-b60b-2f6432baec50">
+    <br>
+    1일 1회 단계별 퀴즈를 풀고 포인트 획득
+  </div>
+</details>
+<details>
+  <summary><b>투자 페이지</b></summary>
+  <div markdown="1">
+    <img src="https://github.com/user-attachments/assets/e59b6cf3-2d4f-4ca6-bef3-a7158d924217">
+    <br>
+    내 주식, 보유상품, 관심종목 조회
+  </div>
+</details>
+<details>
+  <summary><b>종목 페이지</b></summary>
+  <div markdown="1">
+    <img src="https://github.com/user-attachments/assets/57f9746e-0569-4254-b050-1037ad1cb698">
+    <br>
+    특정 종목의 현재가와 차트 조회
+  </div>
+</details>
+<details>
+  <summary><b>구매/판매 페이지</b></summary>
+  <div markdown="1">
+    <img src="https://github.com/user-attachments/assets/7390ae28-b2fb-4594-8fdb-fbe9d6b55b50">
+    <br>
+    구매/판매 수량을 입력하고 주문 확인 과정을 거친 후, 구매/판매 
+  </div>
+</details>
+<details>
+  <summary><b>호가 페이지</b></summary>
+  <div markdown="1">
+    <img src="https://github.com/user-attachments/assets/05192a9b-9461-4293-8f93-106597e21e25">
+    <br>
+    특정 종목의 호가 조회 
+  </div>
+</details>
+<details>
+  <summary><b>보유 주식 페이지</b></summary>
+  <div markdown="1">
+    <img src="https://github.com/user-attachments/assets/33d4a825-dd5e-423e-bccf-36402513fc64">
+    <br>
+    보유 주식 시각화한 원그래프 및 수익률 조회
+  </div>
+</details>
+<details>
+  <summary><b>거래 내역 페이지</b></summary>
+  <div markdown="1">
+    <img src="https://github.com/user-attachments/assets/2bdd1da9-f9a0-46be-8937-c26668cf8d8a">
+    <br>
+    거래 내역 상품 조회
+  </div>
+</details>
+
 ## 기술 스택 ##
 ### ✔ FrontEnd ###
 <img src="https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=white"> <img src="https://img.shields.io/badge/javascript-F7DF1E?style=flat-square&logo=javascript&logoColor=white"> <img src="https://img.shields.io/badge/tailwindcss-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white"> <img src="https://img.shields.io/badge/html5-E34F26?style=flat-square&logo=html5&logoColor=white">
