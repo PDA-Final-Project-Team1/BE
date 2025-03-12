@@ -22,8 +22,9 @@ public class KoreaInvestmentWebSocketClient {
 
     private String tradeKey;
     private String askKey;
+    private boolean reConnectFlag = false;
     private final List<String> trKeys = List.of(
-            //"005930"
+//            "005930"
             "005930", "000660", "373220", "207940", "005380", "005935",
             "000270", "068270", "105560", "035420", "055550", "012330",
             "005490", "028260", "032830", "010130", "051910", "329180",
@@ -39,6 +40,7 @@ public class KoreaInvestmentWebSocketClient {
 
     public void connect() {
         try {
+            reConnectFlag = true;
             this.tradeKey = approvalService.getApprovalKey("trade");
             this.askKey = approvalService.getApprovalKey("ask");
 
@@ -80,6 +82,8 @@ public class KoreaInvestmentWebSocketClient {
                 @Override
                 public void onClose(int code, String reason, boolean remote) {
                     log.warn("WebSocket connection closed: {}", reason);
+
+                    reConnectFlag = false;
                     KoreaInvestmentWebSocketClient.this.reconnect();
                 }
 
@@ -118,6 +122,7 @@ public class KoreaInvestmentWebSocketClient {
                 public void onClose(int code, String reason, boolean remote) {
                     log.warn("WebSocket connection closed: {}", reason);
 
+                    reConnectFlag = false;
                     KoreaInvestmentWebSocketClient.this.reconnect();
                 }
                 @Override
@@ -218,13 +223,15 @@ public class KoreaInvestmentWebSocketClient {
         }
     }
     private void reconnect() {
-        try {
-            log.info("Reconnecting WebSocket...");
-            Thread.sleep(1000); // 3초 대기 후 재연결 (서버 과부하 방지)
-            connect(); // 새로운 WebSocketClient 객체 생성
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.error("Reconnection attempt interrupted: {}", e.getMessage());
+        if(!reConnectFlag) {
+            try {
+                log.info("Reconnecting WebSocket...");
+                Thread.sleep(1000); // 3초 대기 후 재연결 (서버 과부하 방지)
+                connect(); // 새로운 WebSocketClient 객체 생성
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Reconnection attempt interrupted: {}", e.getMessage());
+            }
         }
     }
 }
