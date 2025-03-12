@@ -61,13 +61,13 @@ public class QuizService {
                     earnedPoints = 100;
                     break;
                 case HIGH:
-                    earnedPoints = 80;
+                    earnedPoints = 70;
                     break;
                 case MEDIUM:
-                    earnedPoints = 60;
+                    earnedPoints = 50;
                     break;
                 case LOW:
-                    earnedPoints = 20;
+                    earnedPoints = 10;
                     break;
                 default:
                     earnedPoints = 0; // 혹시 모를 예외 상황 처리
