@@ -44,7 +44,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfig() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://" + reactHost + ":5173");
-        configuration.addAllowedMethod("http://" + reactHost + ":80");
+        configuration.addAllowedOrigin("http://" + reactHost + ":80");
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
