@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class PetGrantRes {
     private Long petId;
     private String img;
+    private String name;
 }
