@@ -43,6 +43,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfig() {
         CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("http://" + reactHost);
         configuration.addAllowedOrigin("http://" + reactHost + ":5173");
         configuration.addAllowedOrigin("http://" + reactHost + ":80");
         configuration.addAllowedMethod("*");
