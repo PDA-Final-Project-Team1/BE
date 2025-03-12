@@ -61,13 +61,13 @@ public class QuizService {
                     earnedPoints = 100;
                     break;
                 case HIGH:
-                    earnedPoints = 80;
+                    earnedPoints = 70;
                     break;
                 case MEDIUM:
-                    earnedPoints = 60;
+                    earnedPoints = 50;
                     break;
                 case LOW:
-                    earnedPoints = 20;
+                    earnedPoints = 10;
                     break;
                 default:
                     earnedPoints = 0; // 혹시 모를 예외 상황 처리
@@ -90,13 +90,13 @@ public class QuizService {
 
     }
     // solvedQuizService
-    public SolvedQuizRes getSolvedQuiz(Long userid, Long quizId,boolean userAnswer){
+    public SolvedQuizRes getSolvedQuiz(Long userid, Long quizId, boolean userAnswer){
         log.info("getSolvedQuiz() 호출됨 - userId: {}, quizId: {}", userid, quizId);
 
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 퀴즈를 찾을 수 없습니다."));
 
-        Integer userPoint = quizUserClient.getUserPoints(userid).getNowUserPoint();
+        Integer userPoint = quizUserClient.getUserPoints(userid).getPoint();
         log.info("사용자 ID: {}, 현재 포인트: {}", userid, userPoint);
 
         // `SolvedQuizRes` 객체 반환
@@ -104,7 +104,8 @@ public class QuizService {
                 quiz.getId(),
                 quiz.getTitle(),
                 quiz.getDifficulty(),
-                userPoint
+                userPoint,
+                quiz.isAnswer()
         );
     }
 
