@@ -104,7 +104,8 @@ public class QuizService {
                 quiz.getId(),
                 quiz.getTitle(),
                 quiz.getDifficulty(),
-                userPoint
+                userPoint,
+                quiz.isAnswer()
         );
     }
 
