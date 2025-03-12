@@ -40,4 +40,9 @@ public class UserStockController {
     }
 
     // 유저 관심 종목들의 전날 종가 조회
+    @GetMapping("/favorite/close-price")
+    public ResponseEntity<List<StockClosePriceRes>> getUserFavoriteStockClosingPrice(@RequestHeader("X-Id") Long userId) {
+        log.info("즐겨찾기 종목들의 전날 종가 조회 (사용자: {})", userId);
+        return ResponseEntity.ok(userStockService.getUserStockClosingPrice(userId));
+    }
 }
