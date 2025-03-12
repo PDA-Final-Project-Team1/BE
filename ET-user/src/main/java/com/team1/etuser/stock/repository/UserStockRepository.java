@@ -19,7 +19,7 @@ public interface UserStockRepository extends JpaRepository<UserStock, Long> {
     UserStock findByUserAndStockCode(User user, String stockCode);
 
     @Query("SELECT new com.team1.etuser.stock.dto.StockClosePriceRes(u.stockCode, 0) " +
-            "FROM UserStock u WHERE u.user = :user")
+            "FROM UserFavoriteStock u WHERE u.user = :user")
     List<StockClosePriceRes> findStockCodeByUser(@Param("user") User user);
 
 }
