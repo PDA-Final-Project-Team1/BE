@@ -246,30 +246,37 @@ public SseEmitter getPortfolioStockPrice(String userId) {
     // 거래 알림 전송 메서드
     @KafkaListener(topics = "tradeResult", groupId = "trade-alert")
     public void sendTradeNotification(ConsumerRecord<String, String> record) throws JsonProcessingException {
-        TradeResultRes tradeResult = objectMapper.readValue(record.value(), TradeResultRes.class);
+        // Kafka에서 넘어온 JSON(혹은 LinkedHashMap)을 객체로 변환
+        TradeResultRes tradeResult = objectMapper.convertValue(record.value(), TradeResultRes.class);
 
-        Long userId = tradeResult.getUserId();
+        // 체결 성공인지 실패인지, 혹은 메시지 필드에 따라 적절히 처리
+        String statusMessage = "체결 " + ("Success".equals(tradeResult.getMessage()) ? "성공" : "실패");
+
+        // 종목 정보 가져오기
         Stock stock = stockRepository.findByStockCode(tradeResult.getStockCode());
 
-        TradeResultRes updatedTradeResult = TradeResultRes.builder()
-                .userId(tradeResult.getUserId())
-                .message(tradeResult.getMessage())
-                .stockCode(tradeResult.getStockCode())
-                .stockAmount(tradeResult.getStockAmount())
-                .stockPrice(tradeResult.getStockPrice())
-                .name(stock.getName())
-                .img(stock.getImg())
-                .build();
+        // 가공된 메시지(문자열) 만들기
+        // 예: "체결 성공: 삼성전자(005930), 수량: 2주, 가격: 55000원"
+        StringBuilder sb = new StringBuilder();
+        sb.append(statusMessage)
+                .append(": ")
+                .append(stock.getName())   // "삼성전자"
+                .append("(").append(tradeResult.getStockCode()).append("), ")
+                .append("수량: ").append(tradeResult.getStockAmount()).append("주, ")
+                .append("가격: ").append(tradeResult.getStockPrice()).append("원");
 
+        // 최종 전송할 메시지
+        String finalMessage = sb.toString();
 
-        SseEmitter emitter = tradeSubscribers.get(userId);
+        // SSE 구독자(해당 userId)에게 메시지 전송
+        SseEmitter emitter = tradeSubscribers.get(tradeResult.getUserId());
         if (emitter != null) {
             try {
-                String jsonData = objectMapper.writeValueAsString(updatedTradeResult);
-                emitter.send(SseEmitter.event().data(jsonData));
+                // JSON이 아니라 문자열 그대로 보내면, 클라이언트 측에서 자연스럽게 표시 가능
+                emitter.send(SseEmitter.event().data(finalMessage));
             } catch (IOException e) {
                 emitter.complete();
-                tradeSubscribers.remove(userId);
+                tradeSubscribers.remove(tradeResult.getUserId());
             }
         }
     }
