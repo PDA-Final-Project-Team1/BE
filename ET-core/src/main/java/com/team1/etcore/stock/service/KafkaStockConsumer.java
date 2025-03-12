@@ -6,6 +6,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class KafkaStockConsumer {
 
@@ -19,70 +22,60 @@ public class KafkaStockConsumer {
     public void StockCurPriceData(ConsumerRecord<String, Object> record) {
         String stockCode = record.key(); // 종목 코드 (ex: "005930")
         Object stockData = record.value(); // 주식 현재가 데이터
-        if (stockData instanceof String) {
-            String data = (String) stockData;  // Object를 String으로 캐스팅
-            String[] splitData = data.split("\\^");  // ^로 구분하여 분리
-            String currentPrice = splitData[1];  // 주식 현재가
-            String priceChange = splitData[2];  // 전일 대비 변동 금액
-            String changeRate = splitData[3];  // 전일 대비 변동률
-            TradeStockPriceReq cur = new TradeStockPriceReq(stockCode, currentPrice, priceChange, changeRate);
 
-            sseService.sendToClientsInterestStockPrice(stockCode,cur);
-            sseService.sendToClientsPortfolioStockPrice(stockCode,cur);
-            sseService.sendToClientsStockCurPrice(stockCode,cur);
+        try {
+            if (stockData instanceof String) {
+                String data = (String) stockData;
+                String[] splitData = data.split("\\^");
 
-        } else {
-            System.out.println("Received data is not of type String.");
+                if (splitData.length < 4) {
+                    throw new IllegalArgumentException("잘못된 형식의 주식 데이터입니다: " + data);
+                }
+
+                String currentPrice = splitData[1];
+                String priceChange = splitData[2];
+                String changeRate = splitData[3];
+
+                TradeStockPriceReq cur = new TradeStockPriceReq(stockCode, currentPrice, priceChange, changeRate);
+
+                sseService.sendToClientsInterestStockPrice(stockCode, cur);
+                sseService.sendToClientsPortfolioStockPrice(stockCode, cur);
+                sseService.sendToClientsStockCurPrice(stockCode, cur);
+            } else {
+                log.warn("주식 코드 {}: 문자열이 아닌 데이터가 수신되었습니다. 원본 데이터: {}", stockCode, stockData);
+            }
+        } catch (Exception e) {
+            log.error("주식 코드 {}: StockCurPriceData 처리 중 오류 발생 - {}", stockCode, e.getMessage(), e);
         }
-
     }
 
     @KafkaListener(topics = "H0STASP0", groupId = "stock-group")
     public void StockAskBidData(ConsumerRecord<String, Object> record) {
         String stockCode = record.key(); // 종목 코드 (ex: "005930")
         Object askBidData = record.value(); // 주식 호가 데이터
-        if (askBidData instanceof String) {
-            String data = (String) askBidData;  // Object를 String으로 캐스팅
 
-            String[] splitData = data.split("\\^");
+        try {
+            if (askBidData instanceof String) {
+                String data = (String) askBidData;
+                String[] splitData = data.split("\\^");
 
-            String askp1 = splitData[2];
-            String askp2 = splitData[3];
-            String askp3 = splitData[4];
-            String askp4 = splitData[5];
-            String askp5 = splitData[6];
+                if (splitData.length < 37) {
+                    throw new IllegalArgumentException("잘못된 형식의 호가 데이터입니다: " + data);
+                }
 
-            String bidp1 = splitData[12];
-            String bidp2 = splitData[13];
-            String bidp3 = splitData[14];
-            String bidp4 = splitData[15];
-            String bidp5 = splitData[16];
-
-            String askRSQN1 = splitData[22];
-            String askRSQN2 = splitData[23];
-            String askRSQN3 = splitData[24];
-            String askRSQN4 = splitData[25];
-            String askRSQN5 = splitData[26];
-
-            String bidRSQN1 = splitData[32];
-            String bidRSQN2 = splitData[33];
-            String bidRSQN3 = splitData[34];
-            String bidRSQN4 = splitData[35];
-            String bidRSQN5 = splitData[36];
-
-            AskStockPriceReq askStockPriceReq = new AskStockPriceReq(
-                    stockCode,  // 종목코드
-                    splitData[2], splitData[3], splitData[4], splitData[5], splitData[6],  // 매도호가
-                    splitData[12], splitData[13], splitData[14], splitData[15], splitData[16],  // 매수호가
-                    splitData[22], splitData[23], splitData[24], splitData[25], splitData[26],  // 매도잔량
-                    splitData[32], splitData[33], splitData[34], splitData[35], splitData[36]   // 매수잔량
-            );
-            sseService.sendToClientsAskBidStockPrice(stockCode, askStockPriceReq);
-
-        } else {
-            System.out.println("Received data is not of type String.");
+                AskStockPriceReq askStockPriceReq = new AskStockPriceReq(
+                        stockCode,
+                        splitData[2], splitData[3], splitData[4], splitData[5], splitData[6],
+                        splitData[12], splitData[13], splitData[14], splitData[15], splitData[16],
+                        splitData[22], splitData[23], splitData[24], splitData[25], splitData[26],
+                        splitData[32], splitData[33], splitData[34], splitData[35], splitData[36]
+                );
+                sseService.sendToClientsAskBidStockPrice(stockCode, askStockPriceReq);
+            } else {
+                log.warn("주식 코드 {}: 문자열이 아닌 호가 데이터가 수신되었습니다. 원본 데이터: {}", stockCode, askBidData);
+            }
+        } catch (Exception e) {
+            log.error("주식 코드 {}: StockAskBidData 처리 중 오류 발생 - {}", stockCode, e.getMessage(), e);
         }
-
     }
-
 }

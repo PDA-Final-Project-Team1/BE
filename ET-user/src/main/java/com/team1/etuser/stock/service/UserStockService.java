@@ -2,6 +2,7 @@ package com.team1.etuser.stock.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.team1.etuser.stock.domain.Position;
+import com.team1.etuser.stock.repository.UserFavoriteStockRepository;
 import com.team1.etuser.user.domain.User;
 import com.team1.etuser.stock.domain.UserStock;
 import com.team1.etuser.stock.dto.StockClosePriceRes;
@@ -27,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 @Transactional
 public class UserStockService {
     private final UserStockRepository userStockRepository;
+    private final UserFavoriteStockRepository userFavoriteStockRepository;
     private final UserRepository userRepository;
     private final RedisTemplate<String, String> redisTemplate;
     private final RestTemplate restTemplate;
@@ -101,6 +103,31 @@ public class UserStockService {
                 .orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
 
         List<StockClosePriceRes> stockList = userStockRepository.findStockCodeByUser(user);
+
+        for (StockClosePriceRes stock : stockList) {
+            String redisKey = CloseKey(stock.getStockCode());
+            String closingPriceStr = redisTemplate.opsForValue().get(redisKey);
+
+            if (closingPriceStr == null) {
+                closingPriceStr = fetchClosingPriceFromApi(stock.getStockCode());
+                if (closingPriceStr != null) {
+                    redisTemplate.opsForValue().set(redisKey, closingPriceStr, REDIS_TTL_HOURS, TimeUnit.HOURS);
+                }
+            }
+
+            BigDecimal closingPrice = parsePrice(closingPriceStr);
+            stock.setClosingPrice(closingPrice);
+        }
+        return stockList;
+    }
+
+    //관심주식의 전일 종가 가져오기
+    public List<StockClosePriceRes> getUserFavoriteStockClosingPrice(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
+
+        //List<StockClosePriceRes> stockList = userStockRepository.findStockCodeByUser(user);
+        List<StockClosePriceRes> stockList = userFavoriteStockRepository.findStockCodeByUser(user);
 
         for (StockClosePriceRes stock : stockList) {
             String redisKey = CloseKey(stock.getStockCode());
