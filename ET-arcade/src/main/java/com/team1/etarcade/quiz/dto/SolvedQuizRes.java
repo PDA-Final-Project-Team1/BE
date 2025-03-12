@@ -13,4 +13,5 @@ public class SolvedQuizRes {
     private String solvedQuizTitle;
     private Difficulty solvedQuizDifficulty;
     private Integer currentUserPoints;
+    private Boolean quizanswer;
 }
