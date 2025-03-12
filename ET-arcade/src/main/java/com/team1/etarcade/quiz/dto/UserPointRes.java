@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserPointRes {
-    private int nowUserPoint;
+    private int point;
 }

@@ -28,7 +28,7 @@ public class EggController {
         List<EggCreateRes> eggs = eggService.getAllEggs(userId);
         return ResponseEntity.ok(eggs);
     }
-    @PostMapping( "/hatching/{eggId}")
+    @GetMapping( "/hatching/{eggId}")
     public ResponseEntity<EggHatchingRes> hatchingEgg(@RequestHeader("X-Id") Long userId, @PathVariable Long eggId){
         EggHatchingRes res  = eggService.hatchEggAndRewardStock(userId,eggId);
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
