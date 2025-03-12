@@ -30,7 +30,7 @@ public class PetController {
     public ResponseEntity<PetGrantRes> grantRandomPet(@RequestHeader("X-Id") Long userId) {
         Long petId = petService.grantRandomPet(userId).getPetId();
         String img = petRepository.findPetById(petId).getImg();
-        return ResponseEntity.ok(new PetGrantRes(petId, img));
+        return ResponseEntity.ok(new PetGrantRes(petId, img, getNameFromPath(img)));
     }
 
     @GetMapping("/{subscribedId}")
@@ -47,4 +47,8 @@ public class PetController {
         return ResponseEntity.ok(pet);
     }
 
+    public String getNameFromPath(String path) {
+        String fileNameWithExtension = path.substring(path.lastIndexOf('/') + 1);
+        return fileNameWithExtension.contains(".") ? fileNameWithExtension.substring(0, fileNameWithExtension.lastIndexOf('.')) : fileNameWithExtension;
+    }
 }
