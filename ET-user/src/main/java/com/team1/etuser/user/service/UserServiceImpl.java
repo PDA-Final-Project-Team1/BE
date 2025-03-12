@@ -1,5 +1,6 @@
 package com.team1.etuser.user.service;
 
+import com.team1.etuser.stock.domain.TradeStatus;
 import com.team1.etuser.stock.service.StockFeignService;
 import com.team1.etuser.user.domain.User;
 import com.team1.etuser.stock.dto.StockRes;
@@ -16,6 +17,8 @@ import com.team1.etuser.stock.repository.UserTradeHistoryRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,29 +79,28 @@ public class UserServiceImpl implements UserService{
      * @return 로그인 User의 거래내역 조회
      */
     @Override
-    public List<UserHistoryRes> getUserHistory(String userId) {
+    public Page<UserHistoryRes> getUserHistory(String userId, Pageable pageable, TradeStatus tradeStatus) {
         Long id = Long.valueOf(userId);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾지 못했습니다."));
 
-        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("사용자를 찾지 못했습니다."));
+        Page<UserHistoryRes> historyPage = userTradeHistoryRepository.findUserHistoryByTradeStatus(user, tradeStatus, pageable);
 
-        List<UserHistoryRes> userHistoryResList = userTradeHistoryRepository.findUserHistory(user);
-
-        log.info(userHistoryResList.toString());
-
-        for (UserHistoryRes u : userHistoryResList) {
+        // 각 내역에 대해 주식 이름 및 이미지를 업데이트
+        historyPage.forEach(u -> {
             StockRes stockRes = stockFeignService.getStock(u.getStockCode());
             if (stockRes != null && stockRes.getName() != null) {
                 u.setStockName(stockRes.getName());
                 u.setImg(stockRes.getImg());
             } else {
-                // stockName을 기본값 또는 알림 메시지를 설정
                 u.setStockName("Unknown Stock");
                 log.warn("Stock name not found for stockCode: {}", u.getStockCode());
             }
-        }
+        });
 
-        return userHistoryResList;
+        return historyPage;
     }
+
 
     /**
      * @return 로그인 User의 보유 주식 조회
