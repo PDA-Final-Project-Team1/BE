@@ -1,27 +1,23 @@
 package com.team1.etcore.stock.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.etcore.stock.domain.Stock;
-import com.team1.etcore.stock.dto.StockDataRes;
 import com.team1.etcore.stock.dto.StockInfoRes;
 import com.team1.etcore.stock.dto.StockRes;
 import com.team1.etcore.stock.repository.StockRepository;
 import com.team1.etcore.stock.util.HangulUtils;
 import com.team1.etcore.stock.util.Trie;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StockServiceImpl implements StockService {
     private final StockRepository stockRepository;
     private final StockCache stockCache;
@@ -65,37 +61,14 @@ public class StockServiceImpl implements StockService {
                 .collect(Collectors.toList());
     }
 
-
-
-
-
     @Override
     public StockInfoRes getRandomStock() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Random random = new Random();
+        Stock stock = stockRepository.getRandomStock();
 
-        try {
-            // StockData.json 파일을 읽어 리스트로 변환
-            List<StockDataRes> stockList = objectMapper.readValue(
-                    new ClassPathResource("stock/StockData.json").getInputStream(),
-                    new TypeReference<List<StockDataRes>>() {}
-            );
-
-            // stockList가 비어있는지 확인
-            if (stockList.isEmpty()) {
-                throw new IllegalStateException("주식 데이터가 없습니다.");
-            }
-
-            // 랜덤한 주식 선택 후 반환
-            StockDataRes selectedStock = stockList.get(random.nextInt(stockList.size()));
-            return new StockInfoRes(
-                    selectedStock.getCode(),
-                    selectedStock.getName()
-
-            );
-        } catch (IOException e) {
-            throw new RuntimeException("StockData.json 파일을 읽는 중 오류 발생", e);
-        }
-
+        return StockInfoRes.builder()
+                .code(stock.getStockCode())
+                .name(stock.getName())
+                .img(stock.getImg())
+                .build();
     }
 }
