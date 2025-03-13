@@ -70,8 +70,4 @@ public class FriendService {
 
         friendRepository.deleteById(friendId);
     }
-
-    public boolean isSubscribedByUser(Long subscriberId) {
-        return friendRepository.existsBySubscriberId(subscriberId);
-    }
 }
