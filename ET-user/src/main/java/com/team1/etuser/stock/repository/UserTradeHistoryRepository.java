@@ -16,7 +16,8 @@ public interface UserTradeHistoryRepository extends JpaRepository<UserTradeHisto
     @Query("SELECT new com.team1.etuser.stock.dto.UserHistoryRes(u.id, '', u.stockCode, '', u.price, u.position, u.amount, u.createdAt, u.updatedAt, u.tradeStatus) " +
             "FROM UserTradeHistory u " +
             "WHERE u.user = :user " +
-            "AND (:tradeStatus IS NULL OR u.tradeStatus = :tradeStatus)")
+            "AND (:tradeStatus IS NULL OR u.tradeStatus = :tradeStatus) " +
+            "ORDER BY u.updatedAt DESC")
     Page<UserHistoryRes> findUserHistoryByTradeStatus(@Param("user") User user,
                                                       @Param("tradeStatus") TradeStatus tradeStatus,
                                                       Pageable pageable);
