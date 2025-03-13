@@ -1,5 +1,4 @@
 package com.team1.etcore.stock.service;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.etcore.stock.domain.Stock;
 import com.team1.etcore.stock.dto.TradeResultRes;
@@ -95,7 +94,7 @@ public class SseService {
 
 public SseEmitter getPortfolioStockPrice(String userId) {
     SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
-    System.out.println(portfolioSubscribers.size());
+//    System.out.println(portfolioSubscribers.size());
 
     // 사용자의 포트폴리오 종목 정보 조회
     ResponseEntity<List<UserStocksRes>> response = userTradeHistoryClient.getUserStocks(userId);
@@ -245,7 +244,7 @@ public SseEmitter getPortfolioStockPrice(String userId) {
 
     // 거래 알림 전송 메서드
     @KafkaListener(topics = "tradeResult", groupId = "trade-alert")
-    public void sendTradeNotification(ConsumerRecord<String, String> record) throws JsonProcessingException {
+    public void sendTradeNotification(ConsumerRecord<String, String> record) {
         // Kafka에서 넘어온 JSON(혹은 LinkedHashMap)을 객체로 변환
         TradeResultRes tradeResult = objectMapper.convertValue(record.value(), TradeResultRes.class);
 
@@ -275,7 +274,6 @@ public SseEmitter getPortfolioStockPrice(String userId) {
                 // JSON이 아니라 문자열 그대로 보내면, 클라이언트 측에서 자연스럽게 표시 가능
                 emitter.send(SseEmitter.event().data(finalMessage));
             } catch (IOException e) {
-                emitter.complete();
                 tradeSubscribers.remove(tradeResult.getUserId());
             }
         }
