@@ -1,7 +1,9 @@
 package com.team1.etuser.stock.controller;
 
 import com.team1.etuser.stock.domain.TradeStatus;
+import com.team1.etuser.stock.dto.TradeCountRes;
 import com.team1.etuser.stock.dto.UserHistoryRes;
+import com.team1.etuser.stock.service.TradeHistoryService;
 import com.team1.etuser.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,6 +23,7 @@ import java.util.List;
 public class TradeHistoryController {
 
     private final UserService userService;
+    private final TradeHistoryService tradeHistoryService;
 
     @GetMapping("")
     public ResponseEntity<Page<UserHistoryRes>> getUserHistory(
@@ -35,6 +38,11 @@ public class TradeHistoryController {
                 tradeStatus
         );
         return ResponseEntity.ok(history);
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<TradeCountRes> getTradeCount(@RequestHeader("X-Id") String userId) {
+        return ResponseEntity.ok(tradeHistoryService.getTradeCount(userId));
     }
 
 }

@@ -1,6 +1,7 @@
 package com.team1.etuser.stock.service;
 
 import com.team1.etuser.stock.domain.TradeStatus;
+import com.team1.etuser.stock.dto.TradeCountRes;
 import com.team1.etuser.user.domain.User;
 import com.team1.etuser.stock.domain.UserTradeHistory;
 import com.team1.etuser.stock.dto.TradeReq;
@@ -63,5 +64,18 @@ public class TradeHistoryService {
         userTradeHistoryRepository.save(userTradeHistory.get());
 
         return true;
+    }
+
+    public TradeCountRes getTradeCount(String userId) {
+
+        User user = userRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
+
+
+        Long count = userTradeHistoryRepository.countByUserAndTradeStatus(user, TradeStatus.EXECUTED);
+
+        log.info(">>> (사용자ID = {}), 거래횟수 = {}", userId, count);
+
+        return new TradeCountRes(count);
     }
 }
