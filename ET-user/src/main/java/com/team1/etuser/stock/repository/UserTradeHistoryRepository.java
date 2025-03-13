@@ -21,4 +21,6 @@ public interface UserTradeHistoryRepository extends JpaRepository<UserTradeHisto
     Page<UserHistoryRes> findUserHistoryByTradeStatus(@Param("user") User user,
                                                       @Param("tradeStatus") TradeStatus tradeStatus,
                                                       Pageable pageable);
+
+    long countByUserAndTradeStatus(User user, TradeStatus tradeStatus);
 }
