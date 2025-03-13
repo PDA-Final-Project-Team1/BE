@@ -77,7 +77,7 @@ public class StockServiceImpl implements StockService {
         try {
             // StockData.json 파일을 읽어 리스트로 변환
             List<StockDataRes> stockList = objectMapper.readValue(
-                    new ClassPathResource("Stock/StockData.json").getInputStream(),
+                    new ClassPathResource("stock/StockData.json").getInputStream(),
                     new TypeReference<List<StockDataRes>>() {}
             );
 
