@@ -107,7 +107,7 @@ public class KoreaInvestmentWebSocketClient {
                     /***
                      * 호가 데이터 전처리
                      */
-                    log.info(message);
+//                    log.info(message);
                     if(message.charAt(21) == '^') {
                         // 1. 종목코드 분리
                         String stockCode = message.substring(15, 21);
