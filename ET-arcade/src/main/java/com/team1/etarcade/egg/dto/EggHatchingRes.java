@@ -13,5 +13,6 @@ import java.math.BigDecimal;
 public class EggHatchingRes {
     private String stockName;
     private BigDecimal amount;
+    private String img;
 
 }

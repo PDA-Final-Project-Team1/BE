@@ -178,7 +178,7 @@ public class EggService {
         eggRepository.delete(egg);
         log.info("알 삭제 완료 - eggId: {}", eggId);
 
-        return new EggHatchingRes(randomStock.getName(), amount);
+        return new EggHatchingRes(randomStock.getName(), amount, randomStock.getImg());
 
     }
 
