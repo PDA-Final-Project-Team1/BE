@@ -231,7 +231,6 @@ public SseEmitter getPortfolioStockPrice(String userId) {
 
     // 거래 알림 구독 메서드
     public SseEmitter subscribeTradeNotifications(Long userId) {
-
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
 
         tradeSubscribers.put(userId, emitter);
@@ -262,7 +261,8 @@ public SseEmitter getPortfolioStockPrice(String userId) {
                 .append(stock.getName())   // "삼성전자"
                 .append("(").append(tradeResult.getStockCode()).append("), ")
                 .append("수량: ").append(tradeResult.getStockAmount()).append("주, ")
-                .append("가격: ").append(tradeResult.getStockPrice()).append("원");
+                .append("가격: ").append(tradeResult.getStockPrice()).append("원")
+                .append("/").append(System.currentTimeMillis());
 
         // 최종 전송할 메시지
         String finalMessage = sb.toString();
