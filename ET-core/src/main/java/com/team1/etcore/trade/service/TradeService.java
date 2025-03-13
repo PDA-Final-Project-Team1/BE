@@ -31,10 +31,13 @@ public class TradeService {
     @Transactional
     public TradeRes createOrder(Long userId, TradeReq tradeReq) {
         try {
-            BigDecimal totalPrice = tradeReq.getPrice().multiply(tradeReq.getAmount());
-            if (!userTradeHistoryClient.enoughDeposit(userId, totalPrice)) {
-                throw new RuntimeException("예치금이 부족합니다.");
+            if (Position.BUY.equals(tradeReq.getPosition())) {
+                BigDecimal totalPrice = tradeReq.getPrice().multiply(tradeReq.getAmount());
+                if (!userTradeHistoryClient.enoughDeposit(userId, totalPrice)) {
+                    throw new RuntimeException("예치금이 부족합니다.");
+                }
             }
+
             // 주문 생성
             TradeRes tradeRes = userTradeHistoryClient.createOrder(userId, tradeReq);
 
