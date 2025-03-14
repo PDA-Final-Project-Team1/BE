@@ -58,7 +58,7 @@ public class SseService {
 
                 try {
                     emitter.send("연결 성공: " + stockCode);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     //emitter.completeWithError(e);
                 }
             }
@@ -81,7 +81,7 @@ public class SseService {
 
                 // JSON 문자열을 보내기
                 emitter.send(SseEmitter.event().data(jsonData));
-            } catch (IOException e) {
+            } catch (Exception e) {
 //                emitter.complete();
 //                completedEmitters.add(emitter); // 완료된 emitter를 추적
             }
@@ -120,7 +120,7 @@ public SseEmitter getPortfolioStockPrice(String userId) {
 
             try {
                 emitter.send("연결 성공: " + stockCode);
-            } catch (IOException e) {
+            } catch (Exception e) {
             }
         }
 
@@ -144,7 +144,7 @@ public SseEmitter getPortfolioStockPrice(String userId) {
                 // JSON 문자열을 보내기
                 emitter.send(SseEmitter.event().data(jsonData));
 
-            } catch (IOException e) {
+            } catch (Exception e) {
 //                // 오류 발생 시 emitter 완료 처리
 //                removeEmitter(portfolioSubscribers, stockCode, emitter); // 리스트에서 제거
 //                emitter.complete();
@@ -194,7 +194,7 @@ public SseEmitter getPortfolioStockPrice(String userId) {
 
                 // JSON 문자열을 보내기
                 emitter.send(SseEmitter.event().data(jsonData));
-            } catch (IOException e) {
+            } catch (Exception e) {
 //                emitter.complete();
             }
         }
@@ -223,7 +223,7 @@ public SseEmitter getPortfolioStockPrice(String userId) {
 
                 // JSON 문자열을 보내기
                 emitter.send(SseEmitter.event().data(jsonData));
-            } catch (IOException e) {
+            } catch (Exception e) {
 //                emitter.complete();
             }
         }
@@ -273,7 +273,7 @@ public SseEmitter getPortfolioStockPrice(String userId) {
             try {
                 // JSON이 아니라 문자열 그대로 보내면, 클라이언트 측에서 자연스럽게 표시 가능
                 emitter.send(SseEmitter.event().data(finalMessage));
-            } catch (IOException e) {
+            } catch (Exception e) {
                 tradeSubscribers.remove(tradeResult.getUserId());
             }
         }

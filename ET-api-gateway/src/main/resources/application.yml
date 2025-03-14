@@ -41,3 +41,8 @@ eureka:
 
 jwt:
   secret: ${JWT_SECRET}
+
+logging:
+  level:
+    org.springframework.cloud: DEBUG
+    org.springframework.web: DEBUG
