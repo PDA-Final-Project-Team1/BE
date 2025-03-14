@@ -127,7 +127,7 @@ public class UserStockService {
                 .orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
 
         //List<StockClosePriceRes> stockList = userStockRepository.findStockCodeByUser(user);
-        List<StockClosePriceRes> stockList = userFavoriteStockRepository.findStockCodeByUser(user);
+        List<StockClosePriceRes> stockList = userFavoriteStockRepository.findFavoriteStockCodeByUser(user);
 
         for (StockClosePriceRes stock : stockList) {
             String redisKey = CloseKey(stock.getStockCode());
