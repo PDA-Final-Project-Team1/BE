@@ -6,6 +6,7 @@ import com.team1.etcore.stock.dto.UserFavoriteStocksRes;
 import com.team1.etcore.stock.dto.UserStocksRes;
 import com.team1.etcore.stock.repository.StockRepository;
 import com.team1.etcore.trade.client.UserTradeHistoryClient;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,8 +16,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
+@Slf4j
 public class SseService {
     private final Map<String, List<SseEmitter>> interestSubscribers = new ConcurrentHashMap<>();//현재가
     private final Map<String, List<SseEmitter>> portfolioSubscribers = new ConcurrentHashMap<>();//현재가
@@ -50,7 +53,7 @@ public class SseService {
                 String stockCode = stock.getStockCode(); // 종목 코드 가져오기
 
                 // 관심 종목별 구독자 리스트에 Emitter 추가
-                interestSubscribers.computeIfAbsent(stockCode, k -> new ArrayList<>()).add(emitter);
+                interestSubscribers.computeIfAbsent(stockCode, k -> new CopyOnWriteArrayList<>()).add(emitter);
 
                 // SSE 연결이 종료되거나 타임아웃될 때 해당 종목 코드에서 Emitter 제거
                 emitter.onCompletion(() -> removeEmitter(interestSubscribers, stockCode, emitter));
@@ -59,7 +62,7 @@ public class SseService {
                 try {
                     emitter.send("연결 성공: " + stockCode);
                 } catch (Exception e) {
-                    //emitter.completeWithError(e);
+                    removeEmitter(interestSubscribers, stockCode, emitter);
                 }
             }
         }
@@ -68,28 +71,19 @@ public class SseService {
     }
 
     public void sendToClientsInterestStockPrice(String stockCode, Object data) {
-
-        List<SseEmitter> emitters = interestSubscribers.getOrDefault(stockCode, new ArrayList<>());
+        List<SseEmitter> emitters = interestSubscribers.getOrDefault(stockCode, new CopyOnWriteArrayList<>());
+//        List<SseEmitter> emitters = interestSubscribers.getOrDefault(stockCode, new ArrayList<>());
 
         // 리스트에서 제거될 때 반복문 내에서 제거하지 않도록 별도의 리스트로 처리
-//        List<SseEmitter> completedEmitters = new ArrayList<>();
         for (SseEmitter emitter : emitters) {
             try {
-                // 객체를 JSON 문자열로 변환
-                ObjectMapper objectMapper = new ObjectMapper();
                 String jsonData = objectMapper.writeValueAsString(data);
-
-                // JSON 문자열을 보내기
                 emitter.send(SseEmitter.event().data(jsonData));
             } catch (Exception e) {
-//                emitter.complete();
-//                completedEmitters.add(emitter); // 완료된 emitter를 추적
+                log.error("Interest SSE 전송 오류, stockCode {}: {}", stockCode, e.getMessage());
+                removeEmitter(interestSubscribers, stockCode, emitter);
             }
         }
-        // 완료된 emitter들 제거
-//        for (SseEmitter emitter : completedEmitters) {
-//            removeEmitter(portfolioSubscribers, stockCode, emitter);
-//        }
     }
 
 public SseEmitter getPortfolioStockPrice(String userId) {
@@ -106,21 +100,16 @@ public SseEmitter getPortfolioStockPrice(String userId) {
             String stockCode = stock.getStockCode(); // 종목 코드 가져오기
 
             // 포트폴리오 종목별 구독자 리스트에 Emitter 추가
-            portfolioSubscribers.computeIfAbsent(stockCode, k -> new ArrayList<>()).add(emitter);
+            portfolioSubscribers.computeIfAbsent(stockCode, k -> new CopyOnWriteArrayList<>()).add(emitter);
 
             // SSE 연결이 종료되거나 타임아웃될 때 해당 종목 코드에서 Emitter 제거
             emitter.onCompletion(() -> removeEmitter(portfolioSubscribers, stockCode, emitter));
             emitter.onTimeout(() -> removeEmitter(portfolioSubscribers, stockCode, emitter));
 
-            // 오류 발생 시 emitter 제거
-//            emitter.onError(e -> {
-//                removeEmitter(portfolioSubscribers, stockCode, emitter);
-//                System.out.println("연결 오류 발생: " + e.getMessage());
-//            });
-
             try {
                 emitter.send("연결 성공: " + stockCode);
             } catch (Exception e) {
+                removeEmitter(portfolioSubscribers, stockCode, emitter);
             }
         }
 
@@ -130,7 +119,7 @@ public SseEmitter getPortfolioStockPrice(String userId) {
 }
 
     public void sendToClientsPortfolioStockPrice(String stockCode, Object data) {
-        List<SseEmitter> emitters = portfolioSubscribers.getOrDefault(stockCode, new ArrayList<>());
+        List<SseEmitter> emitters = portfolioSubscribers.getOrDefault(stockCode, new CopyOnWriteArrayList<>());
 
         // 완료된 emitter를 추적하기 위한 리스트
 //        List<SseEmitter> completedEmitters = new ArrayList<>();
@@ -138,22 +127,16 @@ public SseEmitter getPortfolioStockPrice(String userId) {
         for (SseEmitter emitter : emitters) {
             try {
                 // 객체를 JSON 문자열로 변환
-                ObjectMapper objectMapper = new ObjectMapper();
                 String jsonData = objectMapper.writeValueAsString(data);
 
                 // JSON 문자열을 보내기
                 emitter.send(SseEmitter.event().data(jsonData));
 
             } catch (Exception e) {
-//                // 오류 발생 시 emitter 완료 처리
-//                removeEmitter(portfolioSubscribers, stockCode, emitter); // 리스트에서 제거
-//                emitter.complete();
-//                completedEmitters.add(emitter); // 완료된 emitter를 추적
+                log.error("Portfolio SSE 전송 오류, stockCode {}: {}", stockCode, e.getMessage());
+                removeEmitter(portfolioSubscribers, stockCode, emitter);
             }
         }
-//        for (SseEmitter emitter : completedEmitters) {
-//            removeEmitter(portfolioSubscribers, stockCode, emitter);
-//        }
     }
 
 
@@ -163,9 +146,9 @@ public SseEmitter getPortfolioStockPrice(String userId) {
         if (emitters != null) {
             emitters.remove(emitter);
             // 해당 종목 코드의 구독자가 모두 없으면 해당 키를 삭제
-            if (emitters.isEmpty()) {
-                subscribersMap.remove(stockCode);
-            }
+//            if (emitters.isEmpty()) {
+//                subscribersMap.remove(stockCode);
+//            }
         }
     }
 
@@ -174,7 +157,7 @@ public SseEmitter getPortfolioStockPrice(String userId) {
     public SseEmitter getAskBidPrice(String stockCode) {//호가
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
 
-        askBidSubscribers.computeIfAbsent(stockCode, k -> new ArrayList<>()).add(emitter);
+        askBidSubscribers.computeIfAbsent(stockCode, k -> new CopyOnWriteArrayList<>()).add(emitter);
 
         emitter.onCompletion(() -> askBidSubscribers.get(stockCode).remove(emitter));
         emitter.onTimeout(() -> askBidSubscribers.get(stockCode).remove(emitter));
@@ -184,18 +167,18 @@ public SseEmitter getPortfolioStockPrice(String userId) {
 
     public void sendToClientsAskBidStockPrice(String stockCode, Object data) {
 
-        List<SseEmitter> emitters = askBidSubscribers.getOrDefault(stockCode, new ArrayList<>());
+        List<SseEmitter> emitters = askBidSubscribers.getOrDefault(stockCode, new CopyOnWriteArrayList<>());
 
         for (SseEmitter emitter : emitters) {
             try {
                 // 객체를 JSON 문자열로 변환
-                ObjectMapper objectMapper = new ObjectMapper();
                 String jsonData = objectMapper.writeValueAsString(data);
 
                 // JSON 문자열을 보내기
                 emitter.send(SseEmitter.event().data(jsonData));
             } catch (Exception e) {
-//                emitter.complete();
+                log.error("AskBid SSE 전송 오류, stockCode {}: {}", stockCode, e.getMessage());
+                removeEmitter(askBidSubscribers, stockCode, emitter);
             }
         }
     }
@@ -203,8 +186,8 @@ public SseEmitter getPortfolioStockPrice(String userId) {
 
 
     public SseEmitter getStockCurPrice(String stockCode) {
-        SseEmitter emitter = new SseEmitter();
-        curPriceSubscribers.computeIfAbsent(stockCode, k -> new ArrayList<>()).add(emitter);
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+        curPriceSubscribers.computeIfAbsent(stockCode, k -> new CopyOnWriteArrayList<>()).add(emitter);
 
         emitter.onCompletion(() -> curPriceSubscribers.get(stockCode).remove(emitter));
         emitter.onTimeout(() -> curPriceSubscribers.get(stockCode).remove(emitter));
@@ -213,18 +196,18 @@ public SseEmitter getPortfolioStockPrice(String userId) {
     }
     public void sendToClientsStockCurPrice(String stockCode, Object data) {
 
-        List<SseEmitter> emitters = curPriceSubscribers.getOrDefault(stockCode, new ArrayList<>());
+        List<SseEmitter> emitters = curPriceSubscribers.getOrDefault(stockCode, new CopyOnWriteArrayList<>());
 
         for (SseEmitter emitter : emitters) {
             try {
                 // 객체를 JSON 문자열로 변환
-                ObjectMapper objectMapper = new ObjectMapper();
                 String jsonData = objectMapper.writeValueAsString(data);
 
                 // JSON 문자열을 보내기
                 emitter.send(SseEmitter.event().data(jsonData));
             } catch (Exception e) {
-//                emitter.complete();
+                log.error("StockCurPrice SSE 전송 오류, stockCode {}: {}", stockCode, e.getMessage());
+                removeEmitter(curPriceSubscribers, stockCode, emitter);
             }
         }
     }
@@ -278,5 +261,7 @@ public SseEmitter getPortfolioStockPrice(String userId) {
             }
         }
     }
+
+
 
 }
