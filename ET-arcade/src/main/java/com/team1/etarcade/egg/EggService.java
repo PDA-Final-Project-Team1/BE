@@ -32,7 +32,7 @@ public class EggService {
     private final UserClient userClient;
     private static final Duration INCUBATION_DURATION = Duration.ofMinutes(1); // 부화 시간 24시간
     private final StockClient stockClient;
-    private final TaskScheduler taskScheduler;
+//    private final TaskScheduler taskScheduler;
 
     @Transactional
     //알 얻는 과정
@@ -54,7 +54,7 @@ public class EggService {
         Egg savedEgg = eggRepository.save(newEgg);
 
         // 알 부화 스케줄링
-        scheduleHatchableUpdate(savedEgg.getId());
+//        scheduleHatchableUpdate(savedEgg.getId());
 
         //알DTO 반환
         return new EggCreateRes(
@@ -67,22 +67,22 @@ public class EggService {
         );
     }
 
-    private void scheduleHatchableUpdate(Long eggId) {
-        // Deprecated된 Date 대신, Instant로 예약 시간을 계산
-        Instant futureTime = Instant.now().plus(INCUBATION_DURATION);
-
-        taskScheduler.schedule(
-                () -> {
-                    Egg egg = eggRepository.findById(eggId).orElse(null);
-                    if (egg != null) {
-                        egg.setHatchable(true);
-                        eggRepository.save(egg);
-                        log.info("알(" + eggId + ")이 부화 가능 상태로 업데이트되었습니다.");
-                    }
-                },
-                futureTime
-        );
-    }
+//    private void scheduleHatchableUpdate(Long eggId) {
+//        // Deprecated된 Date 대신, Instant로 예약 시간을 계산
+//        Instant futureTime = Instant.now().plus(INCUBATION_DURATION);
+//
+//        taskScheduler.schedule(
+//                () -> {
+//                    Egg egg = eggRepository.findById(eggId).orElse(null);
+//                    if (egg != null) {
+//                        egg.setHatchable(true);
+//                        eggRepository.save(egg);
+//                        log.info("알(" + eggId + ")이 부화 가능 상태로 업데이트되었습니다.");
+//                    }
+//                },
+//                futureTime
+//        );
+//    }
 
 
     // 유저의 모든 알 조회
