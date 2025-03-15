@@ -6,16 +6,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.reactive.CorsWebFilter;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebFluxSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -25,34 +25,34 @@ public class SecurityConfig {
     private String reactHost;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
-                .httpBasic(basic -> basic.disable())
-                .formLogin(form -> form.disable())
-                .cors(cors -> cors.configurationSource(corsConfig()))
-                .authorizeHttpRequests(auth->
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) throws Exception {
+        http.csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
+                .cors(ServerHttpSecurity.CorsSpec::disable)
+                .authorizeExchange(auth->
                                 auth
-                                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                        .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/users/duplicate").permitAll()
-                                        .anyRequest().authenticated()
+                                        .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                        .pathMatchers("/api/auth/signup", "/api/auth/login", "/api/users/duplicate").permitAll()
+                                        .anyExchange().authenticated()
                 )
-                .addFilterBefore(jwtGatewayFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(jwtGatewayFilter, SecurityWebFiltersOrder.AUTHENTICATION);
         return http.build();
     }
 
     @Bean
-    public CorsConfigurationSource corsConfig() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://" + reactHost);
-        configuration.addAllowedOrigin("http://" + reactHost + ":5173");
-        configuration.addAllowedOrigin("http://" + reactHost + ":80");
-        configuration.addAllowedMethod("*");
-        configuration.addAllowedHeader("*");
-        configuration.setAllowCredentials(true);
+    public CorsWebFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("http://" + reactHost);
+        config.addAllowedOrigin("http://" + reactHost + ":5173");
+        config.addAllowedOrigin("http://" + reactHost + ":80");
+        config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", config);
 
-        return source;
+        return new CorsWebFilter(source);
     }
 }

@@ -12,7 +12,6 @@ spring:
     name: ET-api-gateway
   cloud:
     gateway:
-      mvc:
         routes:
           - id: USER-SERVICE
             uri: lb://ET-user

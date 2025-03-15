@@ -7,27 +7,31 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
-import jakarta.servlet.http.HttpServletRequestWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
 
 import javax.crypto.spec.SecretKeySpec;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.*;
 
 @Component
 @Slf4j
-public class JwtGatewayFilter extends OncePerRequestFilter {
+public class JwtGatewayFilter implements WebFilter {
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -40,52 +44,58 @@ public class JwtGatewayFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
-
-        String path = request.getRequestURI();
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        ServerHttpRequest request = exchange.getRequest();
+        ServerHttpResponse response = exchange.getResponse();
+        String path = request.getURI().getPath();
 
         if (EXCLUDED_PATHS.contains(path)) {
-            chain.doFilter(request, response);
-            return;
+            return chain.filter(exchange);
         }
 
         String token = getTokenFromRequest(request);
 
         if (token == null) {
-            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization header");
-            return;
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            return response.setComplete();
         }
 
-        Claims claims = validateToken(token, response);
-        if (claims == null) return;
+        Claims claims = validateToken(token);
+        if (claims == null) {
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            return response.setComplete();
+        }
 
         String userId = claims.get("X-Id", String.class);
-        authenticateUser(userId);
-
-        MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(request);
-        mutableRequest.putHeader("X-Id", userId);
-
-        chain.doFilter(mutableRequest, response);
+        return authenticateUser(userId)
+                .flatMap(securityContext -> chain.filter(exchange.mutate()
+                                .request(addCustomHeader(request, "X-Id", userId)) // 헤더에 X-Id 추가
+                                .request(addCustomParameter(request, "X-Id", userId)) // 파라미터에 X-Id 추가
+                                .build())
+                        .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)))
+                );
     }
 
-    private String getTokenFromRequest(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-        if (token != null && token.startsWith("Bearer ")) {
-            return token.substring(7);
+    private String getTokenFromRequest(ServerHttpRequest request) {
+        List<String> authHeaders = request.getHeaders().get(HttpHeaders.AUTHORIZATION);
+        if (authHeaders != null && !authHeaders.isEmpty()) {
+            String token = authHeaders.get(0);
+            if (token.startsWith("Bearer ")) {
+                return token.substring(7);
+            }
         }
         return null;
     }
 
-    private Claims validateToken(String token, HttpServletResponse response) {
+    private Claims validateToken(String token) {
         try {
             return parseClaims(token);
         } catch (ExpiredJwtException e) {
-            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Token expired");
+            log.error("Token expired");
         } catch (UnsupportedJwtException | SignatureException e) {
-            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+            log.error("Invalid token");
         } catch (JwtException e) {
-            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            log.error("Unauthorized");
         }
         return null;
     }
@@ -98,66 +108,22 @@ public class JwtGatewayFilter extends OncePerRequestFilter {
                 .getBody();
     }
 
-    private void authenticateUser(String userId) {
+    private Mono<SecurityContext> authenticateUser(String userId) {
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(userId, null, new ArrayList<>());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return Mono.just(new SecurityContextImpl(authentication));
     }
 
-    private void sendError(HttpServletResponse response, int statusCode, String message) {
-        try {
-            response.sendError(statusCode, message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private ServerHttpRequest addCustomHeader(ServerHttpRequest request, String name, String value) {
+        return request.mutate()
+                .headers(headers -> headers.set(name, value))
+                .build();
     }
 
-
-    /**
-     * HttpServletRequestWrapper를 상속하여 헤더를 수정할 수 있는 클래스.
-     */
-    private static class MutableHttpServletRequest extends HttpServletRequestWrapper {
-        private final Map<String, String> customHeaders = new HashMap<>();
-
-        public MutableHttpServletRequest(HttpServletRequest request) {
-            super(request);
-        }
-
-        /**
-         * 새로운 헤더를 추가하는 메서드
-         *
-         * @param name  헤더 이름
-         * @param value 헤더 값
-         */
-        public void putHeader(String name, String value) {
-            customHeaders.put(name, value);
-        }
-
-        @Override
-        public String getHeader(String name) {
-            // customHeaders에 값이 있으면 우선 반환하고, 없으면 원래 request의 헤더를 반환합니다.
-            String headerValue = customHeaders.get(name);
-            return (headerValue != null) ? headerValue : super.getHeader(name);
-        }
-
-        @Override
-        public Enumeration<String> getHeaderNames() {
-            // customHeaders와 원래 request의 헤더를 합쳐서 반환합니다.
-            Set<String> names = new HashSet<>(customHeaders.keySet());
-            Enumeration<String> originalNames = super.getHeaderNames();
-            while (originalNames.hasMoreElements()) {
-                names.add(originalNames.nextElement());
-            }
-            return Collections.enumeration(names);
-        }
-
-        @Override
-        public Enumeration<String> getHeaders(String name) {
-            // customHeaders에 해당 헤더가 있으면 그것을 반환하고, 그렇지 않으면 원래 헤더를 반환합니다.
-            if (customHeaders.containsKey(name)) {
-                return Collections.enumeration(Arrays.asList(customHeaders.get(name)));
-            }
-            return super.getHeaders(name);
-        }
+    private ServerHttpRequest addCustomParameter(ServerHttpRequest request, String name, String value) {
+        // URL 파라미터로 X-Id를 추가합니다.
+        String uri = request.getURI().toString();
+        String newUri = uri.contains("?") ? uri + "&" + name + "=" + value : uri + "?" + name + "=" + value;
+        return request.mutate().uri(URI.create(newUri)).build();
     }
 }
