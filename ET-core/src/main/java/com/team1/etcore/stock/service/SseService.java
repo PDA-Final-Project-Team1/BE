@@ -1,6 +1,8 @@
 package com.team1.etcore.stock.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team1.etcore.stock.domain.Stock;
+import com.team1.etcore.stock.dto.ConnectRes;
 import com.team1.etcore.stock.dto.TradeResultRes;
 import com.team1.etcore.stock.repository.StockRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -28,32 +30,56 @@ public class SseService {
         this.stockRepository = stockRepository;
     }
 
-    /**
-     * 1) 유저별로 단 하나의 SSE를 생성/관리
-     * 2) 연결 시 userTradeHistoryClient로 관심/포트폴리오 종목 조회 후 stockSubscribers에 등록
-     * 3) 기존에 연결이 있으면 강제로 완료
-     */
+    // 유저별로 단 하나의 SSE를 생성/관리
+//    public SseEmitter subscribeUser(String userId, List<String> stockCodes) {
+//        // 기존 Emitter 제거
+//        SseEmitter oldEmitter = userEmitters.get(userId);
+//        if (oldEmitter != null) {
+//            oldEmitter.complete();
+//            userEmitters.remove(userId);
+//        }
+//
+//        // 새 Emitter 생성
+//        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+//        emitter.onCompletion(() -> userEmitters.remove(userId));
+//        emitter.onTimeout(() -> userEmitters.remove(userId));
+//
+//        userEmitters.put(userId, emitter);
+//
+//        // 관심 종목 + 보유 종목을 합쳐서 한번에 처리
+//        // (원한다면 별도 메서드로 분리 가능)
+//        removeUserFromAllStocks(userId);
+//
+//        // 새로 전달받은 stockCodes를 구독
+//        if (stockCodes != null) {
+//            for (String code : stockCodes) {
+//                stockSubscribers.computeIfAbsent(code, k -> new HashSet<>()).add(userId);
+//            }
+//        }
+//
+//        try {
+//            ConnectRes res = new ConnectRes("연결 성공", userId, stockCodes.toString());
+//            emitter.send(res);
+//        } catch (Exception e) {
+//            log.error("subscribeUserWithCodes error: {}", e.getMessage());
+//            emitter.complete();
+//            userEmitters.remove(userId);
+//        }
+//
+//        return emitter;
+//    }
     public SseEmitter subscribeUser(String userId, List<String> stockCodes) {
-        // 기존 Emitter 제거
-        SseEmitter oldEmitter = userEmitters.get(userId);
-        if (oldEmitter != null) {
-            oldEmitter.complete();
-            userEmitters.remove(userId);
+        // 이미 활성화된 연결이 있다면 재활용
+        SseEmitter emitter = userEmitters.get(userId);
+        if (emitter == null) {
+            emitter = new SseEmitter(Long.MAX_VALUE);
+            emitter.onCompletion(() -> userEmitters.remove(userId));
+            emitter.onTimeout(() -> userEmitters.remove(userId));
+            userEmitters.put(userId, emitter);
         }
 
-        // 새 Emitter 생성
-        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
-        emitter.onCompletion(() -> userEmitters.remove(userId));
-        emitter.onTimeout(() -> userEmitters.remove(userId));
-
-        userEmitters.put(userId, emitter);
-
-
-        // 관심 종목 + 보유 종목을 합쳐서 한번에 처리
-        // (원한다면 별도 메서드로 분리 가능)
+        // 기존에 등록된 모든 종목 구독 제거 후 새로운 구독 등록
         removeUserFromAllStocks(userId);
-
-        // 새로 전달받은 stockCodes를 구독
         if (stockCodes != null) {
             for (String code : stockCodes) {
                 stockSubscribers.computeIfAbsent(code, k -> new HashSet<>()).add(userId);
@@ -61,7 +87,8 @@ public class SseService {
         }
 
         try {
-            emitter.send("연결 성공: userId=" + userId + ", codes=" + stockCodes);
+            ConnectRes res = new ConnectRes("연결 성공", userId, stockCodes.toString());
+            emitter.send(res);
         } catch (Exception e) {
             log.error("subscribeUserWithCodes error: {}", e.getMessage());
             emitter.complete();
@@ -98,10 +125,11 @@ public class SseService {
             SseEmitter emitter = userEmitters.get(userId);
             if (emitter != null) {
                 try {
-                    log.info("User ID = {} 에게 전송", userId);
+                    log.info("User ID = {} 에게 전송 데이터 = {}", userId, jsonData);
                     emitter.send(SseEmitter.event()
                             .name(eventName) // 이벤트 이름
-                            .data(jsonData));
+                            .data(jsonData)
+                            .reconnectTime(10000));
                 } catch (Exception e) {
                     log.error("SSE 전송 오류 userId={}, stockCode={}: {}", userId, stockCode, e.getMessage());
                     // 전송 실패 시 연결 제거
@@ -141,10 +169,13 @@ public class SseService {
 
         String statusMessage = "체결 " + ("Success".equals(tradeResult.getMessage()) ? "성공" : "실패");
 
+        // 종목 정보 가져오기
+        Stock stock = stockRepository.findByStockCode(tradeResult.getStockCode());
+
         StringBuilder sb = new StringBuilder();
         sb.append(statusMessage)
                 .append(": ")
-                .append(tradeResult.getName())   // "삼성전자"
+                .append(stock.getName())   // "삼성전자"
                 .append("(").append(tradeResult.getStockCode()).append("), ")
                 .append("수량: ").append(tradeResult.getStockAmount()).append("주, ")
                 .append("가격: ").append(tradeResult.getStockPrice()).append("원")

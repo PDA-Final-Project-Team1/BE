@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class KafkaStockConsumer {
 
     private final DataBuffer dataBuffer;
+    private final SseService sseService;
 
     @KafkaListener(topics = "H0STCNT0", groupId = "stock-group")
     public void StockCurPriceData(ConsumerRecord<String, Object> record) {
@@ -36,13 +37,7 @@ public class KafkaStockConsumer {
 
                 TradeStockPriceReq cur = new TradeStockPriceReq(stockCode, currentPrice, priceChange, changeRate);
 
-                dataBuffer.updateCurrentPrice(stockCode, cur);
-
-//                sseService.sendStockData(stockCode, "currentPrice", cur);
-
-//                sseService.sendToClientsInterestStockPrice(stockCode, cur);
-//                sseService.sendToClientsPortfolioStockPrice(stockCode, cur);
-//                sseService.sendToClientsStockCurPrice(stockCode, cur);
+                sseService.sendStockData(stockCode, "currentPrice", cur);
             } else {
                 log.warn("주식 코드 {}: 문자열이 아닌 데이터가 수신되었습니다. 원본 데이터: {}", stockCode, stockData);
             }
@@ -73,10 +68,7 @@ public class KafkaStockConsumer {
                         splitData[32], splitData[33], splitData[34], splitData[35], splitData[36]
                 );
 
-                dataBuffer.updateAskBid(stockCode, askStockPriceReq);
-
-//                sseService.sendStockData(stockCode, "askBid", askStockPriceReq);
-//                sseService.sendToClientsAskBidStockPrice(stockCode, askStockPriceReq);
+                sseService.sendStockData(stockCode, "askBid", askStockPriceReq);
             } else {
                 log.warn("주식 코드 {}: 문자열이 아닌 호가 데이터가 수신되었습니다. 원본 데이터: {}", stockCode, askBidData);
             }
