@@ -71,17 +71,15 @@ public class SseService {
         return emitter;
     }
 
-    /** 기존에 구독하던 종목에서 제거 */
+    // 기존에 구독하던 종목에서 제거
     private void removeUserFromAllStocks(String userId) {
         for (Set<String> userSet : stockSubscribers.values()) {
             userSet.remove(userId);
         }
     }
 
-    /**
-     * Redis 등에서 해당 종목의 실시간 데이터가 들어오면,
-     * 이 종목을 구독 중인 유저들을 찾아 SSE로 전송
-     */
+    // Redis 등에서 해당 종목의 실시간 데이터가 들어오면,
+    // 이 종목을 구독 중인 유저들을 찾아 SSE로 전송
     public void sendStockData(String stockCode, String eventName, Object data) {
         Set<String> userSet = stockSubscribers.getOrDefault(stockCode, Collections.emptySet());
         if (userSet.isEmpty()) return;
@@ -136,41 +134,13 @@ public class SseService {
         return emitter;
     }
 
-    // Kafka Listener로 들어온 거래 결과 알림을 해당 userId의 SSE로 전송
-//    @KafkaListener(topics = "tradeResult", groupId = "trade-alert")
-//    public void sendTradeNotification(ConsumerRecord<String, String> record) {
-//        try {
-//            TradeResultRes tradeResult = objectMapper.readValue(record.value(), TradeResultRes.class);
-//
-//            String statusMessage = "체결 " + ("Success".equals(tradeResult.getMessage()) ? "성공" : "실패");
-//            // 간단한 예시로만 작성
-//            String finalMessage = statusMessage + " / stockCode=" + tradeResult.getStockCode()
-//                    + " / userId=" + tradeResult.getUserId();
-//
-//            SseEmitter emitter = tradeSubscribers.get(tradeResult.getUserId());
-//            if (emitter != null) {
-//                emitter.send(SseEmitter.event()
-//                        .name("tradeResult")
-//                        .data(finalMessage));
-//            }
-//        } catch (Exception e) {
-//            log.error("sendTradeNotification error: {}", e.getMessage());
-//        }
-//    }
-        // 거래 알림 전송 메서드
+    // 거래 알림 전송 메서드
     @KafkaListener(topics = "tradeResult", groupId = "trade-alert")
     public void sendTradeNotification(ConsumerRecord<String, String> record) {
-        // Kafka에서 넘어온 JSON(혹은 LinkedHashMap)을 객체로 변환
         TradeResultRes tradeResult = objectMapper.convertValue(record.value(), TradeResultRes.class);
 
-        // 체결 성공인지 실패인지, 혹은 메시지 필드에 따라 적절히 처리
         String statusMessage = "체결 " + ("Success".equals(tradeResult.getMessage()) ? "성공" : "실패");
 
-        // 종목 정보 가져오기
-//        Stock stock = stockRepository.findByStockCode(tradeResult.getStockCode());
-
-        // 가공된 메시지(문자열) 만들기
-        // 예: "체결 성공: 삼성전자(005930), 수량: 2주, 가격: 55000원"
         StringBuilder sb = new StringBuilder();
         sb.append(statusMessage)
                 .append(": ")

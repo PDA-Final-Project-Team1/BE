@@ -16,23 +16,6 @@ import java.util.List;
 public class SseController {
     private final SseService sseService;
 
-//    @GetMapping("/subscribe/interest-price")//관심종목 현재가
-//    public SseEmitter StockInterestPrice(@RequestHeader("X-Id") String userId) {
-//        return sseService.getInterestStockPrice(userId);
-//    }
-//    @GetMapping("/subscribe/portfolio-price")//보유 종목 현재가
-//    public SseEmitter StockPortfolioPrice(@RequestHeader("X-Id") String userId) {
-//        return sseService.getPortfolioStockPrice(userId);
-//    }
-//    @GetMapping("/ask-bid/{stockCode}")
-//    public SseEmitter StockAskBid(@PathVariable String stockCode) {
-//        return sseService.getAskBidPrice(stockCode);
-//    }
-//    @GetMapping("/cur-price/{stockCode}")
-//    public SseEmitter StockCurPrice(@PathVariable String stockCode) {
-//        return sseService.getStockCurPrice(stockCode);
-//    }
-
     @GetMapping("/subscribe")
     public SseEmitter subscribeUser(@RequestHeader("X-Id") String userId,
                                     @RequestParam(required = false) String stockCodes) {
