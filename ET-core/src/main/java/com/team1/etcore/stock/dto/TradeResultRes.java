@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class TradeResultRes {
     private Long userId;
     private String message;

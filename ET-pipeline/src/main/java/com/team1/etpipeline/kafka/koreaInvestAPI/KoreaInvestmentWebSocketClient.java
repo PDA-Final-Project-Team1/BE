@@ -24,12 +24,12 @@ public class KoreaInvestmentWebSocketClient {
     private String askKey;
     private boolean reConnectFlag = false;
     private final List<String> trKeys = List.of(
-//            "005930"
-            "005930", "000660", "373220", "207940", "005380", "005935",
-            "000270", "068270", "105560", "035420", "055550", "012330",
-            "005490", "028260", "032830", "010130", "051910", "329180",
-            "138040", "006400", "012450", "000810", "086790", "011200",
-            "035720", "015760", "033780", "066570", "259960", "034020"
+            "005930","086790","035420","015760","000270","005380","005935","207940","051910"
+//            "005930", "000660", "373220", "207940", "005380", "005935",
+//            "000270", "068270", "105560", "035420", "055550", "012330",
+//            "005490", "028260", "032830", "010130", "051910", "329180",
+//            "138040", "006400", "012450", "000810", "086790", "011200",
+//            "035720", "015760", "033780", "066570", "259960", "034020"
     );
 
     public KoreaInvestmentWebSocketClient(ApprovalService approvalService, KafkaProducerService kafkaProducerService) {
@@ -41,13 +41,15 @@ public class KoreaInvestmentWebSocketClient {
     public void connect() {
         try {
             reConnectFlag = true;
-            this.tradeKey = approvalService.getApprovalKey("trade");
-            this.askKey = approvalService.getApprovalKey("ask");
+//            this.tradeKey = approvalService.getApprovalKey("trade");
+//            this.askKey = approvalService.getApprovalKey("ask");
 
             /**
              * 체결가 현재가
              */
-            tradeWebSocket = new WebSocketClient(new URI("ws://ops.koreainvestment.com:21000/tryitout/H0STCNT0")) {
+//            tradeWebSocket = new WebSocketClient(new URI("ws://ops.koreainvestment.com:21000/tryitout/H0STCNT0"))
+            tradeWebSocket = new WebSocketClient(new URI("ws://localhost:3000"))
+            {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {
                     log.info("WebSocket connection established");
@@ -56,7 +58,7 @@ public class KoreaInvestmentWebSocketClient {
 
                 @Override
                 public void onMessage(String message) {
-                    //log.info("Received message: {}", message);
+                    log.info(">>> 체결가: {}", message);
                     //데이터 전처리 작업
                     /**
                      * 토픽: 체결가
@@ -72,7 +74,7 @@ public class KoreaInvestmentWebSocketClient {
                         String priceChange = splitData[4];  // 전일 대비 변동 금액
                         String changeRate = splitData[5];  // 전일 대비 변동률
 
-                        String data = stockCode+"^"+currentPrice + "^" + priceChange + "^" + changeRate;
+                        String data = stockCode + "^" + currentPrice + "^" + priceChange + "^" + changeRate;
 
                         kafkaProducerService.sendMessage("H0STCNT0", stockCode, data);
                     }
@@ -95,7 +97,9 @@ public class KoreaInvestmentWebSocketClient {
             /**
              * 호가
              */
-            askBidWebSocket = new WebSocketClient(new URI("ws://ops.koreainvestment.com:21000/tryitout/H0STASP0")) {
+//            askBidWebSocket = new WebSocketClient(new URI("ws://ops.koreainvestment.com:21000/tryitout/H0STASP0"))
+            askBidWebSocket = new WebSocketClient(new URI("ws://localhost:3001"))
+            {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {
                     log.info("WebSocket connection established");
@@ -107,14 +111,14 @@ public class KoreaInvestmentWebSocketClient {
                     /***
                      * 호가 데이터 전처리
                      */
-//                    log.info(message);
+                    log.info(">>> 호가: {}", message);
                     if(message.charAt(21) == '^') {
                         // 1. 종목코드 분리
-                        String stockCode = message.substring(15, 21);
+                        String stockCode = message.substring(15, 21); // stockCode
                         // 2. 종목코드를 제외한 나머지 데이터 추출
                         String datas = message.substring(22);
-                        kafkaProducerService.sendMessage("H0STASP0", stockCode, datas);
 
+                        kafkaProducerService.sendMessage("H0STASP0", stockCode, datas);
                     }
                 }
 
@@ -145,22 +149,28 @@ public class KoreaInvestmentWebSocketClient {
          */
         try {
             for (String trKey : trKeys) {
+//                String message = String.format("""
+//                    {
+//                        "header": {
+//                            "approval_key": "%s",
+//                            "custtype":"P",
+//                            "tr_type":"1",
+//                            "content-type":"utf-8"
+//                        },
+//                        "body": {
+//                            "input": {
+//                                "tr_id": "H0STCNT0",
+//                                "tr_key": "%s"
+//                            }
+//                        }
+//                    }
+//                    """, tradeKey,trKey);
                 String message = String.format("""
                     {
-                        "header": {
-                            "approval_key": "%s",
-                            "custtype":"P",
-                            "tr_type":"1",
-                            "content-type":"utf-8"
-                        },
-                        "body": {
-                            "input": {
-                                "tr_id": "H0STCNT0",
-                                "tr_key": "%s"
-                            }
-                        }
+                        "tr_id": "H0STCNT0",
+                        "tr_key": "%s"
                     }
-                    """, tradeKey,trKey);
+                    """, trKey);
 
                 if (tradeWebSocket != null && tradeWebSocket.isOpen()) {
                     tradeWebSocket.send(message.getBytes(StandardCharsets.UTF_8));
@@ -184,22 +194,28 @@ public class KoreaInvestmentWebSocketClient {
         try {
             for (String trKey : trKeys) {
 
+//                String message2 = String.format("""
+//                    {
+//                        "header": {
+//                            "approval_key": "%s",
+//                            "custtype":"P",
+//                            "tr_type":"1",
+//                            "content-type":"utf-8"
+//                        },
+//                        "body": {
+//                            "input": {
+//                                "tr_id": "H0STASP0",
+//                                "tr_key": "%s"
+//                            }
+//                        }
+//                    }
+//                    """, askKey,trKey);
                 String message2 = String.format("""
                     {
-                        "header": {
-                            "approval_key": "%s",
-                            "custtype":"P",
-                            "tr_type":"1",
-                            "content-type":"utf-8"
-                        },
-                        "body": {
-                            "input": {
-                                "tr_id": "H0STASP0",
-                                "tr_key": "%s"
-                            }
-                        }
+                        "tr_id": "H0STASP0",
+                        "tr_key": "%s"
                     }
-                    """, askKey,trKey);
+                    """, trKey);
 
                 if (askBidWebSocket != null && askBidWebSocket.isOpen()) {
                     askBidWebSocket.send(message2.getBytes(StandardCharsets.UTF_8));
@@ -226,7 +242,7 @@ public class KoreaInvestmentWebSocketClient {
         if(!reConnectFlag) {
             try {
                 log.info("Reconnecting WebSocket...");
-                Thread.sleep(1000); // 3초 대기 후 재연결 (서버 과부하 방지)
+                Thread.sleep(10000); // 3초 대기 후 재연결 (서버 과부하 방지)
                 connect(); // 새로운 WebSocketClient 객체 생성
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

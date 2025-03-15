@@ -1,267 +1,198 @@
-//package com.team1.etcore.stock.service;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.team1.etcore.stock.domain.Stock;
-//import com.team1.etcore.stock.dto.TradeResultRes;
-//import com.team1.etcore.stock.dto.UserFavoriteStocksRes;
-//import com.team1.etcore.stock.dto.UserStocksRes;
-//import com.team1.etcore.stock.repository.StockRepository;
-//import com.team1.etcore.trade.client.UserTradeHistoryClient;
-//import lombok.extern.slf4j.Slf4j;
-//import org.apache.kafka.clients.consumer.ConsumerRecord;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.kafka.annotation.KafkaListener;
-//import org.springframework.stereotype.Service;
-//import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-//
-//import java.io.IOException;
-//import java.util.*;
-//import java.util.concurrent.ConcurrentHashMap;
-//import java.util.concurrent.CopyOnWriteArrayList;
-//
-//@Service
-//@Slf4j
-//public class SseService {
-//    private final Map<String, List<SseEmitter>> interestSubscribers = new ConcurrentHashMap<>();//현재가
-//    private final Map<String, List<SseEmitter>> portfolioSubscribers = new ConcurrentHashMap<>();//현재가
-//    private final Map<String, List<SseEmitter>> askBidSubscribers = new ConcurrentHashMap<>();//현재가
-//    private final Map<String, List<SseEmitter>> curPriceSubscribers = new ConcurrentHashMap<>();//현재가
-//    private final ObjectMapper objectMapper = new ObjectMapper(); // 싱글톤 필드로 관리
-//
-//    // 거래 알림용 SSE 구독자 관리 Map (userId를 key로 사용)
-//    private final Map<Long, SseEmitter> tradeSubscribers = new ConcurrentHashMap<>();
-////    private final UserClient userClient;
-//
-//    private final UserTradeHistoryClient userTradeHistoryClient;
-//    private final StockRepository stockRepository;
-//
-//    public SseService(final UserTradeHistoryClient userTradeHistoryClient,
-//                      final StockRepository stockRepository) {
-//        this.userTradeHistoryClient = userTradeHistoryClient;
-//        this.stockRepository = stockRepository;
-//    }
-//
-//    public SseEmitter getInterestStockPrice(String userId) {
-//        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE); // 200초 타임아웃 설정
-//
-//        // 사용자의 관심 종목 정보 조회
-//        ResponseEntity<List<UserFavoriteStocksRes>> response = userTradeHistoryClient.getUserFavoriteStocks(userId);
-//        List<UserFavoriteStocksRes> userFavoriteStocks = response.getBody();
-//
-//        // 관심 종목에 대한 구독자 등록
-//        if (userFavoriteStocks != null) {
-//            for (UserFavoriteStocksRes stock : userFavoriteStocks) {
-//                String stockCode = stock.getStockCode(); // 종목 코드 가져오기
-//
-//                // 관심 종목별 구독자 리스트에 Emitter 추가
-//                interestSubscribers.computeIfAbsent(stockCode, k -> new CopyOnWriteArrayList<>()).add(emitter);
-//
-//                // SSE 연결이 종료되거나 타임아웃될 때 해당 종목 코드에서 Emitter 제거
-//                emitter.onCompletion(() -> removeEmitter(interestSubscribers, stockCode, emitter));
-//                emitter.onTimeout(() -> removeEmitter(interestSubscribers, stockCode, emitter));
-//
-//                try {
-//                    emitter.send("연결 성공: " + stockCode);
-//                } catch (Exception e) {
-//                    removeEmitter(interestSubscribers, stockCode, emitter);
-//                }
-//            }
+package com.team1.etcore.stock.service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team1.etcore.stock.domain.Stock;
+import com.team1.etcore.stock.dto.ConnectRes;
+import com.team1.etcore.stock.dto.TradeResultRes;
+import com.team1.etcore.stock.repository.StockRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Service
+@Slf4j
+public class SseService {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private final Map<String, SseEmitter> userEmitters = new ConcurrentHashMap<>();
+    private final Map<String, Set<String>> stockSubscribers = new ConcurrentHashMap<>();
+    private final Map<Long, SseEmitter> tradeSubscribers = new ConcurrentHashMap<>();
+
+    private final StockRepository stockRepository;
+
+    public SseService(StockRepository stockRepository) {
+        this.stockRepository = stockRepository;
+    }
+
+    // 유저별로 단 하나의 SSE를 생성/관리
+//    public SseEmitter subscribeUser(String userId, List<String> stockCodes) {
+//        // 기존 Emitter 제거
+//        SseEmitter oldEmitter = userEmitters.get(userId);
+//        if (oldEmitter != null) {
+//            oldEmitter.complete();
+//            userEmitters.remove(userId);
 //        }
 //
-//        return emitter;
-//    }
-//
-//    public void sendToClientsInterestStockPrice(String stockCode, Object data) {
-//        List<SseEmitter> emitters = interestSubscribers.getOrDefault(stockCode, new CopyOnWriteArrayList<>());
-////        List<SseEmitter> emitters = interestSubscribers.getOrDefault(stockCode, new ArrayList<>());
-//
-//        // 리스트에서 제거될 때 반복문 내에서 제거하지 않도록 별도의 리스트로 처리
-//        for (SseEmitter emitter : emitters) {
-//            try {
-//                String jsonData = objectMapper.writeValueAsString(data);
-//                emitter.send(SseEmitter.event().data(jsonData));
-//            } catch (Exception e) {
-//                log.error("Interest SSE 전송 오류, stockCode {}: {}", stockCode, e.getMessage());
-//                removeEmitter(interestSubscribers, stockCode, emitter);
-//            }
-//        }
-//    }
-//
-//public SseEmitter getPortfolioStockPrice(String userId) {
-//    SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
-////    System.out.println(portfolioSubscribers.size());
-//
-//    // 사용자의 포트폴리오 종목 정보 조회
-//    ResponseEntity<List<UserStocksRes>> response = userTradeHistoryClient.getUserStocks(userId);
-//    List<UserStocksRes> userStocks = response.getBody();
-//
-//    // 포트폴리오 종목에 대한 구독자 등록
-//    if (userStocks != null) {
-//        for (UserStocksRes stock : userStocks) {
-//            String stockCode = stock.getStockCode(); // 종목 코드 가져오기
-//
-//            // 포트폴리오 종목별 구독자 리스트에 Emitter 추가
-//            portfolioSubscribers.computeIfAbsent(stockCode, k -> new CopyOnWriteArrayList<>()).add(emitter);
-//
-//            // SSE 연결이 종료되거나 타임아웃될 때 해당 종목 코드에서 Emitter 제거
-//            emitter.onCompletion(() -> removeEmitter(portfolioSubscribers, stockCode, emitter));
-//            emitter.onTimeout(() -> removeEmitter(portfolioSubscribers, stockCode, emitter));
-//
-//            try {
-//                emitter.send("연결 성공: " + stockCode);
-//            } catch (Exception e) {
-//                removeEmitter(portfolioSubscribers, stockCode, emitter);
-//            }
-//        }
-//
-//    }
-//
-//    return emitter;
-//}
-//
-//    public void sendToClientsPortfolioStockPrice(String stockCode, Object data) {
-//        List<SseEmitter> emitters = portfolioSubscribers.getOrDefault(stockCode, new CopyOnWriteArrayList<>());
-//
-//        // 완료된 emitter를 추적하기 위한 리스트
-////        List<SseEmitter> completedEmitters = new ArrayList<>();
-//
-//        for (SseEmitter emitter : emitters) {
-//            try {
-//                // 객체를 JSON 문자열로 변환
-//                String jsonData = objectMapper.writeValueAsString(data);
-//
-//                // JSON 문자열을 보내기
-//                emitter.send(SseEmitter.event().data(jsonData));
-//
-//            } catch (Exception e) {
-//                log.error("Portfolio SSE 전송 오류, stockCode {}: {}", stockCode, e.getMessage());
-//                removeEmitter(portfolioSubscribers, stockCode, emitter);
-//            }
-//        }
-//    }
-//
-//
-//    // 구독자 목록에서 SSE Emitter 제거하는 메서드
-//    private void removeEmitter(Map<String, List<SseEmitter>> subscribersMap, String stockCode, SseEmitter emitter) {
-//        List<SseEmitter> emitters = subscribersMap.get(stockCode);
-//        if (emitters != null) {
-//            emitters.remove(emitter);
-//            // 해당 종목 코드의 구독자가 모두 없으면 해당 키를 삭제
-////            if (emitters.isEmpty()) {
-////                subscribersMap.remove(stockCode);
-////            }
-//        }
-//    }
-//
-//
-//
-//    public SseEmitter getAskBidPrice(String stockCode) {//호가
+//        // 새 Emitter 생성
 //        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+//        emitter.onCompletion(() -> userEmitters.remove(userId));
+//        emitter.onTimeout(() -> userEmitters.remove(userId));
 //
-//        askBidSubscribers.computeIfAbsent(stockCode, k -> new CopyOnWriteArrayList<>()).add(emitter);
+//        userEmitters.put(userId, emitter);
 //
-//        emitter.onCompletion(() -> askBidSubscribers.get(stockCode).remove(emitter));
-//        emitter.onTimeout(() -> askBidSubscribers.get(stockCode).remove(emitter));
+//        // 관심 종목 + 보유 종목을 합쳐서 한번에 처리
+//        // (원한다면 별도 메서드로 분리 가능)
+//        removeUserFromAllStocks(userId);
+//
+//        // 새로 전달받은 stockCodes를 구독
+//        if (stockCodes != null) {
+//            for (String code : stockCodes) {
+//                stockSubscribers.computeIfAbsent(code, k -> new HashSet<>()).add(userId);
+//            }
+//        }
+//
+//        try {
+//            ConnectRes res = new ConnectRes("연결 성공", userId, stockCodes.toString());
+//            emitter.send(res);
+//        } catch (Exception e) {
+//            log.error("subscribeUserWithCodes error: {}", e.getMessage());
+//            emitter.complete();
+//            userEmitters.remove(userId);
+//        }
 //
 //        return emitter;
 //    }
-//
-//    public void sendToClientsAskBidStockPrice(String stockCode, Object data) {
-//
-//        List<SseEmitter> emitters = askBidSubscribers.getOrDefault(stockCode, new CopyOnWriteArrayList<>());
-//
-//        for (SseEmitter emitter : emitters) {
-//            try {
-//                // 객체를 JSON 문자열로 변환
-//                String jsonData = objectMapper.writeValueAsString(data);
-//
-//                // JSON 문자열을 보내기
-//                emitter.send(SseEmitter.event().data(jsonData));
-//            } catch (Exception e) {
-//                log.error("AskBid SSE 전송 오류, stockCode {}: {}", stockCode, e.getMessage());
-//                removeEmitter(askBidSubscribers, stockCode, emitter);
-//            }
-//        }
-//    }
-//
-//
-//
-//    public SseEmitter getStockCurPrice(String stockCode) {
-//        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
-//        curPriceSubscribers.computeIfAbsent(stockCode, k -> new CopyOnWriteArrayList<>()).add(emitter);
-//
-//        emitter.onCompletion(() -> curPriceSubscribers.get(stockCode).remove(emitter));
-//        emitter.onTimeout(() -> curPriceSubscribers.get(stockCode).remove(emitter));
-//
-//        return emitter;
-//    }
-//    public void sendToClientsStockCurPrice(String stockCode, Object data) {
-//
-//        List<SseEmitter> emitters = curPriceSubscribers.getOrDefault(stockCode, new CopyOnWriteArrayList<>());
-//
-//        for (SseEmitter emitter : emitters) {
-//            try {
-//                // 객체를 JSON 문자열로 변환
-//                String jsonData = objectMapper.writeValueAsString(data);
-//
-//                // JSON 문자열을 보내기
-//                emitter.send(SseEmitter.event().data(jsonData));
-//            } catch (Exception e) {
-//                log.error("StockCurPrice SSE 전송 오류, stockCode {}: {}", stockCode, e.getMessage());
-//                removeEmitter(curPriceSubscribers, stockCode, emitter);
-//            }
-//        }
-//    }
-//
-//    // 거래 알림 구독 메서드
-//    public SseEmitter subscribeTradeNotifications(Long userId) {
-//        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
-//
-//        tradeSubscribers.put(userId, emitter);
-//
-//        emitter.onCompletion(() -> tradeSubscribers.remove(userId));
-//        emitter.onTimeout(() -> tradeSubscribers.remove(userId));
-//
-//        return emitter;
-//    }
-//
-//    // 거래 알림 전송 메서드
-//    @KafkaListener(topics = "tradeResult", groupId = "trade-alert")
-//    public void sendTradeNotification(ConsumerRecord<String, String> record) {
-//        // Kafka에서 넘어온 JSON(혹은 LinkedHashMap)을 객체로 변환
-//        TradeResultRes tradeResult = objectMapper.convertValue(record.value(), TradeResultRes.class);
-//
-//        // 체결 성공인지 실패인지, 혹은 메시지 필드에 따라 적절히 처리
-//        String statusMessage = "체결 " + ("Success".equals(tradeResult.getMessage()) ? "성공" : "실패");
-//
-//        // 종목 정보 가져오기
-//        Stock stock = stockRepository.findByStockCode(tradeResult.getStockCode());
-//
-//        // 가공된 메시지(문자열) 만들기
-//        // 예: "체결 성공: 삼성전자(005930), 수량: 2주, 가격: 55000원"
-//        StringBuilder sb = new StringBuilder();
-//        sb.append(statusMessage)
-//                .append(": ")
-//                .append(stock.getName())   // "삼성전자"
-//                .append("(").append(tradeResult.getStockCode()).append("), ")
-//                .append("수량: ").append(tradeResult.getStockAmount()).append("주, ")
-//                .append("가격: ").append(tradeResult.getStockPrice()).append("원")
-//                .append("/").append(System.currentTimeMillis());
-//
-//        // 최종 전송할 메시지
-//        String finalMessage = sb.toString();
-//
-//        // SSE 구독자(해당 userId)에게 메시지 전송
-//        SseEmitter emitter = tradeSubscribers.get(tradeResult.getUserId());
-//        if (emitter != null) {
-//            try {
-//                // JSON이 아니라 문자열 그대로 보내면, 클라이언트 측에서 자연스럽게 표시 가능
-//                emitter.send(SseEmitter.event().data(finalMessage));
-//            } catch (Exception e) {
-//                tradeSubscribers.remove(tradeResult.getUserId());
-//            }
-//        }
-//    }
-//
-//
-//
-//}
+    public SseEmitter subscribeUser(String userId, List<String> stockCodes) {
+        // 이미 활성화된 연결이 있다면 재활용
+        SseEmitter emitter = userEmitters.get(userId);
+        if (emitter == null) {
+            emitter = new SseEmitter(Long.MAX_VALUE);
+            emitter.onCompletion(() -> userEmitters.remove(userId));
+            emitter.onTimeout(() -> userEmitters.remove(userId));
+            userEmitters.put(userId, emitter);
+        }
+
+        // 기존에 등록된 모든 종목 구독 제거 후 새로운 구독 등록
+        removeUserFromAllStocks(userId);
+        if (stockCodes != null) {
+            for (String code : stockCodes) {
+                stockSubscribers.computeIfAbsent(code, k -> new HashSet<>()).add(userId);
+            }
+        }
+
+        try {
+            ConnectRes res = new ConnectRes("연결 성공", userId, stockCodes.toString());
+            emitter.send(res);
+        } catch (Exception e) {
+            log.error("subscribeUserWithCodes error: {}", e.getMessage());
+            emitter.complete();
+            userEmitters.remove(userId);
+        }
+
+        return emitter;
+    }
+
+    // 기존에 구독하던 종목에서 제거
+    private void removeUserFromAllStocks(String userId) {
+        for (Set<String> userSet : stockSubscribers.values()) {
+            userSet.remove(userId);
+        }
+    }
+
+    // Redis 등에서 해당 종목의 실시간 데이터가 들어오면,
+    // 이 종목을 구독 중인 유저들을 찾아 SSE로 전송
+    public void sendStockData(String stockCode, String eventName, Object data) {
+        Set<String> userSet = stockSubscribers.getOrDefault(stockCode, Collections.emptySet());
+        if (userSet.isEmpty()) return;
+
+        // JSON 변환
+        String jsonData;
+        try {
+            jsonData = objectMapper.writeValueAsString(data);
+        } catch (Exception e) {
+            log.error("JSON 변환 오류: {}", e.getMessage());
+            return;
+        }
+
+        for (String userId : userSet) {
+
+            SseEmitter emitter = userEmitters.get(userId);
+            if (emitter != null) {
+                try {
+                    log.info("User ID = {} 에게 전송 데이터 = {}", userId, jsonData);
+                    emitter.send(SseEmitter.event()
+                            .name(eventName) // 이벤트 이름
+                            .data(jsonData)
+                            .reconnectTime(10000));
+                } catch (Exception e) {
+                    log.error("SSE 전송 오류 userId={}, stockCode={}: {}", userId, stockCode, e.getMessage());
+                    // 전송 실패 시 연결 제거
+                    emitter.complete();
+                    userEmitters.remove(userId);
+                }
+            }
+        }
+    }
+
+    /**
+     * 거래 알림 구독 (userId별로 1개)
+     * 만약 거래 알림도 위의 userEmitters에 통합해서 보내고 싶다면,
+     * 굳이 별도 맵을 만들 필요 없이, sendStockData처럼 보내면 됩니다.
+     */
+    public SseEmitter subscribeTradeNotifications(Long userId) {
+        // 기존 있으면 제거
+        SseEmitter old = tradeSubscribers.get(userId);
+        if (old != null) {
+            old.complete();
+            tradeSubscribers.remove(userId);
+        }
+
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+        tradeSubscribers.put(userId, emitter);
+
+        emitter.onCompletion(() -> tradeSubscribers.remove(userId));
+        emitter.onTimeout(() -> tradeSubscribers.remove(userId));
+
+        return emitter;
+    }
+
+    // 거래 알림 전송 메서드
+    @KafkaListener(topics = "tradeResult", groupId = "trade-alert")
+    public void sendTradeNotification(ConsumerRecord<String, String> record) {
+        TradeResultRes tradeResult = objectMapper.convertValue(record.value(), TradeResultRes.class);
+
+        String statusMessage = "체결 " + ("Success".equals(tradeResult.getMessage()) ? "성공" : "실패");
+
+        // 종목 정보 가져오기
+        Stock stock = stockRepository.findByStockCode(tradeResult.getStockCode());
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(statusMessage)
+                .append(": ")
+                .append(stock.getName())   // "삼성전자"
+                .append("(").append(tradeResult.getStockCode()).append("), ")
+                .append("수량: ").append(tradeResult.getStockAmount()).append("주, ")
+                .append("가격: ").append(tradeResult.getStockPrice()).append("원")
+                .append("/").append(System.currentTimeMillis());
+
+        // 최종 전송할 메시지
+        String finalMessage = sb.toString();
+
+        // SSE 구독자(해당 userId)에게 메시지 전송
+        SseEmitter emitter = tradeSubscribers.get(tradeResult.getUserId());
+        if (emitter != null) {
+            try {
+                // JSON이 아니라 문자열 그대로 보내면, 클라이언트 측에서 자연스럽게 표시 가능
+                emitter.send(SseEmitter.event().data(finalMessage));
+            } catch (Exception e) {
+                tradeSubscribers.remove(tradeResult.getUserId());
+            }
+        }
+    }
+}
