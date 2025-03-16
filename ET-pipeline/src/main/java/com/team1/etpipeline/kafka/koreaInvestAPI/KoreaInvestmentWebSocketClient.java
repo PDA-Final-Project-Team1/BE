@@ -4,6 +4,7 @@ import com.team1.etpipeline.kafka.service.KafkaProducerService;
 import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -15,6 +16,8 @@ import java.util.List;
 @Service
 public class KoreaInvestmentWebSocketClient {
 
+    @Value("${HOST_NAME}")
+    private String local;
     private final ApprovalService approvalService;
     private WebSocketClient tradeWebSocket; // 체결가 웹소켓
     private WebSocketClient askBidWebSocket; // 호가 웹소켓
@@ -48,7 +51,7 @@ public class KoreaInvestmentWebSocketClient {
              * 체결가 현재가
              */
 //            tradeWebSocket = new WebSocketClient(new URI("ws://ops.koreainvestment.com:21000/tryitout/H0STCNT0"))
-            tradeWebSocket = new WebSocketClient(new URI("ws://localhost:3000"))
+            tradeWebSocket = new WebSocketClient(new URI("ws://+"+local+":3000"))
             {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {
@@ -98,7 +101,7 @@ public class KoreaInvestmentWebSocketClient {
              * 호가
              */
 //            askBidWebSocket = new WebSocketClient(new URI("ws://ops.koreainvestment.com:21000/tryitout/H0STASP0"))
-            askBidWebSocket = new WebSocketClient(new URI("ws://localhost:3001"))
+            askBidWebSocket = new WebSocketClient(new URI("ws://+"+local+":3001"))
             {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {
