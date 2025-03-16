@@ -15,9 +15,6 @@ import java.util.List;
 @Slf4j
 @Service
 public class KoreaInvestmentWebSocketClient {
-
-    @Value("${HOST_NAME}")
-    private String local;
     private final ApprovalService approvalService;
     private WebSocketClient tradeWebSocket; // 체결가 웹소켓
     private WebSocketClient askBidWebSocket; // 호가 웹소켓
@@ -27,12 +24,12 @@ public class KoreaInvestmentWebSocketClient {
     private String askKey;
     private boolean reConnectFlag = false;
     private final List<String> trKeys = List.of(
-            "005930","086790","035420","015760","000270","005380","005935","207940","051910"
-//            "005930", "000660", "373220", "207940", "005380", "005935",
-//            "000270", "068270", "105560", "035420", "055550", "012330",
-//            "005490", "028260", "032830", "010130", "051910", "329180",
-//            "138040", "006400", "012450", "000810", "086790", "011200",
-//            "035720", "015760", "033780", "066570", "259960", "034020"
+//            "005930","086790","035420","015760","000270","005380","005935","207940","051910"
+            "005930", "000660", "373220", "207940", "005380", "005935",
+            "000270", "068270", "105560", "035420", "055550", "012330",
+            "005490", "028260", "032830", "010130", "051910", "329180",
+            "138040", "006400", "012450", "000810", "086790", "011200",
+            "035720", "015760", "033780", "066570", "259960", "034020"
     );
 
     public KoreaInvestmentWebSocketClient(ApprovalService approvalService, KafkaProducerService kafkaProducerService) {
@@ -44,14 +41,13 @@ public class KoreaInvestmentWebSocketClient {
     public void connect() {
         try {
             reConnectFlag = true;
-//            this.tradeKey = approvalService.getApprovalKey("trade");
-//            this.askKey = approvalService.getApprovalKey("ask");
+            this.tradeKey = approvalService.getApprovalKey("trade");
+            this.askKey = approvalService.getApprovalKey("ask");
 
             /**
              * 체결가 현재가
              */
-//            tradeWebSocket = new WebSocketClient(new URI("ws://ops.koreainvestment.com:21000/tryitout/H0STCNT0"))
-            tradeWebSocket = new WebSocketClient(new URI("ws://+"+local+":3000"))
+            tradeWebSocket = new WebSocketClient(new URI("ws://ops.koreainvestment.com:21000/tryitout/H0STCNT0"))
             {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {
@@ -100,8 +96,7 @@ public class KoreaInvestmentWebSocketClient {
             /**
              * 호가
              */
-//            askBidWebSocket = new WebSocketClient(new URI("ws://ops.koreainvestment.com:21000/tryitout/H0STASP0"))
-            askBidWebSocket = new WebSocketClient(new URI("ws://+"+local+":3001"))
+            askBidWebSocket = new WebSocketClient(new URI("ws://ops.koreainvestment.com:21000/tryitout/H0STASP0"))
             {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {
@@ -152,28 +147,22 @@ public class KoreaInvestmentWebSocketClient {
          */
         try {
             for (String trKey : trKeys) {
-//                String message = String.format("""
-//                    {
-//                        "header": {
-//                            "approval_key": "%s",
-//                            "custtype":"P",
-//                            "tr_type":"1",
-//                            "content-type":"utf-8"
-//                        },
-//                        "body": {
-//                            "input": {
-//                                "tr_id": "H0STCNT0",
-//                                "tr_key": "%s"
-//                            }
-//                        }
-//                    }
-//                    """, tradeKey,trKey);
                 String message = String.format("""
                     {
-                        "tr_id": "H0STCNT0",
-                        "tr_key": "%s"
+                        "header": {
+                            "approval_key": "%s",
+                            "custtype":"P",
+                            "tr_type":"1",
+                            "content-type":"utf-8"
+                        },
+                        "body": {
+                            "input": {
+                                "tr_id": "H0STCNT0",
+                                "tr_key": "%s"
+                            }
+                        }
                     }
-                    """, trKey);
+                    """, tradeKey,trKey);
 
                 if (tradeWebSocket != null && tradeWebSocket.isOpen()) {
                     tradeWebSocket.send(message.getBytes(StandardCharsets.UTF_8));
@@ -196,29 +185,22 @@ public class KoreaInvestmentWebSocketClient {
          */
         try {
             for (String trKey : trKeys) {
-
-//                String message2 = String.format("""
-//                    {
-//                        "header": {
-//                            "approval_key": "%s",
-//                            "custtype":"P",
-//                            "tr_type":"1",
-//                            "content-type":"utf-8"
-//                        },
-//                        "body": {
-//                            "input": {
-//                                "tr_id": "H0STASP0",
-//                                "tr_key": "%s"
-//                            }
-//                        }
-//                    }
-//                    """, askKey,trKey);
                 String message2 = String.format("""
                     {
-                        "tr_id": "H0STASP0",
-                        "tr_key": "%s"
+                        "header": {
+                            "approval_key": "%s",
+                            "custtype":"P",
+                            "tr_type":"1",
+                            "content-type":"utf-8"
+                        },
+                        "body": {
+                            "input": {
+                                "tr_id": "H0STASP0",
+                                "tr_key": "%s"
+                            }
+                        }
                     }
-                    """, trKey);
+                    """, askKey,trKey);
 
                 if (askBidWebSocket != null && askBidWebSocket.isOpen()) {
                     askBidWebSocket.send(message2.getBytes(StandardCharsets.UTF_8));
@@ -245,7 +227,7 @@ public class KoreaInvestmentWebSocketClient {
         if(!reConnectFlag) {
             try {
                 log.info("Reconnecting WebSocket...");
-                Thread.sleep(10000); // 3초 대기 후 재연결 (서버 과부하 방지)
+                Thread.sleep(10000); // 10초 대기 후 재연결 (서버 과부하 방지)
                 connect(); // 새로운 WebSocketClient 객체 생성
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
