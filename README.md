@@ -1,8 +1,6 @@
 # 📈 펫과 함께 시작하는 나만의 주식 마을 Trade Town #
 ![Image](https://github.com/user-attachments/assets/64cd3fe5-18e7-4e39-86f7-6001c63244e7)
-- **배포 URL**:
-- **Test ID**:
-- **Test PW**: 
+**배포 URL**: http://3.39.172.25/
 <br><br>
 ## 🏡 서비스 개요 ##
 주식 투자 초보자들이 재미있게 투자 개념을 익히고 지속적으로 시장에 관심을 가질 수 있도록 돕는 서비스
