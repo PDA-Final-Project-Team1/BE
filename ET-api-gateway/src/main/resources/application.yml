@@ -2,7 +2,7 @@ server:
   port: 8080
   tomcat:
     threads:
-      max: 200
+      max: 400
     connection-timeout: 20000
     keep-alive-timeout: 10000
 
@@ -18,6 +18,8 @@ spring:
   cloud:
     gateway:
       mvc:
+        http-client:
+          connect-timeout: 10000
         routes:
           - id: USER-SERVICE
             uri: lb://ET-user

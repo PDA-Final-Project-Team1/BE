@@ -14,6 +14,11 @@ spring:
 #    show-sql: true
 
 server:
+  tomcat:
+    threads:
+      max: 400
+    connection-timeout: 20000
+    keep-alive-timeout: 10000
   port: 8082
 
 eureka:
