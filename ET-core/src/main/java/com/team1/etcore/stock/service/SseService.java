@@ -125,7 +125,7 @@ public class SseService {
             SseEmitter emitter = userEmitters.get(userId);
             if (emitter != null) {
                 try {
-                    log.info("User ID = {} 에게 전송 데이터 = {}", userId, jsonData);
+//                    log.info("User ID = {} 에게 전송 데이터 = {}", userId, jsonData);
                     emitter.send(SseEmitter.event()
                             .name(eventName) // 이벤트 이름
                             .data(jsonData)

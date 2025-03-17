@@ -11,7 +11,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+#    show-sql: true
 
 server:
   port: 8082
@@ -23,3 +23,8 @@ eureka:
   instance:
     prefer-ip-address: true
     ip-address: ${HOST_NAME}
+
+logging:
+  level:
+    com.zaxxer.hikari.HikariConfig: DEBUG
+    com.zaxxer.hikari: TRACE
