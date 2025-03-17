@@ -8,6 +8,12 @@ spring:
     username: ${CORE_DB_USER}
     password: ${CORE_DB_PWD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+      idle-timeout: 30000      # 유휴 커넥션 제거 시간 증가 (30초 → 60초)
+      max-lifetime: 1800000    # 커넥션 최대 수명 증가 (30분 → 1시간)
+      connection-timeout: 30000 # 커넥션 획득 대기 시간 유지 (30초)
   jpa:
     hibernate:
       ddl-auto: update

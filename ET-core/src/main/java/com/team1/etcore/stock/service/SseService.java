@@ -8,6 +8,7 @@ import com.team1.etcore.stock.repository.StockRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -195,5 +196,19 @@ public class SseService {
                 tradeSubscribers.remove(tradeResult.getUserId());
             }
         }
+    }
+
+    @Scheduled(fixedRate = 5000)
+    public void sendHeartbeat() {
+        // tradeSubscribers에 등록된 거래 알림 SSE에 heartbeat 전송
+        tradeSubscribers.forEach((userId, emitter) -> {
+            try {
+                emitter.send(SseEmitter.event().comment("heartbeat:trade-" + userId));
+            } catch (Exception e) {
+                log.error("Heartbeat 전송 실패 (tradeSubscribers) - userId: {}, error: {}", userId, e.getMessage());
+                emitter.complete();
+                tradeSubscribers.remove(userId);
+            }
+        });
     }
 }
