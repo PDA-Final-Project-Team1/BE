@@ -188,6 +188,7 @@ public class SseService {
         SseEmitter emitter = tradeSubscribers.get(tradeResult.getUserId());
         if (emitter != null) {
             try {
+                log.info("사용자 = {} , 알림 발송 = " + finalMessage, tradeResult.getUserId());
                 // JSON이 아니라 문자열 그대로 보내면, 클라이언트 측에서 자연스럽게 표시 가능
                 emitter.send(SseEmitter.event().data(finalMessage));
             } catch (Exception e) {
